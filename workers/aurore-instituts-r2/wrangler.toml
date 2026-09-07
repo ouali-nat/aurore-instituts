@@ -9,4 +9,4 @@ bucket_name = "aurore-instituts"
 [vars]
 SUPABASE_URL = "https://fdstrbqvkemtjyxxaxbj.supabase.co"
 ALLOWED_ORIGINS_EXTRA = ""
-# first-build-trigger
+# build-trigger-2
