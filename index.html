@@ -206,6 +206,21 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .space-tool-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 10%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 52%);pointer-events:none}
 .space-tool-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 12px 28px rgba(0,0,0,.10)}
 .space-tool-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.spaces-focus .hero,.spaces-focus .fused-promise,.spaces-focus #etablissements,.spaces-focus #services,.spaces-focus #support,.spaces-focus #presenter{display:none!important}
+.spaces-focus .spaces-section{margin-top:28px}
+.space-tool-card-wide{grid-column:span 2;min-height:220px}
+.space-dashboard{margin-top:20px;padding:22px;border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:var(--shadow)}
+.space-dashboard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.space-dashboard-head h3{font-size:1.15rem;margin:3px 0}.space-dashboard-head p{color:var(--muted);font-size:.78rem}
+.space-big-square{min-height:260px;border:1px solid var(--line);border-radius:24px;background:var(--panel2);padding:22px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow)}
+.space-big-square .big-number{font-size:3rem;font-weight:850;letter-spacing:-.05em;color:var(--accent)}
+.space-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.space-mini-card{min-height:105px;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel);display:flex;flex-direction:column;justify-content:space-between}
+.space-mini-card strong{font-size:.82rem}.space-mini-card span{color:var(--muted);font-size:.68rem}.space-mini-card b{color:var(--accent);font-size:1.05rem}
+.space-list{display:grid;gap:9px}.space-list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}
+.space-person{display:flex;align-items:center;gap:11px;min-width:0}.space-avatar{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;background:var(--panel);color:var(--accent);font-weight:800}.space-person strong{display:block;font-size:.8rem}.space-person span{display:block;color:var(--muted);font-size:.67rem}.space-effectif{font-size:.68rem;color:var(--accent);font-weight:800;white-space:nowrap}
+@media(max-width:700px){.space-tool-card-wide{grid-column:span 1}.space-mini-grid{grid-template-columns:1fr 1fr}.space-dashboard{padding:17px}}
+
 .space-tool-icon{position:relative;width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:var(--panel);display:grid;place-items:center;color:var(--accent);font-weight:800}
 .space-tool-kicker{position:relative;color:var(--accent);font-size:.62rem;font-weight:800;letter-spacing:.08em}
 .space-tool-card h3{position:relative;font-size:.91rem;margin:6px 0 4px;color:var(--text)}
@@ -224,12 +239,12 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
       <div><strong>Aurore</strong><small>Section Instituts</small></div>
     </a>
     <nav>
-      <a class="active" href="#accueil" data-nav="accueil">Accueil</a>
+      <a class="active" href="#accueil" data-nav="accueil" onclick="document.body.classList.remove('spaces-focus');document.getElementById('spacePanel')?.classList.remove('visible')">Accueil</a>
       <a href="#etablissements" data-nav="etablissements">Établissements</a>
       <a href="#services" data-nav="services">Services</a>
       <a href="#apropos" data-nav="apropos">À propos</a>
     </nav>
-    <button class="topbtn" onclick="document.getElementById('espaces').scrollIntoView({behavior:'smooth'})">Espaces</button>
+    <button class="topbtn" onclick="openSpacesLanding()">Espaces</button>
     <div class="theme-control">
       <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-haspopup="true">◐ <span id="themeLabel">Thème</span></button>
       <div class="theme-menu" id="themeMenu" role="menu">
@@ -268,11 +283,11 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
     <section class="spaces-section" id="espaces">
       <div class="section-head"><div><div class="kicker">Accès Aurore</div><h2>Espaces</h2><p>Des espaces dédiés selon votre rôle dans l’établissement et la plateforme.</p></div></div>
       <div class="spaces-grid">
-        <article class="space-card" onclick="openSpace('proviseur')" tabindex="0" role="button">
-          <div class="space-icon">⌂</div><div><span class="space-kicker">Espace 01</span><h3>Proviseur</h3><p>Gérer et suivre l’espace de votre lycée.</p></div><span class="space-arrow">→</span>
+        <article class="space-card" onclick="openSpace('eleve')" tabindex="0" role="button">
+          <div class="space-icon">♙</div><div><span class="space-kicker">Espace 01</span><h3>Élèves</h3><p>Votre espace personnel, votre classe et votre suivi scolaire.</p></div><span class="space-arrow">→</span>
         </article>
         <article class="space-card" onclick="openSpace('administration')" tabindex="0" role="button">
-          <div class="space-icon">▤</div><div><span class="space-kicker">Espace 02</span><h3>Administration</h3><p>Administrer les informations et les services du lycée.</p></div><span class="space-arrow">→</span>
+          <div class="space-icon">▤</div><div><span class="space-kicker">Espace 02</span><h3>Administration lycée</h3><p>Administrer les informations et les services du lycée.</p></div><span class="space-arrow">→</span>
         </article>
         <article class="space-card" onclick="openSpace('parent')" tabindex="0" role="button">
           <div class="space-icon">♙</div><div><span class="space-kicker">Espace 03</span><h3>Parent</h3><p>Accéder aux informations et au suivi de votre enfant.</p></div><span class="space-arrow">→</span>
@@ -598,43 +613,62 @@ function appliquerCouleur(couleur){
 }
 (function(){const t=$('colorToggle'),m=$('colorMenu');if(!t||!m)return; appliquerCouleur(localStorage.getItem('aurore-instituts-color-theme')||'violet'); t.onclick=e=>{e.stopPropagation();m.classList.toggle('open')}; m.querySelectorAll('[data-color-choice]').forEach(b=>b.onclick=()=>{appliquerCouleur(b.dataset.colorChoice);m.classList.remove('open')});})();
 
-function openSpace(role){
-  const configs={
-    proviseur:{title:'Espace élèves',subtitle:'Votre espace personnel',items:[
-      ['Ma classe','Retrouvez votre classe, vos informations et votre organisation scolaire.','⌂'],
-      ['Mes devoirs','Consultez les devoirs à faire, les consignes et les échéances.','✓'],
-      ['Mes camarades','Retrouvez les élèves de votre classe et les échanges autorisés.','♙'],
-      ['Mes professeurs','Accédez à la liste de vos professeurs et aux matières enseignées.','◉'],
-      ['Mon bulletin','Consultez vos bulletins scolaires lorsqu’ils sont publiés.','▤'],
-      ['Mes notes','Suivez vos notes et vos résultats par matière.','★'],
-      ['Mes demandes','Envoyez et suivez vos demandes auprès de l’établissement.','✦']
-    ]},
-    administration:{title:'Administration lycée',subtitle:'Gestion et services de l’établissement',items:[
-      ['Présentation du lycée','Gérez la présentation, les informations générales et l’identité du lycée.','⌂'],
-      ['Informations à passer','Publiez et transmettez les informations importantes aux élèves et aux familles.','!'],
-      ['Professeurs','Gérez les professeurs, leurs informations et leur organisation.','◉'],
-      ['Élèves','Consultez et gérez les informations liées aux élèves.','♙'],
-      ['Inscriptions','Gérez les inscriptions et les informations administratives associées.','＋'],
-      ['Bulletins et notes','Gérez la publication et le suivi des bulletins et des notes.','▤'],
-      ['Cahiers de test','Gérez les cahiers de test et les ressources d’évaluation.','✎']
-    ]}
-  };
-  const cfg=configs[role];
-  if(!cfg){ alert('Cet espace sera activé lors de la prochaine étape.'); return; }
-  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card" tabindex="0" role="button" onclick="openSpaceTool('${role}',${i})"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
+function openSpacesLanding(){
+  document.body.classList.add('spaces-focus');
   const panel=document.getElementById('spacePanel');
-  if(panel){ panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div>`; panel.classList.add('visible'); panel.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if(panel) panel.classList.remove('visible');
+  document.getElementById('espaces')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function openSpaceTool(role,index){
-  const names={proviseur:['Ma classe','Mes devoirs','Mes camarades','Mes professeurs','Mon bulletin','Mes notes','Mes demandes'],administration:['Présentation du lycée','Informations à passer','Professeurs','Élèves','Inscriptions','Bulletins et notes','Cahiers de test']};
-  const name=names[role]?.[index]||'Espace';
-  alert(name+' — cette rubrique sera reliée à son fonctionnement lors de la prochaine étape.');
+function openSpace(role){
+  document.body.classList.add('spaces-focus');
+  const configs={
+    eleve:{title:'Espace élèves',subtitle:'Tout ce qui concerne votre vie scolaire.',items:[
+      ['Ma classe','Votre classe, votre groupe et les informations essentielles.','⌂','class'],
+      ['Mes devoirs','Devoirs à faire, consignes et échéances.','✓','devoirs'],
+      ['Mes camarades','Les élèves de votre classe et les effectifs.','♙','camarades'],
+      ['Mes professeurs','Vos enseignants et les matières qu’ils enseignent.','◉','professeurs'],
+      ['Mon bulletin','Vos bulletins scolaires publiés par l’établissement.','▤','bulletin'],
+      ['Mes notes','Vos résultats, matières et tests.','★','notes'],
+      ['Mes demandes','Demandes adressées à l’administration et leur suivi.','✦','demandes']
+    ]},
+    administration:{title:'Administration lycée',subtitle:'Gestion des informations et du suivi de l’établissement.',items:[
+      ['Présentation du lycée','Identité, présentation, contacts et informations générales.','⌂','presentation'],
+      ['Informations à passer','Annonces et informations importantes à transmettre.','!','infos'],
+      ['Professeurs','Gestion de la liste des professeurs et de leurs informations.','◉','admin-professeurs'],
+      ['Élèves','Gestion des élèves, classes et effectifs.','♙','admin-eleves'],
+      ['Inscriptions','Suivi des inscriptions et des dossiers.','＋','inscriptions'],
+      ['Bulletins et notes','Suivi et publication des résultats scolaires.','▤','admin-notes'],
+      ['Cahiers de test','Organisation des cahiers et évaluations.','✎','tests']
+    ]},
+    parent:{title:'Espace parent',subtitle:'Un espace pour suivre la scolarité de votre enfant.',items:[['Suivi scolaire','Suivi de la scolarité et informations transmises.','♙','parent-suivi'],['Bulletins','Consulter les bulletins disponibles.','▤','parent-bulletins']]},
+    general:{title:'Espace général',subtitle:'Administration générale Aurore.',items:[['Vue générale','Pilotage global de la plateforme.','✦','general-vue'],['Établissements','Suivi des établissements présents sur Aurore.','⌂','general-etablissements']]}
+  };
+  const cfg=configs[role]; if(!cfg)return;
+  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${item[3]==='notes'||item[3]==='class'||item[3]==='professeurs'||item[3]==='camarades'?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
+  const panel=document.getElementById('spacePanel');
+  if(panel){panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+
+function openSpaceTool(role,key){
+  const root=document.getElementById('spaceDashboard'); if(!root)return;
+  const common=`<button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button>`;
+  if(role==='eleve' && key==='notes'){
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
+  }
+  if(role==='eleve' && key==='class'){
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>3e A — Année scolaire 2026–2027</h3><p>Organisation de la classe et cases de démonstration.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">CLASSE</span><div class="big-number">3e A</div><p>Effectif : 42 élèves · Salle : B12 · Professeur principal : Mme Awa Traoré</p></div><div class="space-mini-grid">${['Test 01','Test 02','Test 03','Test 04','Test 05','Test 06'].map(x=>`<div class="space-mini-card"><strong>${x}</strong><span>Case de classe</span><b>test</b></div>`).join('')}</div></div></section>`;return;
+  }
+  if(role==='eleve' && (key==='professeurs'||key==='camarades')){
+    const teacher=key==='professeurs'; const people=teacher?[['Awa Traoré','Mathématiques · Professeur principal','42 élèves'],['Moussa Kaboré','Français','38 élèves'],['Clarisse Ouédraogo','Anglais','41 élèves'],['Idrissa Sawadogo','Physique-Chimie','40 élèves'],['Fatimata Diallo','Histoire-Géographie','42 élèves']]:[['Adama Kinda','3e A · Élève','42 élèves'],['Mariam Compaoré','3e A · Élève','42 élèves'],['Salif Ouédraogo','3e A · Élève','42 élèves'],['Nadia Zongo','3e A · Élève','42 élèves'],['Issouf Kaboré','3e A · Élève','42 élèves']];
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
+  }
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Aurore</span><h3>${key.replaceAll('-',' ')}</h3><p>Cette rubrique est prête pour son branchement aux données réelles.</p></div>${common}</div></section>`;
 }
 
 function closeSpacePanel(){
-  const panel=document.getElementById('spacePanel');
-  if(panel) panel.classList.remove('visible');
+  const panel=document.getElementById('spacePanel'); if(panel)panel.classList.remove('visible');
+  document.body.classList.remove('spaces-focus');
   document.getElementById('espaces')?.scrollIntoView({behavior:'smooth'});
 }
 
