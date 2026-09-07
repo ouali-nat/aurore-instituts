@@ -6,6 +6,20 @@
 <meta name="theme-color" content="#0B0912">
 <meta name="description" content="Aurore — Section Instituts, la plateforme des établissements d’enseignement du Burkina Faso.">
 <title>Aurore — Section Instituts</title>
+
+<script>
+(function(){
+  try{
+    const saved=localStorage.getItem('aurore-instituts-theme')||'systeme';
+    const actual=saved==='systeme'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')
+      : (saved==='clair'?'light':'dark');
+    document.documentElement.setAttribute('data-theme',actual);
+    document.documentElement.setAttribute('data-theme-choice',saved);
+    var c=localStorage.getItem('aurore-instituts-color-theme')||'violet'; document.documentElement.setAttribute('data-color-theme',c);
+  }catch(e){}
+})();
+</script>
 <style>
 :root{--bg:#0b0912;--panel:#15111f;--panel2:#191426;--line:#2a2438;--text:#f7f5ff;--muted:#a9a3b8;--p:#8b5cf6;--m:#c084fc;--green:#7fbf9e;--r:24px;--rs:16px;--shadow:0 14px 40px rgba(0,0,0,.24)}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 8% 0%,rgba(139,92,246,.13),transparent 30%),radial-gradient(circle at 92% 10%,rgba(192,132,252,.1),transparent 28%),var(--bg);color:var(--text);line-height:1.55}button,input,select{font:inherit}button{cursor:pointer}.wrap{width:min(1160px,calc(100% - 40px));margin:auto}
@@ -22,6 +36,184 @@ main{padding:18px 0 70px}.hero{position:relative;overflow:hidden;border-radius:3
 .profile-page{display:none;padding:18px 0 70px}.profile-page.show{display:block}.profile-top{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}.profile-hero,.profile-panel,.profile-news,.profile-student,.profile-location,.profile-gallery{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.profile-hero{overflow:hidden}.profile-cover{height:210px;background:radial-gradient(circle at 80% 15%,rgba(192,132,252,.25),transparent 32%),linear-gradient(135deg,#20162e,#171225);background-size:cover;background-position:center}.profile-logo-wrap{padding:0 24px}.profile-logo{width:112px;height:112px;margin-top:-56px;border-radius:28px;display:grid;place-items:center;background:#15111f;border:3px solid #302744;box-shadow:0 16px 35px rgba(0,0,0,.3);overflow:hidden;font-family:Georgia,serif;font-size:2rem;font-weight:850;color:#d8b4fe}.profile-logo img{width:100%;height:100%;object-fit:cover}.profile-content{padding:18px 24px 25px}.profile-content h1{font-size:clamp(1.8rem,4vw,3rem);margin-top:8px}.profile-description{color:#aaa1b8;margin-top:12px;font-size:.9rem;line-height:1.75}.profile-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.profile-actions button,.back-btn{border:1px solid #352b49;background:#1a1427;color:#ede9fe;border-radius:10px;padding:9px 12px;font-size:.75rem;font-weight:750}.profile-actions button:hover,.back-btn:hover{border-color:#8b5cf6}.profile-panel{padding:22px}.profile-panel h3,.profile-news h3,.profile-student h3,.profile-location h3,.profile-gallery h3{font-size:1rem}.profile-panel p,.profile-news p,.profile-student p,.profile-location p{color:#9f97ae;font-size:.8rem;margin-top:6px;line-height:1.65}.profile-list{display:grid;gap:9px;margin-top:16px}.info-row{display:flex;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #272135;font-size:.76rem}.info-row span{color:#81788f}.info-row b{font-weight:700;text-align:right}.profile-wide{display:grid;gap:16px;margin-top:18px}.profile-news,.profile-student,.profile-location,.profile-gallery{padding:22px}.news-card{display:block;text-decoration:none;color:inherit;background:#1a1427;border:1px solid #2e2640;border-radius:13px;padding:14px;margin-top:10px}.news-card b{display:block;font-size:.82rem}.news-card span{display:block;color:#81788f;font-size:.7rem;margin-top:4px}.student-box{display:flex;align-items:center;justify-content:space-between;gap:18px}.student-box button{border:0;border-radius:11px;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);padding:10px 14px;font-weight:750;font-size:.75rem;white-space:nowrap}.location-map{margin-top:14px;min-height:110px;border:1px dashed #3a3150;border-radius:15px;display:grid;place-items:center;text-align:center;background:#110e18;color:#8f879d;font-size:.75rem}.class-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.class-chip{padding:13px;border:1px solid #302740;border-radius:13px;background:#1a1427}.class-chip b{display:block;font-size:.78rem}.class-chip span{display:block;color:#81788f;font-size:.66rem;margin-top:3px}.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:14px}.gallery-card{overflow:hidden;border-radius:15px;border:1px solid #302740;background:#1a1427}.gallery-image{height:150px;background:linear-gradient(135deg,#20162e,#171225);background-size:cover;background-position:center}.gallery-card p{padding:11px 12px;color:#9f97ae;font-size:.72rem;line-height:1.5}.support{margin-top:43px}.support-card{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:12px;padding:20px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,rgba(139,92,246,.13),rgba(192,132,252,.06))}.support-main h3{font-size:1rem}.support-main p{color:#9f97ae;font-size:.78rem;margin-top:5px}.support-item{padding:12px;border:1px solid rgba(216,180,254,.1);border-radius:14px;background:rgba(10,8,16,.2)}.support-item span{display:block;color:#81788f;font-size:.65rem}.support-item b{display:block;margin-top:4px;font-size:.76rem}.fused-promise{display:grid;grid-template-columns:1fr 3fr;gap:18px;padding:23px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-top:18px}.fused-intro h3{font-size:1.05rem}.fused-intro p{color:#9f97ae;font-size:.8rem;margin-top:6px}.fused-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.fused-item{padding:14px;border:1px solid #2e2640;border-radius:14px;background:#1a1427}.fused-item h4{font-size:.8rem;margin-top:9px}.fused-item p{font-size:.7rem;color:#8f879d;margin-top:4px;line-height:1.5}.hide-home{display:none!important}
 @media(max-width:900px){.profile-top{grid-template-columns:1fr}.class-grid{grid-template-columns:repeat(2,1fr)}.support-card{grid-template-columns:1fr 1fr}.support-main{grid-column:1/-1}.fused-promise{grid-template-columns:1fr}.fused-items{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.profile-cover{height:170px}.profile-content,.profile-logo-wrap{padding-left:18px;padding-right:18px}.profile-logo{width:92px;height:92px;margin-top:-46px;border-radius:23px}.class-grid,.gallery-grid,.support-card{grid-template-columns:1fr}.support-main{grid-column:auto}.student-box{align-items:flex-start;flex-direction:column}.student-box button{width:100%}.fused-items{grid-template-columns:1fr}}
+
+/* ===== Aurore Instituts — thème inspiré d'Aurore Archives ===== */
+:root{
+  --bg:#090812;
+  --panel:#11101c;
+  --panel2:#17142a;
+  --text:#f7f5ff;
+  --muted:#aaa5bd;
+  --line:#29253a;
+  --accent:#8b5cf6;
+  --accent2:#c084fc;
+  --accent-strong:#7c3aed;
+  --shadow:0 18px 45px rgba(0,0,0,.22);
+  color-scheme:dark;
+}
+html[data-theme="light"]{
+  --bg:#f7f7f9;
+  --panel:#ffffff;
+  --panel2:#f2f0f7;
+  --text:#17131f;
+  --muted:#625d69;
+  --line:#ded9e6;
+  --accent:#7c3aed;
+  --accent2:#a855f7;
+  --accent-strong:#6d28d9;
+  --shadow:0 12px 32px rgba(34,25,45,.10);
+  color-scheme:light;
+}
+html,body{background:var(--bg);color:var(--text)}
+body{transition:background-color .22s ease,color .22s ease}
+header,.card,.module,.stat,.toolbar,.control,.notice,.profile-hero,.profile-panel,.profile-news,.profile-student,.profile-location,.profile-gallery,.support-card,.fused-promise,.cta{
+  transition:background-color .22s ease,border-color .22s ease,color .22s ease,box-shadow .22s ease;
+}
+header{background:color-mix(in srgb,var(--bg) 90%,transparent);border-bottom:1px solid var(--line)}
+a{color:var(--accent)}
+h1,h2,h3,h4,strong,b{color:var(--text)}
+.copy,.section-head p,.meta,.module p,.fused-item p,.fused-intro p,.profile-description,.profile-panel p,.profile-news p,.profile-student p,.profile-location p,.support-main p,.gallery-card p{color:var(--muted)}
+.card,.module,.stat,.notice,.profile-hero,.profile-panel,.profile-news,.profile-student,.profile-location,.profile-gallery,.support-card,.fused-promise,.cta{background:var(--panel);border-color:var(--line)}
+.toolbar,.control{background:var(--panel);border-color:var(--line)}
+.control input,.control select,.hero-search input,input,textarea,select{background:transparent;color:var(--text)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.tag{border-color:var(--line);background:var(--panel2);color:var(--text)}
+.home-shortcuts button,.shortcuts button,.profile-actions button,.back-btn,.support-item,.fused-item,.class-chip,.news-card,.gallery-card{
+  background:var(--panel2);border-color:var(--line);color:var(--text)
+}
+.topbtn,.hero-search button,.cta button,.student-box button{
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2));
+  color:#fff;
+}
+.badge,.profile-logo{background:var(--panel2);border-color:var(--line);color:var(--accent2)}
+.cover{background-color:var(--panel2)}
+.location-map{background:var(--panel2);border-color:var(--line);color:var(--muted)}
+.link{color:var(--accent)}
+footer{border-top-color:var(--line);color:var(--muted)}
+footer b{color:var(--text)}
+/* Correctifs du mode clair : aucune encre blanche héritée. */
+html[data-theme="light"] .hero-search,
+html[data-theme="light"] .topbtn,
+html[data-theme="light"] .cta button,
+html[data-theme="light"] .student-box button{color:#fff}
+html[data-theme="light"] .ico{color:var(--accent-strong)}
+html[data-theme="light"] .tag.green{color:#166534}
+html[data-theme="light"] .notice strong{color:var(--text)}
+/* Sélecteur de thème, même logique utilisateur que Archives : Système / Clair / Sombre. */
+.theme-control{position:relative}
+.theme-toggle{
+  border:1px solid var(--line);background:var(--panel);color:var(--text);
+  border-radius:11px;padding:9px 11px;cursor:pointer;font-size:.76rem;font-weight:750;
+  display:inline-flex;align-items:center;gap:7px
+}
+.theme-toggle:hover{border-color:var(--accent)}
+.theme-menu{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:50;min-width:150px;
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  box-shadow:var(--shadow);padding:6px;display:none
+}
+.theme-menu.open{display:grid}
+.theme-menu button{
+  border:0;background:transparent;color:var(--text);text-align:left;border-radius:9px;
+  padding:9px 10px;cursor:pointer;font-size:.74rem
+}
+.theme-menu button:hover,.theme-menu button.active{background:var(--panel2);color:var(--accent)}
+@media(max-width:850px){
+  .head{gap:9px}.head nav{display:none}.theme-toggle{padding:8px 9px}
+}
+
+
+
+/* Palette Aurore Archives — mêmes 25 accents */
+html[data-color-theme="violet"]{--theme-primary:#8B5CF6;--theme-secondary:#C084FC;--theme-strong:#6D28D9}
+html[data-color-theme="rouge"]{--theme-primary:#E05260;--theme-secondary:#FF8A96;--theme-strong:#C93648}
+html[data-color-theme="vert"]{--theme-primary:#2FA66A;--theme-secondary:#75D89C;--theme-strong:#198754}
+html[data-color-theme="bleu"]{--theme-primary:#3B82F6;--theme-secondary:#7DB3FF;--theme-strong:#1D4ED8}
+html[data-color-theme="jaune"]{--theme-primary:#D5A51B;--theme-secondary:#F5D36B;--theme-strong:#B77900}
+html[data-color-theme="orange"]{--theme-primary:#E8791A;--theme-secondary:#FFB36B;--theme-strong:#C85C0D}
+html[data-color-theme="cyan"]{--theme-primary:#0891B2;--theme-secondary:#67E8F9;--theme-strong:#0E7490}
+html[data-color-theme="rose"]{--theme-primary:#DB2777;--theme-secondary:#F9A8D4;--theme-strong:#BE185D}
+html[data-color-theme="indigo"]{--theme-primary:#6366F1;--theme-secondary:#A5B4FC;--theme-strong:#4338CA}
+html[data-color-theme="turquoise"]{--theme-primary:#14B8A6;--theme-secondary:#67E8F9;--theme-strong:#0F766E}
+html[data-color-theme="emeraude"]{--theme-primary:#10B981;--theme-secondary:#6EE7B7;--theme-strong:#047857}
+html[data-color-theme="lime"]{--theme-primary:#84CC16;--theme-secondary:#BEF264;--theme-strong:#4D7C0F}
+html[data-color-theme="sarcelle"]{--theme-primary:#0D9488;--theme-secondary:#5EEAD4;--theme-strong:#115E59}
+html[data-color-theme="magenta"]{--theme-primary:#D946EF;--theme-secondary:#F0ABFC;--theme-strong:#A21CAF}
+html[data-color-theme="fuchsia"]{--theme-primary:#C026D3;--theme-secondary:#F0ABFC;--theme-strong:#86198F}
+html[data-color-theme="corail"]{--theme-primary:#F06A57;--theme-secondary:#FFB4A8;--theme-strong:#C2412D}
+html[data-color-theme="bordeaux"]{--theme-primary:#9F1239;--theme-secondary:#FB7185;--theme-strong:#881337}
+html[data-color-theme="pourpre"]{--theme-primary:#9333EA;--theme-secondary:#D8B4FE;--theme-strong:#6B21A8}
+html[data-color-theme="prune"]{--theme-primary:#7E22CE;--theme-secondary:#C084FC;--theme-strong:#581C87}
+html[data-color-theme="or"]{--theme-primary:#D4A017;--theme-secondary:#F6D365;--theme-strong:#9A6700}
+html[data-color-theme="ambre"]{--theme-primary:#F59E0B;--theme-secondary:#FCD34D;--theme-strong:#B45309}
+html[data-color-theme="menthe"]{--theme-primary:#10B981;--theme-secondary:#A7F3D0;--theme-strong:#047857}
+html[data-color-theme="azur"]{--theme-primary:#0EA5E9;--theme-secondary:#7DD3FC;--theme-strong:#0369A1}
+html[data-color-theme="lavande"]{--theme-primary:#8B5CF6;--theme-secondary:#DDD6FE;--theme-strong:#6D28D9}
+html[data-color-theme="safran"]{--theme-primary:#EAB308;--theme-secondary:#FDE68A;--theme-strong:#A16207}
+html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secondary);--accent-strong:var(--theme-strong);--p:var(--theme-primary);--m:var(--theme-secondary)}
+.color-menu{min-width:238px;padding:10px}.color-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.color-grid button{width:32px;height:32px;border-radius:10px;border:2px solid var(--line);padding:0;position:relative}.color-grid button:after{content:"";position:absolute;inset:5px;border-radius:7px;background:var(--swatch)}.color-grid button:hover,.color-grid button.active{border-color:var(--text);transform:scale(1.08)}
+.color-grid button:nth-child(1){--swatch:#8B5CF6}
+.color-grid button:nth-child(2){--swatch:#E05260}
+.color-grid button:nth-child(3){--swatch:#2FA66A}
+.color-grid button:nth-child(4){--swatch:#3B82F6}
+.color-grid button:nth-child(5){--swatch:#D5A51B}
+.color-grid button:nth-child(6){--swatch:#E8791A}
+.color-grid button:nth-child(7){--swatch:#0891B2}
+.color-grid button:nth-child(8){--swatch:#DB2777}
+.color-grid button:nth-child(9){--swatch:#6366F1}
+.color-grid button:nth-child(10){--swatch:#14B8A6}
+.color-grid button:nth-child(11){--swatch:#10B981}
+.color-grid button:nth-child(12){--swatch:#84CC16}
+.color-grid button:nth-child(13){--swatch:#0D9488}
+.color-grid button:nth-child(14){--swatch:#D946EF}
+.color-grid button:nth-child(15){--swatch:#C026D3}
+.color-grid button:nth-child(16){--swatch:#F06A57}
+.color-grid button:nth-child(17){--swatch:#9F1239}
+.color-grid button:nth-child(18){--swatch:#9333EA}
+.color-grid button:nth-child(19){--swatch:#7E22CE}
+.color-grid button:nth-child(20){--swatch:#D4A017}
+.color-grid button:nth-child(21){--swatch:#F59E0B}
+.color-grid button:nth-child(22){--swatch:#10B981}
+.color-grid button:nth-child(23){--swatch:#0EA5E9}
+.color-grid button:nth-child(24){--swatch:#8B5CF6}
+.color-grid button:nth-child(25){--swatch:#EAB308}
+/* ESPACES — modèle Aurore Archives : cartes carrées, contours doux et adaptatifs */
+.spaces-section{margin:28px 0 58px}
+.spaces-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.space-card{position:relative;min-height:190px;padding:20px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;overflow:hidden}
+.space-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 48%);pointer-events:none}
+.space-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.12)}
+.space-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.space-icon{position:relative;width:46px;height:46px;border:1px solid var(--line);border-radius:15px;display:grid;place-items:center;background:var(--panel2);color:var(--accent);font-size:1.25rem;font-weight:800}
+.space-card h3{position:relative;margin:8px 0 5px;font-size:1.05rem;color:var(--text)}
+.space-card p{position:relative;margin:0;color:var(--muted);font-size:.78rem;line-height:1.55;max-width:230px}
+.space-kicker{position:relative;color:var(--accent);font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.space-arrow{position:absolute;right:18px;bottom:17px;color:var(--accent);font-size:1.15rem;font-weight:800}
+@media(max-width:1000px){.spaces-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.spaces-grid{grid-template-columns:1fr}.space-card{min-height:165px}}
+
+/* ===== Sous-espaces ===== */
+.space-panel{display:none;margin:8px 0 58px;padding:24px;border:1px solid var(--line);border-radius:26px;background:var(--panel);box-shadow:var(--shadow)}
+.space-panel.visible{display:block}
+.space-panel-head{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.space-panel-label{display:block;color:var(--accent);font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.space-panel-head h2{font-size:clamp(1.35rem,2.5vw,2rem);margin:0 0 4px}
+.space-panel-head p{color:var(--muted);font-size:.82rem}
+.space-back{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:12px;padding:8px 11px;margin-bottom:18px;font-size:.75rem;font-weight:750}
+.space-back:hover{border-color:var(--accent);color:var(--accent)}
+.space-tools-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.space-tool-card{position:relative;min-height:170px;padding:17px;border:1px solid var(--line);border-radius:19px;background:var(--panel2);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;overflow:hidden;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.space-tool-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 10%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 52%);pointer-events:none}
+.space-tool-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 12px 28px rgba(0,0,0,.10)}
+.space-tool-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.space-tool-icon{position:relative;width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:var(--panel);display:grid;place-items:center;color:var(--accent);font-weight:800}
+.space-tool-kicker{position:relative;color:var(--accent);font-size:.62rem;font-weight:800;letter-spacing:.08em}
+.space-tool-card h3{position:relative;font-size:.91rem;margin:6px 0 4px;color:var(--text)}
+.space-tool-card p{position:relative;color:var(--muted);font-size:.7rem;line-height:1.5;max-width:270px}
+.space-tool-arrow{position:absolute;right:15px;bottom:14px;color:var(--accent);font-weight:800}
+@media(max-width:1000px){.space-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.space-panel{padding:18px}.space-tools-grid{grid-template-columns:1fr}.space-tool-card{min-height:145px}}
+
 </style>
 </head>
 <body>
@@ -37,7 +229,19 @@ main{padding:18px 0 70px}.hero{position:relative;overflow:hidden;border-radius:3
       <a href="#services" data-nav="services">Services</a>
       <a href="#apropos" data-nav="apropos">À propos</a>
     </nav>
-    <button class="topbtn" onclick="document.getElementById('etablissements').scrollIntoView({behavior:'smooth'})">Trouver un établissement</button>
+    <button class="topbtn" onclick="document.getElementById('espaces').scrollIntoView({behavior:'smooth'})">Espaces</button>
+    <div class="theme-control">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-haspopup="true">◐ <span id="themeLabel">Thème</span></button>
+      <div class="theme-menu" id="themeMenu" role="menu">
+        <button type="button" data-theme-choice="systeme" role="menuitem">◌ Système</button>
+        <button type="button" data-theme-choice="clair" role="menuitem">☀ Clair</button>
+        <button type="button" data-theme-choice="sombre" role="menuitem">☾ Sombre</button>
+      </div>
+    </div>
+    <div class="theme-control color-control">
+      <button class="theme-toggle" id="colorToggle" type="button" aria-expanded="false" aria-haspopup="true">● <span id="colorLabel">Couleur</span></button>
+      <div class="theme-menu color-menu" id="colorMenu" role="menu"><div class="color-grid"><button data-color-choice="violet" title="Violet"></button><button data-color-choice="rouge" title="Rouge"></button><button data-color-choice="vert" title="Vert"></button><button data-color-choice="bleu" title="Bleu"></button><button data-color-choice="jaune" title="Jaune"></button><button data-color-choice="orange" title="Orange"></button><button data-color-choice="cyan" title="Cyan"></button><button data-color-choice="rose" title="Rose"></button><button data-color-choice="indigo" title="Indigo"></button><button data-color-choice="turquoise" title="Turquoise"></button><button data-color-choice="emeraude" title="Émeraude"></button><button data-color-choice="lime" title="Lime"></button><button data-color-choice="sarcelle" title="Sarcelle"></button><button data-color-choice="magenta" title="Magenta"></button><button data-color-choice="fuchsia" title="Fuchsia"></button><button data-color-choice="corail" title="Corail"></button><button data-color-choice="bordeaux" title="Bordeaux"></button><button data-color-choice="pourpre" title="Pourpre"></button><button data-color-choice="prune" title="Prune"></button><button data-color-choice="or" title="Or"></button><button data-color-choice="ambre" title="Ambre"></button><button data-color-choice="menthe" title="Menthe"></button><button data-color-choice="azur" title="Azur"></button><button data-color-choice="lavande" title="Lavande"></button><button data-color-choice="safran" title="Safran"></button></div></div>
+    </div>
   </div>
 </header>
 
@@ -60,6 +264,26 @@ main{padding:18px 0 70px}.hero{position:relative;overflow:hidden;border-radius:3
         <button data-filter="Bobo-Dioulasso">Bobo-Dioulasso</button>
       </div>
     </section>
+
+    <section class="spaces-section" id="espaces">
+      <div class="section-head"><div><div class="kicker">Accès Aurore</div><h2>Espaces</h2><p>Des espaces dédiés selon votre rôle dans l’établissement et la plateforme.</p></div></div>
+      <div class="spaces-grid">
+        <article class="space-card" onclick="openSpace('proviseur')" tabindex="0" role="button">
+          <div class="space-icon">⌂</div><div><span class="space-kicker">Espace 01</span><h3>Proviseur</h3><p>Gérer et suivre l’espace de votre lycée.</p></div><span class="space-arrow">→</span>
+        </article>
+        <article class="space-card" onclick="openSpace('administration')" tabindex="0" role="button">
+          <div class="space-icon">▤</div><div><span class="space-kicker">Espace 02</span><h3>Administration</h3><p>Administrer les informations et les services du lycée.</p></div><span class="space-arrow">→</span>
+        </article>
+        <article class="space-card" onclick="openSpace('parent')" tabindex="0" role="button">
+          <div class="space-icon">♙</div><div><span class="space-kicker">Espace 03</span><h3>Parent</h3><p>Accéder aux informations et au suivi de votre enfant.</p></div><span class="space-arrow">→</span>
+        </article>
+        <article class="space-card" onclick="openSpace('general')" tabindex="0" role="button">
+          <div class="space-icon">✦</div><div><span class="space-kicker">Espace 04</span><h3>Général</h3><p>Mon espace d’administration générale Aurore.</p></div><span class="space-arrow">→</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="space-panel" id="spacePanel" aria-live="polite"></section>
 
     <!-- Les trois blocs de présentation sont fusionnés en un seul bloc. -->
     <section class="fused-promise">
@@ -365,6 +589,89 @@ document.querySelectorAll('.shortcuts button').forEach(b=>b.addEventListener('cl
 }));
 window.addEventListener('hashchange',handleHash);
 loadInstituts().then(()=>handleHash());
+
+
+function appliquerCouleur(couleur){
+  const allowed=['violet','rouge','vert','bleu','jaune','orange','cyan','rose','indigo','turquoise','emeraude','lime','sarcelle','magenta','fuchsia','corail','bordeaux','pourpre','prune','or','ambre','menthe','azur','lavande','safran'];
+  if(!allowed.includes(couleur))couleur='violet'; document.documentElement.setAttribute('data-color-theme',couleur); try{localStorage.setItem('aurore-instituts-color-theme',couleur)}catch(e){};
+  const b=document.querySelector(`[data-color-choice="${couleur}"]`); const l=$('colorLabel'); if(l)l.textContent=b?.title||'Couleur'; document.querySelectorAll('[data-color-choice]').forEach(x=>x.classList.toggle('active',x.dataset.colorChoice===couleur));
+}
+(function(){const t=$('colorToggle'),m=$('colorMenu');if(!t||!m)return; appliquerCouleur(localStorage.getItem('aurore-instituts-color-theme')||'violet'); t.onclick=e=>{e.stopPropagation();m.classList.toggle('open')}; m.querySelectorAll('[data-color-choice]').forEach(b=>b.onclick=()=>{appliquerCouleur(b.dataset.colorChoice);m.classList.remove('open')});})();
+
+function openSpace(role){
+  const configs={
+    proviseur:{title:'Espace élèves',subtitle:'Votre espace personnel',items:[
+      ['Ma classe','Retrouvez votre classe, vos informations et votre organisation scolaire.','⌂'],
+      ['Mes devoirs','Consultez les devoirs à faire, les consignes et les échéances.','✓'],
+      ['Mes camarades','Retrouvez les élèves de votre classe et les échanges autorisés.','♙'],
+      ['Mes professeurs','Accédez à la liste de vos professeurs et aux matières enseignées.','◉'],
+      ['Mon bulletin','Consultez vos bulletins scolaires lorsqu’ils sont publiés.','▤'],
+      ['Mes notes','Suivez vos notes et vos résultats par matière.','★'],
+      ['Mes demandes','Envoyez et suivez vos demandes auprès de l’établissement.','✦']
+    ]},
+    administration:{title:'Administration lycée',subtitle:'Gestion et services de l’établissement',items:[
+      ['Présentation du lycée','Gérez la présentation, les informations générales et l’identité du lycée.','⌂'],
+      ['Informations à passer','Publiez et transmettez les informations importantes aux élèves et aux familles.','!'],
+      ['Professeurs','Gérez les professeurs, leurs informations et leur organisation.','◉'],
+      ['Élèves','Consultez et gérez les informations liées aux élèves.','♙'],
+      ['Inscriptions','Gérez les inscriptions et les informations administratives associées.','＋'],
+      ['Bulletins et notes','Gérez la publication et le suivi des bulletins et des notes.','▤'],
+      ['Cahiers de test','Gérez les cahiers de test et les ressources d’évaluation.','✎']
+    ]}
+  };
+  const cfg=configs[role];
+  if(!cfg){ alert('Cet espace sera activé lors de la prochaine étape.'); return; }
+  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card" tabindex="0" role="button" onclick="openSpaceTool('${role}',${i})"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
+  const panel=document.getElementById('spacePanel');
+  if(panel){ panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div>`; panel.classList.add('visible'); panel.scrollIntoView({behavior:'smooth',block:'start'}); }
+}
+
+function openSpaceTool(role,index){
+  const names={proviseur:['Ma classe','Mes devoirs','Mes camarades','Mes professeurs','Mon bulletin','Mes notes','Mes demandes'],administration:['Présentation du lycée','Informations à passer','Professeurs','Élèves','Inscriptions','Bulletins et notes','Cahiers de test']};
+  const name=names[role]?.[index]||'Espace';
+  alert(name+' — cette rubrique sera reliée à son fonctionnement lors de la prochaine étape.');
+}
+
+function closeSpacePanel(){
+  const panel=document.getElementById('spacePanel');
+  if(panel) panel.classList.remove('visible');
+  document.getElementById('espaces')?.scrollIntoView({behavior:'smooth'});
+}
+
+function appliquerTheme(choix){
+  const actual=choix==='systeme'
+    ? (window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')
+    : (choix==='clair'?'light':'dark');
+  document.documentElement.setAttribute('data-theme',actual);
+  document.documentElement.setAttribute('data-theme-choice',choix);
+  try{localStorage.setItem('aurore-instituts-theme',choix)}catch(e){}
+  const labels={systeme:'Système',clair:'Clair',sombre:'Sombre'};
+  const lab=$('themeLabel'); if(lab) lab.textContent=labels[choix];
+  document.querySelectorAll('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===choix));
+}
+(function initThemeControls(){
+  const toggle=$('themeToggle'), menu=$('themeMenu');
+  if(!toggle||!menu)return;
+  const saved=localStorage.getItem('aurore-instituts-theme')||'systeme';
+  appliquerTheme(saved);
+  toggle.addEventListener('click',e=>{
+    e.stopPropagation();
+    menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded',menu.classList.contains('open')?'true':'false');
+  });
+  menu.querySelectorAll('[data-theme-choice]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      appliquerTheme(btn.dataset.themeChoice);
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded','false');
+    });
+  });
+  document.addEventListener('click',()=>menu.classList.remove('open'));
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener?.('change',()=>{
+    if((localStorage.getItem('aurore-instituts-theme')||'systeme')==='systeme') appliquerTheme('systeme');
+  });
+})();
+
 </script>
 </body>
 </html>
