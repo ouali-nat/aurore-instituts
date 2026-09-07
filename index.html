@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0B0912">
 <meta name="description" content="Aurore — Section Instituts, la plateforme des établissements d’enseignement du Burkina Faso.">
 <title>Aurore — Section Instituts</title>
@@ -17,51 +18,353 @@ main{padding:18px 0 70px}.hero{position:relative;overflow:hidden;border-radius:3
 .notice{margin-top:20px;padding:13px 15px;border:1px dashed #3a3150;border-radius:16px;background:#110e18;color:#8f879d;font-size:.73rem}.notice strong{color:#c4b5fd}.cta{margin-top:24px;border:1px solid rgba(192,132,252,.14);border-radius:24px;padding:23px 25px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,rgba(139,92,246,.13),rgba(192,132,252,.06))}.cta h3{font-size:1rem}.cta p{color:#9f97ae;font-size:.8rem;margin-top:4px}.cta button{padding:10px 15px;white-space:nowrap}
 .modules{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.module{padding:21px}.module h3{font-size:.92rem;margin-top:14px}.module p{font-size:.78rem}.module .ico{background:rgba(192,132,252,.09)}footer{margin-top:35px;background:#07060b;border-top:1px solid #1d1927;color:#81788f;padding:28px 0;font-size:.73rem}.footer{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.footer b{color:#beb6cb}
 @media(max-width:900px){nav a:nth-child(3),nav a:nth-child(4){display:none}.grid{grid-template-columns:repeat(2,1fr)}.modules{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}.toolbar .control:first-child{grid-column:1/-1}}@media(max-width:700px){.wrap{width:min(1160px,calc(100% - 28px))}.head{min-height:68px;flex-wrap:wrap;padding:9px 0}nav{order:3;width:100%;overflow:auto;margin-left:0}.topbtn{margin-left:auto}.hero{padding:44px 21px 31px;border-radius:26px}h1{font-size:2.35rem}.hero-search{flex-wrap:wrap}.hero-search input{flex-basis:calc(100% - 35px)}.hero-search button{width:100%}.promise,.modules,.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.toolbar .control:first-child{grid-column:auto}.section-head{align-items:flex-start;flex-direction:column}.cta{align-items:flex-start;flex-direction:column}.cta button{width:100%}}
-.media-list{display:grid;gap:8px;margin-top:12px}.media-item{display:flex;align-items:center;gap:10px;text-decoration:none;color:#eee9f8;background:#1a1427;border:1px solid #2e2640;border-radius:12px;padding:11px 12px;font-size:.78rem}.media-item span{color:#c4b5fd;white-space:nowrap}.media-item b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}</style></head>
+.media-list{display:grid;gap:8px;margin-top:12px}.media-item{display:flex;align-items:center;gap:10px;text-decoration:none;color:#eee9f8;background:#1a1427;border:1px solid #2e2640;border-radius:12px;padding:11px 12px;font-size:.78rem}.media-item span{color:#c4b5fd;white-space:nowrap}.media-item b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-page{display:none;padding:18px 0 70px}.profile-page.show{display:block}.profile-top{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}.profile-hero,.profile-panel,.profile-news,.profile-student,.profile-location,.profile-gallery{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.profile-hero{overflow:hidden}.profile-cover{height:210px;background:radial-gradient(circle at 80% 15%,rgba(192,132,252,.25),transparent 32%),linear-gradient(135deg,#20162e,#171225);background-size:cover;background-position:center}.profile-logo-wrap{padding:0 24px}.profile-logo{width:112px;height:112px;margin-top:-56px;border-radius:28px;display:grid;place-items:center;background:#15111f;border:3px solid #302744;box-shadow:0 16px 35px rgba(0,0,0,.3);overflow:hidden;font-family:Georgia,serif;font-size:2rem;font-weight:850;color:#d8b4fe}.profile-logo img{width:100%;height:100%;object-fit:cover}.profile-content{padding:18px 24px 25px}.profile-content h1{font-size:clamp(1.8rem,4vw,3rem);margin-top:8px}.profile-description{color:#aaa1b8;margin-top:12px;font-size:.9rem;line-height:1.75}.profile-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.profile-actions button,.back-btn{border:1px solid #352b49;background:#1a1427;color:#ede9fe;border-radius:10px;padding:9px 12px;font-size:.75rem;font-weight:750}.profile-actions button:hover,.back-btn:hover{border-color:#8b5cf6}.profile-panel{padding:22px}.profile-panel h3,.profile-news h3,.profile-student h3,.profile-location h3,.profile-gallery h3{font-size:1rem}.profile-panel p,.profile-news p,.profile-student p,.profile-location p{color:#9f97ae;font-size:.8rem;margin-top:6px;line-height:1.65}.profile-list{display:grid;gap:9px;margin-top:16px}.info-row{display:flex;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid #272135;font-size:.76rem}.info-row span{color:#81788f}.info-row b{font-weight:700;text-align:right}.profile-wide{display:grid;gap:16px;margin-top:18px}.profile-news,.profile-student,.profile-location,.profile-gallery{padding:22px}.news-card{display:block;text-decoration:none;color:inherit;background:#1a1427;border:1px solid #2e2640;border-radius:13px;padding:14px;margin-top:10px}.news-card b{display:block;font-size:.82rem}.news-card span{display:block;color:#81788f;font-size:.7rem;margin-top:4px}.student-box{display:flex;align-items:center;justify-content:space-between;gap:18px}.student-box button{border:0;border-radius:11px;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);padding:10px 14px;font-weight:750;font-size:.75rem;white-space:nowrap}.location-map{margin-top:14px;min-height:110px;border:1px dashed #3a3150;border-radius:15px;display:grid;place-items:center;text-align:center;background:#110e18;color:#8f879d;font-size:.75rem}.class-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.class-chip{padding:13px;border:1px solid #302740;border-radius:13px;background:#1a1427}.class-chip b{display:block;font-size:.78rem}.class-chip span{display:block;color:#81788f;font-size:.66rem;margin-top:3px}.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:14px}.gallery-card{overflow:hidden;border-radius:15px;border:1px solid #302740;background:#1a1427}.gallery-image{height:150px;background:linear-gradient(135deg,#20162e,#171225);background-size:cover;background-position:center}.gallery-card p{padding:11px 12px;color:#9f97ae;font-size:.72rem;line-height:1.5}.support{margin-top:43px}.support-card{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:12px;padding:20px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,rgba(139,92,246,.13),rgba(192,132,252,.06))}.support-main h3{font-size:1rem}.support-main p{color:#9f97ae;font-size:.78rem;margin-top:5px}.support-item{padding:12px;border:1px solid rgba(216,180,254,.1);border-radius:14px;background:rgba(10,8,16,.2)}.support-item span{display:block;color:#81788f;font-size:.65rem}.support-item b{display:block;margin-top:4px;font-size:.76rem}.fused-promise{display:grid;grid-template-columns:1fr 3fr;gap:18px;padding:23px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-top:18px}.fused-intro h3{font-size:1.05rem}.fused-intro p{color:#9f97ae;font-size:.8rem;margin-top:6px}.fused-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.fused-item{padding:14px;border:1px solid #2e2640;border-radius:14px;background:#1a1427}.fused-item h4{font-size:.8rem;margin-top:9px}.fused-item p{font-size:.7rem;color:#8f879d;margin-top:4px;line-height:1.5}.hide-home{display:none!important}
+@media(max-width:900px){.profile-top{grid-template-columns:1fr}.class-grid{grid-template-columns:repeat(2,1fr)}.support-card{grid-template-columns:1fr 1fr}.support-main{grid-column:1/-1}.fused-promise{grid-template-columns:1fr}.fused-items{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.profile-cover{height:170px}.profile-content,.profile-logo-wrap{padding-left:18px;padding-right:18px}.profile-logo{width:92px;height:92px;margin-top:-46px;border-radius:23px}.class-grid,.gallery-grid,.support-card{grid-template-columns:1fr}.support-main{grid-column:auto}.student-box{align-items:flex-start;flex-direction:column}.student-box button{width:100%}.fused-items{grid-template-columns:1fr}}
+</style>
+</head>
 <body>
-<header><div class="wrap head"><a class="brand" href="#accueil"><div class="logo">A</div><div><strong>Aurore</strong><small>Section Instituts</small></div></a><nav><a class="active" href="#accueil">Accueil</a><a href="#etablissements">Établissements</a><a href="#services">Services</a><a href="#apropos">À propos</a></nav><button class="topbtn" onclick="document.getElementById('etablissements').scrollIntoView({behavior:'smooth'})">Trouver un établissement</button></div></header>
-<main id="accueil"><div class="wrap">
-<section class="hero"><div class="eyebrow">Aurore — Section Instituts</div><h1>Les établissements du Burkina Faso, <span class="accent">réunis dans un même espace.</span></h1><p class="copy">Découvrez les établissements d’enseignement, leurs formations, leurs actualités, leurs contacts et bientôt leurs bibliothèques de classe, dans une présentation claire et standardisée.</p><form class="hero-search" id="heroSearch"><span>⌕</span><input id="heroInput" type="search" placeholder="Rechercher un établissement, une ville, une formation…"><button>Rechercher</button></form><div class="shortcuts"><button data-filter="Lycée">Lycées</button><button data-filter="Collège">Collèges</button><button data-filter="Université">Universités</button><button data-filter="Ouagadougou">Ouagadougou</button><button data-filter="Bobo-Dioulasso">Bobo-Dioulasso</button></div></section>
-<section class="promise"><article><div class="ico">⌂</div><h3>Un annuaire national</h3><p>Un point d’accès unique pour retrouver les établissements et leurs informations essentielles.</p></article><article><div class="ico">◈</div><h3>Une identité standardisée</h3><p>Chaque établissement dispose d’une présentation structurée, claire et cohérente avec Aurore.</p></article><article><div class="ico">▤</div><h3>Une bibliothèque par classe</h3><p>Les documents pourront être organisés par établissement, niveau, classe et matière.</p></article></section>
-<section id="etablissements"><div class="section-head"><div><div class="kicker">Annuaire national</div><h2>Établissements</h2><p>Explorez les établissements présents sur la plateforme.</p></div><a class="link" href="#etablissements">Voir tout →</a></div><div class="toolbar"><label class="control">⌕<input id="q" type="search" placeholder="Nom, ville, formation…"></label><label class="control"><select id="type"><option value="">Tous les types</option><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option></select></label><label class="control"><select id="city"><option value="">Toutes les villes</option><option>Ouagadougou</option><option>Bobo-Dioulasso</option><option>Koudougou</option></select></label></div><div class="stats"><div class="stat"><strong id="count">0</strong><span>Établissements</span></div><div class="stat"><strong>13</strong><span>Régions</span></div><div class="stat"><strong>∞</strong><span>Profils possibles</span></div><div class="stat"><strong>24/7</strong><span>Accès en ligne</span></div></div><div class="grid" id="grid"></div><div class="notice" id="dataNotice"><strong>Connexion :</strong> chargement des établissements depuis Supabase…</div><div class="cta"><div><h3>Votre établissement doit apparaître sur Aurore ?</h3><p>Un espace dédié permettra aux établissements de compléter et gérer leur profil.</p></div><button onclick="alert('Le formulaire établissement sera connecté à Supabase dans la prochaine étape.')">Présenter mon établissement</button></div></section>
-<section id="services"><div class="section-head"><div><div class="kicker">L’écosystème Aurore</div><h2>Un espace pensé pour les établissements</h2><p>Les briques principales de la Section Instituts.</p></div></div><div class="modules"><article class="module"><div class="ico">⌂</div><h3>Profil établissement</h3><p>Présentation, logo, localisation, contacts, formations, niveaux et informations utiles.</p></article><article class="module"><div class="ico">◉</div><h3>Actualités & communications</h3><p>Les établissements pourront publier leurs annonces, événements et informations importantes.</p></article><article class="module"><div class="ico">▤</div><h3>Bibliothèque personnalisée</h3><p>Une organisation établissement → niveau → classe → matière pour retrouver les documents.</p></article><article class="module"><div class="ico">◎</div><h3>Localisation</h3><p>Adresse et emplacement de l’établissement, avec une expérience pensée pour le mobile.</p></article><article class="module"><div class="ico">♙</div><h3>Espaces utilisateurs</h3><p>Les futurs rôles pourront être adaptés aux administrateurs, enseignants, élèves et parents.</p></article><article class="module"><div class="ico">✦</div><h3>Une plateforme nationale</h3><p>Une même expérience Aurore pour découvrir et suivre les établissements du pays.</p></article></div></section>
-<section id="apropos"><div class="section-head"><div><div class="kicker">Aurore</div><h2>Section Instituts</h2><p>La nouvelle section consacrée aux établissements d’enseignement du Burkina Faso.</p></div></div></section>
-</div></main><footer><div class="wrap footer"><div><b>Aurore — Section Instituts</b></div><div>Plateforme nationale des établissements d’enseignement · Burkina Faso</div></div></footer>
+<header>
+  <div class="wrap head">
+    <a class="brand" href="#accueil" onclick="showHome()">
+      <div class="logo">A</div>
+      <div><strong>Aurore</strong><small>Section Instituts</small></div>
+    </a>
+    <nav>
+      <a class="active" href="#accueil" data-nav="accueil">Accueil</a>
+      <a href="#etablissements" data-nav="etablissements">Établissements</a>
+      <a href="#services" data-nav="services">Services</a>
+      <a href="#apropos" data-nav="apropos">À propos</a>
+    </nav>
+    <button class="topbtn" onclick="document.getElementById('etablissements').scrollIntoView({behavior:'smooth'})">Trouver un établissement</button>
+  </div>
+</header>
+
+<main id="homeView">
+  <div class="wrap">
+    <section class="hero" id="accueil">
+      <div class="eyebrow">Aurore — Section Instituts</div>
+      <h1>Les établissements du Burkina Faso, <span class="accent">réunis dans un même espace.</span></h1>
+      <p class="copy">Découvrez les établissements d’enseignement, leurs formations, leurs actualités, leurs contacts et bientôt leurs bibliothèques de classe, dans une présentation claire et standardisée.</p>
+      <form class="hero-search" id="heroSearch">
+        <span>⌕</span><input id="heroInput" type="search" placeholder="Rechercher un établissement, une ville, une formation…">
+        <button>Rechercher</button>
+      </form>
+      <div class="shortcuts">
+        <button data-filter="Lycée">Lycées</button>
+        <button data-filter="Collège">Collèges</button>
+        <button data-filter="Université">Universités</button>
+        <button data-filter="Institut">Instituts</button>
+        <button data-filter="Ouagadougou">Ouagadougou</button>
+        <button data-filter="Bobo-Dioulasso">Bobo-Dioulasso</button>
+      </div>
+    </section>
+
+    <!-- Les trois blocs de présentation sont fusionnés en un seul bloc. -->
+    <section class="fused-promise">
+      <div class="fused-intro">
+        <div class="ico">✦</div>
+        <h3>Aurore, un point d’accès unique</h3>
+        <p>Une présentation commune pour découvrir les établissements et accéder progressivement à leurs informations et ressources.</p>
+      </div>
+      <div class="fused-items">
+        <article class="fused-item"><div class="ico">⌂</div><h4>Annuaire national</h4><p>Retrouvez les établissements et leurs informations essentielles.</p></article>
+        <article class="fused-item"><div class="ico">◈</div><h4>Identité standardisée</h4><p>Une fiche claire, structurée et cohérente avec Aurore.</p></article>
+        <article class="fused-item"><div class="ico">▤</div><h4>Bibliothèque par classe</h4><p>Les ressources pourront être organisées par établissement, niveau, classe et matière.</p></article>
+      </div>
+    </section>
+
+    <section id="etablissements">
+      <div class="section-head">
+        <div><div class="kicker">Annuaire national</div><h2>Établissements</h2><p>Explorez les établissements présents sur la plateforme.</p></div>
+        <a class="link" href="#etablissements">Voir tout →</a>
+      </div>
+      <div class="toolbar">
+        <label class="control">⌕<input id="q" type="search" placeholder="Nom, ville, formation…"></label>
+        <label class="control"><select id="type"><option value="">Tous les types</option><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option></select></label>
+        <label class="control"><select id="city"><option value="">Toutes les villes</option><option>Ouagadougou</option><option>Bobo-Dioulasso</option><option>Koudougou</option></select></label>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="count">0</strong><span>Établissements</span></div>
+        <div class="stat"><strong>13</strong><span>Régions</span></div>
+        <div class="stat"><strong>∞</strong><span>Profils possibles</span></div>
+        <div class="stat"><strong>24/7</strong><span>Accès en ligne</span></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="notice" id="dataNotice"><strong>Connexion :</strong> chargement des établissements depuis Supabase…</div>
+    </section>
+
+    <section id="services">
+      <div class="section-head"><div><div class="kicker">L’écosystème Aurore</div><h2>Un espace pensé pour les établissements</h2><p>Les briques principales de la Section Instituts.</p></div></div>
+      <div class="modules">
+        <article class="module"><div class="ico">⌂</div><h3>Profil établissement</h3><p>Présentation, logo, localisation, contacts, formations, niveaux et informations utiles.</p></article>
+        <article class="module"><div class="ico">◉</div><h3>Actualités & communications</h3><p>Les établissements pourront publier leurs annonces, événements et informations importantes.</p></article>
+        <article class="module"><div class="ico">▤</div><h3>Bibliothèque personnalisée</h3><p>Une organisation établissement → niveau → classe → matière pour retrouver les documents.</p></article>
+        <article class="module"><div class="ico">◎</div><h3>Localisation</h3><p>Adresse et emplacement de l’établissement, avec une expérience pensée pour le mobile.</p></article>
+        <article class="module"><div class="ico">♙</div><h3>Espaces utilisateurs</h3><p>Les futurs rôles pourront être adaptés aux administrateurs, enseignants, élèves et parents.</p></article>
+        <article class="module"><div class="ico">✦</div><h3>Une plateforme nationale</h3><p>Une même expérience Aurore pour découvrir et suivre les établissements du pays.</p></article>
+      </div>
+    </section>
+
+    <section id="apropos">
+      <div class="section-head"><div><div class="kicker">Aurore</div><h2>Section Instituts</h2><p>La nouvelle section consacrée aux établissements d’enseignement du Burkina Faso.</p></div></div>
+    </section>
+
+    <!-- Bloc service client : son contenu est piloté par Supabase. -->
+    <section class="support" id="support">
+      <div class="section-head"><div><div class="kicker">Assistance</div><h2>Service client</h2><p>Un espace d’assistance dont les coordonnées pourront être modifiées depuis l’administration.</p></div></div>
+      <div class="support-card" id="supportCard">
+        <div class="support-main"><h3 id="supportTitle">Besoin d’aide ?</h3><p id="supportDescription">Notre équipe est disponible pour vous accompagner.</p></div>
+        <div class="support-item"><span>Téléphone</span><b id="supportPhone">—</b></div>
+        <div class="support-item"><span>Email</span><b id="supportEmail">—</b></div>
+        <div class="support-item"><span>Horaires</span><b id="supportHours">—</b></div>
+      </div>
+    </section>
+
+    <!-- Toujours en dernier sur la page d'accueil. -->
+    <section class="cta" id="presenter">
+      <div><h3>Votre établissement doit apparaître sur Aurore ?</h3><p>Un espace dédié permettra aux établissements de compléter et gérer leur profil.</p></div>
+      <button onclick="requestEstablishment()">Présenter mon établissement</button>
+    </section>
+  </div>
+</main>
+
+<!-- Page établissement : affichée après un clic sur une fiche. -->
+<main class="profile-page" id="profileView">
+  <div class="wrap" id="profileRoot"></div>
+</main>
+
+<footer>
+  <div class="wrap footer"><div><b>Aurore — Section Instituts</b></div><div>Plateforme nationale des établissements d’enseignement · Burkina Faso</div></div>
+</footer>
+
 <script>
 const SUPABASE_URL='https://fdstrbqvkemtjyxxaxbj.supabase.co';
 const SUPABASE_KEY='sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
 const API_HEADERS={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`};
+
 const demoData=[
-{nom:'Lycée exemple de Ouagadougou',type:'Lycée',ville:'Ouagadougou',province:'Kadiogo',formation:'Enseignement secondaire général',code:'LO'},
-{nom:'Collège exemple de Bobo-Dioulasso',type:'Collège',ville:'Bobo-Dioulasso',province:'Houet',formation:'Collège général',code:'CB'},
-{nom:'Institut exemple de Koudougou',type:'Institut',ville:'Koudougou',province:'Boulkiemdé',formation:'Formations professionnelles',code:'IK'},
-{nom:'Université exemple du Burkina',type:'Université',ville:'Ouagadougou',province:'Kadiogo',formation:'Formations universitaires',code:'UB'},
-{nom:'Lycée exemple de Bobo',type:'Lycée',ville:'Bobo-Dioulasso',province:'Houet',formation:'Enseignement secondaire',code:'LB'},
-{nom:'Institut exemple de Ouaga',type:'Institut',ville:'Ouagadougou',province:'Kadiogo',formation:'Sciences, technologie et métiers',code:'IO'}];
+  {id:'demo-1',nom:'Lycée exemple de Ouagadougou',type:'Lycée',ville:'Ouagadougou',province:'Kadiogo',formation:'Enseignement secondaire général',slug:'lycee-exemple-ouagadougou',code:'LO'},
+  {id:'demo-2',nom:'Collège exemple de Bobo-Dioulasso',type:'Collège',ville:'Bobo-Dioulasso',province:'Houet',formation:'Collège général',slug:'college-exemple-bobo',code:'CB'},
+  {id:'demo-3',nom:'Institut exemple de Koudougou',type:'Institut',ville:'Koudougou',province:'Boulkiemdé',formation:'Formations professionnelles',slug:'institut-exemple-koudougou',code:'IK'},
+  {id:'demo-4',nom:'Université exemple du Burkina',type:'Université',ville:'Ouagadougou',province:'Kadiogo',formation:'Formations universitaires',slug:'universite-exemple-burkina',code:'UB'}
+];
+
 let data=[];
-const $=id=>document.getElementById(id),grid=$('grid');function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-function initials(n){return String(n||'A').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
-function normalize(e){return {id:e.id,nom:e.nom,type:e.type||'Établissement',ville:e.ville||'—',province:e.province||'—',formation:e.domaine||e.niveau||'Enseignement',code:initials(e.nom),logo_url:e.logo_url,cover_url:e.cover_url,presentation:e.presentation,adresse:e.adresse,telephone:e.telephone,email:e.email,site_web:e.site_web,annee_fondation:e.annee_fondation}}
+const $=id=>document.getElementById(id);
+const grid=$('grid');
+
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function initials(n){
+  return String(n||'A').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+}
+function normalize(e){
+  return {
+    id:e.id, nom:e.nom, slug:e.slug, type:e.type||'Établissement',
+    ville:e.ville||'—', province:e.province||'—',
+    formation:e.domaine||e.niveau||'Enseignement',
+    niveau:e.niveau, domaine:e.domaine, logo_url:e.logo_url, cover_url:e.cover_url,
+    presentation:e.presentation, adresse:e.adresse, latitude:e.latitude, longitude:e.longitude,
+    telephone:e.telephone, email:e.email, site_web:e.site_web,
+    annee_fondation:e.annee_fondation, actif:e.actif
+  };
+}
+
+function showHome(){
+  $('homeView').classList.remove('hide-home');
+  $('profileView').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  document.querySelector('nav a[data-nav="accueil"]').classList.add('active');
+}
+
+function requestEstablishment(){
+  alert('Le formulaire de présentation d’établissement sera relié au futur espace administration.');
+}
+
 async function loadInstituts(){
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&select=*&order=nom.asc`,{headers:API_HEADERS});
     if(!r.ok) throw new Error('Supabase '+r.status);
-    const rows=await r.json(); data=rows.map(normalize);
+    const rows=await r.json();
+    data=rows.map(normalize);
     $('dataNotice').innerHTML='<strong>Connecté :</strong> les établissements sont maintenant chargés depuis Supabase.';
   }catch(err){
     data=demoData.map(normalize);
-    $('dataNotice').innerHTML='<strong>Mode démonstration :</strong> Supabase est prêt mais aucun établissement réel n’est encore enregistré.';
+    $('dataNotice').innerHTML='<strong>Mode démonstration :</strong> aucun établissement réel n’est encore enregistré.';
     console.warn(err);
   }
   render();
+  loadSupport();
 }
-function render(){let term=$('q').value.toLowerCase().trim(),t=$('type').value,c=$('city').value;let list=data.filter(e=>(!term||[e.nom,e.type,e.ville,e.province,e.formation].join(' ').toLowerCase().includes(term))&&(!t||e.type===t)&&(!c||e.ville===c));$('count').textContent=list.length;grid.innerHTML=list.length?list.map((e,i)=>`<article class="card"><div class="cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.35),rgba(23,18,36,.8)),url('${esc(e.cover_url)}');background-size:cover;background-position:center"`:''}><div class="badge">${esc(e.code)}</div></div><div class="body"><div class="tags"><span class="tag">${esc(e.type)}</span><span class="tag green">Profil public</span></div><h3>${esc(e.nom)}</h3><div class="meta">${esc(e.ville)} · ${esc(e.province)}</div><div class="meta">${esc(e.formation)}</div><div class="foot"><span>Établissement #${i+1}</span><button onclick="openProfile('${esc(e.id||'')}')">Voir le profil →</button></div></div></article>`).join(''):`<div class="notice" style="grid-column:1/-1">Aucun établissement ne correspond aux critères sélectionnés.</div>`}
-async function openProfile(id){
-  const e=data.find(x=>x.id===id); if(!e){alert('Cette fiche est disponible lorsque l’établissement est enregistré dans Supabase.');return;}
-  let media=[];
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/documents?etablissement_id=eq.${encodeURIComponent(id)}&publie=eq.true&select=titre,description,type_media,fichier_url,miniature_url,duree_secondes&order=created_at.desc`,{headers:API_HEADERS}); if(r.ok) media=await r.json();}catch(_){ }
-  const mediaHtml=media.length?`<div class="media-list">${media.map(m=>{const label=m.type_media==='video'?'🎥 Vidéo':m.type_media==='pdf'?'📄 PDF':m.type_media==='image'?'🖼️ Image':'📎 Document';return `<a class="media-item" href="${esc(m.fichier_url)}" target="_blank" rel="noopener"><span>${label}</span><b>${esc(m.titre)}</b></a>`}).join('')}</div>`:'<div class="notice">Aucun document ou média publié pour le moment.</div>';
-  const modal=document.createElement('div');modal.id='profileModal';modal.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(5,4,9,.78);backdrop-filter:blur(10px);padding:20px;overflow:auto;display:grid;place-items:center';modal.innerHTML=`<div style="width:min(720px,100%);background:#15111f;border:1px solid #352b49;border-radius:24px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.45)"><div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-start"><div><div class="kicker">Fiche établissement</div><h2>${esc(e.nom)}</h2><p class="meta">${esc(e.ville)} · ${esc(e.province)}</p></div><button id="closeProfile" style="border:1px solid #352b49;background:#1a1427;color:#fff;border-radius:10px;padding:8px 11px">Fermer</button></div><p class="copy" style="font-size:.88rem;margin-top:15px">${esc(e.presentation||'Présentation de l’établissement à venir.')}</p><div class="tags" style="margin-top:14px"><span class="tag">${esc(e.type)}</span>${e.annee_fondation?`<span class="tag">Fondé en ${esc(e.annee_fondation)}</span>`:''}</div><h3 style="margin-top:24px;font-size:1rem">Bibliothèque & médias</h3><p class="meta">Les PDF, vidéos et autres ressources publiées par l’établissement apparaîtront ici.</p>${mediaHtml}</div>`;document.body.appendChild(modal);$('closeProfile').onclick=()=>modal.remove();modal.onclick=x=>{if(x.target===modal)modal.remove()};}
 
-['q','type','city'].forEach(id=>$(id).addEventListener('input',render));$('type').addEventListener('change',render);$('city').addEventListener('change',render);$('heroSearch').addEventListener('submit',e=>{e.preventDefault();$('q').value=$('heroInput').value;render();$('etablissements').scrollIntoView({behavior:'smooth'})});document.querySelectorAll('.shortcuts button').forEach(b=>b.addEventListener('click',()=>{let v=b.dataset.filter;if(['Lycée','Collège','Université','Institut'].includes(v)){$('type').value=v;$('q').value=''}else{$('city').value=v;$('q').value=''}render();$('etablissements').scrollIntoView({behavior:'smooth'})}));loadInstituts();
-</script></body></html>
+function render(){
+  const term=$('q').value.toLowerCase().trim(),t=$('type').value,c=$('city').value;
+  const list=data.filter(e=>
+    (!term||[e.nom,e.type,e.ville,e.province,e.formation].join(' ').toLowerCase().includes(term)) &&
+    (!t||e.type===t) && (!c||e.ville===c)
+  );
+  $('count').textContent=list.length;
+  grid.innerHTML=list.length?list.map((e,i)=>`
+    <article class="card" role="button" tabindex="0" onclick="openProfile('${esc(e.id)}')" onkeydown="if(event.key==='Enter'||event.key===' ')openProfile('${esc(e.id)}')">
+      <div class="cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.35),rgba(23,18,36,.8)),url('${esc(e.cover_url)}');background-size:cover;background-position:center"`:''}>
+        <div class="badge">${esc(initials(e.nom))}</div>
+      </div>
+      <div class="body">
+        <div class="tags"><span class="tag">${esc(e.type)}</span><span class="tag green">Profil public</span></div>
+        <h3>${esc(e.nom)}</h3>
+        <div class="meta">${esc(e.ville)} · ${esc(e.province)}</div>
+        <div class="meta">${esc(e.formation)}</div>
+        <div class="foot"><span>Établissement #${i+1}</span><button onclick="event.stopPropagation();openProfile('${esc(e.id)}')">Explorer l’établissement →</button></div>
+      </div>
+    </article>`).join(''):
+    `<div class="notice" style="grid-column:1/-1">Aucun établissement ne correspond aux critères sélectionnés.</div>`;
+}
+
+async function openProfile(id){
+  const e=data.find(x=>String(x.id)===String(id));
+  if(!e) return;
+  $('homeView').classList.add('hide-home');
+  $('profileView').classList.add('show');
+  window.location.hash='etablissement/'+encodeURIComponent(e.slug||e.id);
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  $('profileRoot').innerHTML=`<button class="back-btn" onclick="showHome();history.replaceState(null,'','#accueil')">← Retour à l’annuaire</button>
+  <div class="profile-top" style="margin-top:14px">
+    <section class="profile-hero">
+      <div class="profile-cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.35),rgba(23,18,36,.82)),url('${esc(e.cover_url)}')"`:''}></div>
+      <div class="profile-logo-wrap"><div class="profile-logo">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}">`:esc(initials(e.nom))}</div></div>
+      <div class="profile-content">
+        <div class="tags"><span class="tag">${esc(e.type)}</span>${e.statut?`<span class="tag">${esc(e.statut)}</span>`:''}</div>
+        <h1>${esc(e.nom)}</h1>
+        <div class="meta">${esc(e.ville)} · ${esc(e.province)}</div>
+        <p class="profile-description">${esc(e.presentation||'La présentation de cet établissement sera publiée ici.')}</p>
+        <div class="profile-actions">
+          ${e.telephone?`<button onclick="location.href='tel:${esc(e.telephone)}'">Appeler</button>`:''}
+          ${e.email?`<button onclick="location.href='mailto:${esc(e.email)}'">Email</button>`:''}
+          ${e.site_web?`<button onclick="window.open('${esc(e.site_web)}','_blank','noopener')">Site web</button>`:''}
+        </div>
+      </div>
+    </section>
+    <aside class="profile-panel">
+      <h3>Informations essentielles</h3>
+      <p>Les informations officielles de l’établissement seront affichées ici.</p>
+      <div class="profile-list">
+        <div class="info-row"><span>Type</span><b>${esc(e.type)}</b></div>
+        <div class="info-row"><span>Niveau</span><b>${esc(e.niveau||'—')}</b></div>
+        <div class="info-row"><span>Domaine</span><b>${esc(e.domaine||'—')}</b></div>
+        <div class="info-row"><span>Ville</span><b>${esc(e.ville)}</b></div>
+        <div class="info-row"><span>Adresse</span><b>${esc(e.adresse||'—')}</b></div>
+        <div class="info-row"><span>Fondé en</span><b>${esc(e.annee_fondation||'—')}</b></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="profile-wide">
+    <section class="profile-news">
+      <h3>Informations récemment publiées par l’administration</h3>
+      <p>Les dernières annonces officielles de l’établissement apparaîtront ici.</p>
+      <div id="profileNews"><div class="notice">Chargement des informations…</div></div>
+    </section>
+
+    <section class="profile-student">
+      <div class="student-box">
+        <div><h3>Je suis élève, étudiant(e) ou membre de cet établissement</h3><p>Accédez à l’espace correspondant à votre établissement lorsque les comptes seront ouverts.</p></div>
+        <button onclick="alert('L’espace membre sera activé avec le système de comptes Aurore.')">Accéder à mon espace</button>
+      </div>
+    </section>
+
+    <section class="profile-location">
+      <h3>Localisation de l’établissement</h3>
+      <p>${esc(e.adresse||'Adresse à compléter par l’administration.')}</p>
+      <div class="location-map">${e.latitude&&e.longitude?`Position enregistrée : ${esc(e.latitude)}, ${esc(e.longitude)}`:'La carte et l’itinéraire seront activés lorsque la localisation sera renseignée.'}</div>
+    </section>
+
+    <section class="profile-panel">
+      <h3>Classes disponibles</h3>
+      <p>Les classes actives de cet établissement seront soigneusement organisées ici.</p>
+      <div class="class-grid" id="profileClasses"><div class="notice" style="grid-column:1/-1">Chargement des classes…</div></div>
+    </section>
+
+    <section class="profile-gallery">
+      <h3>Découvrir l’établissement</h3>
+      <p>Trois aperçus maximum, avec une description pour chaque image.</p>
+      <div class="gallery-grid" id="profileGallery"><div class="notice" style="grid-column:1/-1">Chargement des images…</div></div>
+    </section>
+  </div>`;
+
+  await Promise.all([loadProfileNews(e.id),loadProfileClasses(e.id),loadProfileGallery(e.id)]);
+}
+
+async function loadProfileNews(id){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/actualites?etablissement_id=eq.${encodeURIComponent(id)}&publie=eq.true&select=titre,contenu,image_url,published_at,created_at&order=published_at.desc.nullslast,created_at.desc&limit=3`,{headers:API_HEADERS});
+    if(!r.ok) throw new Error();
+    const rows=await r.json();
+    $('profileNews').innerHTML=rows.length?rows.map(n=>`<article class="news-card"><b>${esc(n.titre)}</b><span>${esc(n.published_at||n.created_at||'') }</span><p>${esc(n.contenu||'')}</p></article>`).join(''):'<div class="notice">Aucune information publiée pour le moment.</div>';
+  }catch(_){ $('profileNews').innerHTML='<div class="notice">Les informations de l’administration seront disponibles ici.</div>'; }
+}
+
+async function loadProfileClasses(id){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(id)}&actif=eq.true&select=nom,niveau,annee_scolaire&order=nom.asc`,{headers:API_HEADERS});
+    if(!r.ok) throw new Error();
+    const rows=await r.json();
+    $('profileClasses').innerHTML=rows.length?rows.map(c=>`<div class="class-chip"><b>${esc(c.nom)}</b><span>${esc(c.niveau||'')} ${c.annee_scolaire?'· '+esc(c.annee_scolaire):''}</span></div>`).join(''):'<div class="notice" style="grid-column:1/-1">Aucune classe publiée pour le moment.</div>';
+  }catch(_){ $('profileClasses').innerHTML='<div class="notice" style="grid-column:1/-1">Les classes seront affichées ici.</div>'; }
+}
+
+async function loadProfileGallery(id){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_galerie?etablissement_id=eq.${encodeURIComponent(id)}&actif=eq.true&select=image_url,description,position&order=position.asc`,{headers:API_HEADERS});
+    if(!r.ok) throw new Error();
+    const rows=(await r.json()).slice(0,3);
+    $('profileGallery').innerHTML=rows.length?rows.map((g,i)=>`<article class="gallery-card"><div class="gallery-image" style="background-image:url('${esc(g.image_url)}')"></div><p>${esc(g.description||'Aperçu de l’établissement.')}</p></article>`).join(''):'<div class="notice" style="grid-column:1/-1">Les images de présentation seront ajoutées par l’administration.</div>';
+  }catch(_){ $('profileGallery').innerHTML='<div class="notice" style="grid-column:1/-1">La galerie sera disponible ici.</div>'; }
+}
+
+async function loadSupport(){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/site_support?cle=eq.principal&actif=eq.true&select=titre,description,telephone,email,whatsapp,horaires&limit=1`,{headers:API_HEADERS});
+    if(!r.ok) throw new Error();
+    const rows=await r.json(); const s=rows[0];
+    if(!s) return;
+    $('supportTitle').textContent=s.titre||'Besoin d’aide ?';
+    $('supportDescription').textContent=s.description||'Notre équipe est disponible pour vous accompagner.';
+    $('supportPhone').textContent=s.telephone||'—';
+    $('supportEmail').textContent=s.email||'—';
+    $('supportHours').textContent=s.horaires||'—';
+  }catch(_){ console.warn('Service client non disponible'); }
+}
+
+function handleHash(){
+  const h=decodeURIComponent(location.hash||'');
+  if(h.startsWith('#etablissement/')){
+    const key=h.slice('#etablissement/'.length);
+    const e=data.find(x=>String(x.slug||x.id)===key);
+    if(e) openProfile(e.id);
+    else showHome();
+  }else showHome();
+}
+
+['q','type','city'].forEach(id=>$(id).addEventListener('input',render));
+$('type').addEventListener('change',render);
+$('city').addEventListener('change',render);
+$('heroSearch').addEventListener('submit',e=>{
+  e.preventDefault(); $('q').value=$('heroInput').value; render(); $('etablissements').scrollIntoView({behavior:'smooth'});
+});
+document.querySelectorAll('.shortcuts button').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.filter;
+  if(['Lycée','Collège','Université','Institut'].includes(v)){$('type').value=v;$('q').value='';}
+  else{$('city').value=v;$('q').value='';}
+  render(); $('etablissements').scrollIntoView({behavior:'smooth'});
+}));
+window.addEventListener('hashchange',handleHash);
+loadInstituts().then(()=>handleHash());
+</script>
+</body>
+</html>
