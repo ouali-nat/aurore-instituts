@@ -1,0 +1,11 @@
+name = "aurore-instituts-r2"
+main = "src/index.js"
+compatibility_date = "2026-09-07"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "aurore-instituts"
+
+[vars]
+SUPABASE_URL = "https://fdstrbqvkemtjyxxaxbj.supabase.co"
+ALLOWED_ORIGINS = "https://auroresectioninstituts.vercel.app"
