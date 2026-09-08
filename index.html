@@ -1169,27 +1169,30 @@ async function loadAuroreProfile(){
   if(!id)return null;
   const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
 
-  // 1) Auth est la source de secours la plus fiable pour l'identité Google/e-mail
-  //    et ses métadonnées (nom, prénom, avatar, etc.).
-  let authUser=null;
-  try{
-    const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'});
-    if(r.ok){
-      authUser=await r.json().catch(()=>null);
-      if(authUser){
-        currentAuroreSession.user=authUser;
-        currentAuroreSession.id=authUser.id||id;
-      }
-    }
-  }catch(_){ }
-
-  // 2) Le profil établissement complète les informations enregistrées côté DB.
-  let dbProfile=null;
-  try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'});
-    const rows=r.ok?await r.json().catch(()=>[]):[];
-    dbProfile=rows[0]||null;
-  }catch(_){ }
+  // Auth et profil DB sont indépendants : chargement en parallèle pour
+  // raccourcir nettement la phase « Finalisation » après Google.
+  let authUser=null, dbProfile=null;
+  await Promise.all([
+    (async()=>{
+      try{
+        const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'});
+        if(r.ok){
+          authUser=await r.json().catch(()=>null);
+          if(authUser){
+            currentAuroreSession.user=authUser;
+            currentAuroreSession.id=authUser.id||id;
+          }
+        }
+      }catch(_){}
+    })(),
+    (async()=>{
+      try{
+        const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'});
+        const rows=r.ok?await r.json().catch(()=>[]):[];
+        dbProfile=rows[0]||null;
+      }catch(_){}
+    })()
+  ]);
 
   const meta=authUser?.user_metadata||currentAuroreSession?.user?.user_metadata||{};
   currentAuroreProfile={
@@ -1358,7 +1361,7 @@ async function afterLoginToPersonalSpace(showWelcome=true){
   if(showWelcome){
     accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Ouverture de votre espace personnel…`,'ok');
     if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… ouverture de votre espace personnel');
-    await new Promise(r=>setTimeout(r,650));
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   }
   $('homeView')?.classList.add('hide-home');
   $('profileView')?.classList.remove('show');
@@ -1572,6 +1575,7 @@ async function openProfile(id,options={}){
   const e=data.find(x=>String(x.id)===String(id));
   if(!e) return;
   setSpaceLogo(e.logo_url,e.nom);
+  setSpaceBrand(e,'');
   $('homeView').classList.add('hide-home');
   $('authView').classList.remove('show');
   $('profileView').classList.add('show');
