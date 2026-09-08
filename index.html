@@ -2174,14 +2174,30 @@ function appliquerTheme(choix){
     const strong=btn.querySelector('strong'); if(strong)strong.textContent=on?'Connexion à Google…':'Continuer avec Google';
   }
 
-  function startGoogle(){
+  async function startGoogle(){
     if(googleBusy)return;
     setGoogleLoading(true);
     accessMessage('Ouverture de Google…','ok');
-    const redirectTo=window.location.origin+window.location.pathname;
-    const url=SUPABASE_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirectTo);
-    // Redirection directe : aucun SDK à attendre avant d'ouvrir Google.
-    window.location.assign(url);
+    try{
+      const c=await getClient();
+      // Utilise le flux OAuth officiel de Supabase : le SDK crée et conserve
+      // automatiquement le verifier PKCE nécessaire au retour depuis Google.
+      const redirectTo='https://auroresectioninstituts.vercel.app/';
+      const {error}=await c.auth.signInWithOAuth({
+        provider:'google',
+        options:{redirectTo}
+      });
+      if(error)throw error;
+    }catch(err){
+      console.error('[Google OAuth] démarrage impossible',err);
+      setGoogleLoading(false);
+      const raw=String(err?.message||'');
+      if(/provider.*not enabled/i.test(raw)){
+        accessMessage('La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.','err');
+      }else{
+        accessMessage('Impossible de démarrer la connexion Google. Réessayez.','err');
+      }
+    }
   }
   window.auroreGoogleLogin=function(e){e?.preventDefault();startGoogle();};
 
@@ -2192,14 +2208,20 @@ function appliquerTheme(choix){
     try{
       showPortal(); accessMessage('Finalisation de votre connexion…','ok');
       const c=await getClient();
-      const {data,error}=await c.auth.exchangeCodeForSession(code); if(error)throw error;
+      let {data,error}=await c.auth.exchangeCodeForSession(code);
+      // Si le SDK a déjà consommé le code pendant le retour, relire la session.
+      if(error || !data?.session){
+        const again=await c.auth.getSession();
+        if(again?.data?.session){ data=again.data; error=null; }
+        else if(error) throw error;
+      }
       const session=data?.session; if(!session)throw new Error('Session Google introuvable.');
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
       if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess(); history.replaceState({},document.title,location.pathname+location.hash); return true;
-    }catch(err){accessMessage(err?.message||'La connexion n’a pas pu être finalisée.','err');return true;}
+      unlockAccess(); setGoogleLoading(false); history.replaceState({},document.title,location.pathname+location.hash); return true;
+    }catch(err){setGoogleLoading(false);accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
   }
 
   async function restoreGoogleSession(){
