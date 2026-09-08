@@ -56,6 +56,18 @@
  *   Le ZIP d'origine contenant la liste exacte des types autorisés n'a pas pu
  *   être récupéré. La liste ci-dessous (CATEGORY_MIME_TYPES) est une liste
  *   raisonnable par défaut à AJUSTER si votre liste d'origine diffère.
+ *
+ * NOTE PERFORMANCE (correctif 2026-09-08) :
+ *   buildAuthContext() enchaînait auparavant 3 appels réseau Supabase l'un
+ *   après l'autre (vérification du token, puis etablissement_membres, puis
+ *   eleves) : chaque requête authentifiée du site attendait donc la somme des
+ *   3 allers-retours. C'est la cause principale de la lenteur générale
+ *   ressentie (accueil, "Mon espace", et surtout juste après la connexion
+ *   Google puisque /api/me appelle immédiatement cette fonction). Les deux
+ *   requêtes de lecture (etablissement_membres et eleves) ne dépendent pas
+ *   l'une de l'autre : elles sont maintenant lancées en parallèle avec
+ *   Promise.all, ce qui coupe ce temps d'environ un tiers à la moitié selon
+ *   la latence réseau vers Supabase.
  */
 
 // ---------------------------------------------------------------------------
@@ -268,6 +280,10 @@ function extractBearerToken(request) {
 /**
  * Construit le contexte d'authentification/autorisation de la requête :
  *   { user, isAdminGeneral, memberships: [{ etablissement_id, role }] }
+ *
+ * Correctif performance : les deux lectures (etablissement_membres et eleves)
+ * sont indépendantes l'une de l'autre une fois l'utilisateur connu ; elles
+ * partent donc en parallèle au lieu de s'enchaîner.
  */
 async function buildAuthContext(request, env) {
   const token = extractBearerToken(request);
@@ -285,11 +301,22 @@ async function buildAuthContext(request, env) {
 
   const memberships = [];
 
+  // Les deux lectures ci-dessous ne dépendent que de user.id : on les lance
+  // en parallèle plutôt que l'une après l'autre (gain net de latence sur
+  // CHAQUE requête authentifiée du site, y compris /api/me juste après la
+  // connexion Google).
+  const [membresResp, elevesResp] = await Promise.all([
+    supabaseRest(
+      env,
+      `etablissement_membres?profile_id=eq.${encodeURIComponent(user.id)}&select=etablissement_id,role`
+    ),
+    supabaseRest(
+      env,
+      `eleves?profile_id=eq.${encodeURIComponent(user.id)}&select=etablissement_id`
+    ),
+  ]);
+
   // 1. Adhésions explicites via etablissement_membres
-  const membresResp = await supabaseRest(
-    env,
-    `etablissement_membres?profile_id=eq.${encodeURIComponent(user.id)}&select=etablissement_id,role`
-  );
   if (membresResp.ok) {
     const rows = await membresResp.json();
     for (const row of rows) {
@@ -299,10 +326,6 @@ async function buildAuthContext(request, env) {
   }
 
   // 2. Élèves reconnus via eleves.profile_id même sans ligne etablissement_membres
-  const elevesResp = await supabaseRest(
-    env,
-    `eleves?profile_id=eq.${encodeURIComponent(user.id)}&select=etablissement_id`
-  );
   if (elevesResp.ok) {
     const rows = await elevesResp.json();
     for (const row of rows) {
