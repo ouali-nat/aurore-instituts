@@ -525,7 +525,7 @@ async function renderAccountHome(){
   const isPlatformAdmin=roles.includes('admin_general') || accountEmail==='oualikevin9@gmail.com';
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
-  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="openSpace(\'general\')">Administration générale Aurore</button>':'';
+  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="window.openSpace(\'general\')">Administration générale Aurore</button>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces</button></div></div></section>`;
 }
 
@@ -846,6 +846,8 @@ async function openSpace(role){
   const panel=document.getElementById('spacePanel');
   if(panel){panel.classList.add('page-mode');panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'smooth',block:'start'});}
 }
+
+window.openSpace=openSpace;
 
 function getSavedAdminSession(){
   try{
