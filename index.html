@@ -285,7 +285,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .space-tool-card.admin-general-card .space-tool-icon{width:34px;height:34px;font-size:.72rem}.space-tool-card.admin-general-card h3{font-size:.82rem}.space-tool-card.admin-general-card p{font-size:.68rem;line-height:1.35}.space-tool-card.admin-general-card .space-tool-kicker{font-size:.58rem}.space-tool-card.admin-general-card .space-tool-arrow{font-size:.9rem}
 .profile-logo.adaptive-logo,.establishment-logo-adaptive,.cover.adaptive-logo{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 22%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
 #decisionReasonCode{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}
-</style><style>body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending #accessLock{visibility:visible!important;opacity:1!important;background:#F7F4FB!important}</style></head>
+</style><style>body.auth-initializing > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.auth-initializing #accessLock{visibility:visible!important;opacity:1!important} body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending #accessLock{visibility:visible!important;opacity:1!important;background:#F7F4FB!important}</style></head>
 <style id="aurore-visual-fixes-v2">
 /* Centre de contrôle : contraste renforcé en mode sombre. */
 .config-test{background:var(--panel)!important;border-color:color-mix(in srgb,var(--accent) 28%,var(--line))!important}
@@ -782,7 +782,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 .member-request-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.member-request-actions .approve{border:0;background:#16a34a;color:#fff}.member-request-actions .reject{border:1px solid rgba(220,38,38,.3);background:transparent;color:#dc2626}.member-request-actions button{border-radius:11px;padding:9px 12px;font-weight:800;font-size:.7rem}
 @media(max-width:650px){.member-request-card{grid-template-columns:auto 1fr}.member-request-actions{grid-column:1/-1;justify-content:stretch}.member-request-actions button{flex:1}.personal-avatar-editor{align-items:flex-start;flex-direction:column}}
 </style></head>
-<body>
+<body class="auth-initializing">
 <header>
   <div class="wrap head">
     <a class="brand" href="#accueil" onclick="showHome()">
@@ -1348,10 +1348,11 @@ async function savePersonalProfile(){
     let avatarUrl=currentAuroreProfile?.avatar_url||null;
     if(avatarFile){if(msg)msg.textContent='Téléversement de votre photo…';avatarUrl=await uploadPersonalAvatar(avatarFile,id);}
     const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,enfant_informations:enfant,telephone,adresse,date_naissance:dateNaissance};
-    const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
-    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/soumettre_demande_membre`,{method:'POST',headers,body:JSON.stringify({p_etablissement_id:etabId,p_role:role,p_classe_id:role==='eleve'?classeId:null,p_informations:informations,p_avatar_url:avatarUrl})},12000);
-    const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Impossible d’envoyer votre dossier.');
-    const client=await getClient();const updated=await client.auth.updateUser({data:{prenom,nom,full_name:`${prenom} ${nom}`,avatar_url:avatarUrl||null}});if(updated.error)console.warn(updated.error);
+    const client=await getClient();
+    const {data:demande,error:demandeError}=await client.rpc('soumettre_demande_membre',{p_etablissement_id:etabId,p_role:role,p_classe_id:role==='eleve'?classeId:null,p_informations:informations,p_avatar_url:avatarUrl});
+    if(demandeError)throw demandeError;
+    if(!demande)throw new Error('Le dossier n’a pas pu être transmis à l’administration.');
+    const updated=await client.auth.updateUser({data:{prenom,nom,full_name:`${prenom} ${nom}`,avatar_url:avatarUrl||null}});if(updated.error)console.warn(updated.error);
     await loadAuroreProfile();selectedOnboardingRole=role;
     if(msg){msg.textContent='Votre dossier a bien été transmis à l’administration du lycée. Vous recevrez une notification dès qu’il sera accepté ou refusé.';msg.className='personal-profile-message ok';}
     await renderPersonalSpace();
@@ -1411,7 +1412,7 @@ async function renderPersonalSpace(){
     ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
     : pending
       ? `<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
-      : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><label>Votre profil<select id="personalRole"><option value="eleve" ${role==='eleve'?'selected':''}>Élève</option><option value="professeur" ${role==='professeur'?'selected':''}>Professeur</option><option value="proviseur" ${role==='proviseur'?'selected':''}>Proviseur</option><option value="administration" ${role==='administration'?'selected':''}>Administration</option><option value="parent" ${role==='parent'?'selected':''}>Parent</option></select></label><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
+      : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><div class="profile-page-role"><span class="auth-kicker">Profil sélectionné</span><strong>${esc(roleLabels[role]||role)}</strong><small>Cette page est dédiée à votre profil.</small></div><input type="hidden" id="personalRole" value="${esc(role)}"><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
   root.innerHTML=`<section class="personal-space-view"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
   document.getElementById('personalAvatarFile')?.addEventListener('change',e=>{const f=e.target.files?.[0],img=document.getElementById('personalAvatarPreview');if(!f||!img)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>3*1024*1024){e.target.value='';return;}const r=new FileReader();r.onload=()=>{if(img.tagName==='IMG')img.src=r.result;else{img.innerHTML='';img.style.backgroundImage=`url(${r.result})`;img.style.backgroundSize='cover';img.style.backgroundPosition='center';}};r.readAsDataURL(f);});
   if(!complete){
@@ -2243,10 +2244,14 @@ async function loadMemberRequestsAdmin(){
   }catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les dossiers.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p></div>`;}
 }
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-member-decision][data-member-request-id]');if(!b)return;e.preventDefault();if(b.dataset.busy==='1')return;b.dataset.busy='1';decideMemberRequest(b.dataset.memberRequestId,b.dataset.memberDecision).finally(()=>{b.dataset.busy='0';});});
+async function getFreshAccessToken(){
+  try{const c=await getClient();const {data}=await c.auth.getSession();if(data?.session?.access_token){currentAuroreSession={...data.session,expires_at:(data.session.expires_at||0)*1000};return data.session.access_token;}}catch(_){}
+  return currentAuroreSession?.access_token||'';
+}
 async function decideMemberRequest(id,decision){
   let comment=null;if(decision==='refuse')comment=prompt('Motif du refus (facultatif) :','Informations à compléter ou à vérifier')||null;
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_membre`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});
+    const freshToken=await getFreshAccessToken();if(!freshToken)throw new Error('Session expirée. Veuillez vous reconnecter.');const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_membre`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${freshToken}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});
     const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Décision impossible.');
     await Promise.all([loadMemberRequestsAdmin(),loadAdminClasses()]);
   }catch(e){alert(e.message||'Impossible de traiter ce dossier.');}
@@ -2608,6 +2613,7 @@ function appliquerTheme(choix){
   }
   function cacherVeuillezPatienter(){
     if(authWait){authWait.classList.remove('show');authWait.setAttribute('aria-hidden','true');}
+    document.body.classList.remove('auth-initializing');
   }
   window.auroreAfficherVeuillezPatienter=afficherVeuillezPatienter;
   window.auroreCacherVeuillezPatienter=cacherVeuillezPatienter;
@@ -2617,7 +2623,7 @@ function appliquerTheme(choix){
     el.textContent=text; el.className='access-message '+type; el.style.display='block';
   }
   function unlockAccess(){
-    document.body.classList.remove('site-locked');
+    document.body.classList.remove('site-locked','auth-initializing');
     const lock=document.getElementById('accessLock'); if(lock)lock.style.display='none';
   }
   function showPortal(){
@@ -2681,6 +2687,7 @@ function appliquerTheme(choix){
   async function startGoogle(){
     if(googleBusy)return;
     googleBusy=true;
+    try{sessionStorage.setItem('aurore-google-oauth-pending','1');}catch(_){}
     setGoogleLoading(true);
     afficherVeuillezPatienter('Connexion sécurisée avec Google…');
     accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
@@ -2689,7 +2696,7 @@ function appliquerTheme(choix){
       try{localStorage.removeItem('sb-fdstrbqvkemtjyxxaxbj-auth-token-code-verifier');}catch(_){}
       const c=await assurerClientAuthGoogle();
       const redirectTo=window.location.origin+window.location.pathname;
-      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo}});
+      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
       if(error)throw error;
       // Le navigateur quitte la page pour Google : on garde le verrouillage actif.
     }catch(err){
@@ -2735,6 +2742,7 @@ function appliquerTheme(choix){
       history.replaceState({},document.title,window.location.pathname+window.location.hash);
       document.body.classList.remove('aurore-oauth-callback-pending');
 
+      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
       // Les opérations secondaires ne bloquent jamais la connexion.
       try{
         if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
@@ -2747,6 +2755,7 @@ function appliquerTheme(choix){
       }
       return true;
     }catch(err){
+      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
       console.error('[Google OAuth PKCE] callback impossible',err);
       setGoogleLoading(false);
       cacherVeuillezPatienter();
@@ -2824,10 +2833,12 @@ function appliquerTheme(choix){
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const handled=await handleGoogleReturn();
     if(!handled){
-      const restored=await restoreGoogleSession();
+      let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
+      const restored=oauthPending?false:await restoreGoogleSession();
       if(!restored){
         cacherVeuillezPatienter();
         showPortal();
+        document.body.classList.remove('auth-initializing');
       }
     }
   }
