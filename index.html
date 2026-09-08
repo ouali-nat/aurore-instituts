@@ -406,6 +406,86 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
   .promise article,.module,.card,.space-tool-card,.config-test-grid button{aspect-ratio:auto!important;min-height:150px!important;}
 }
 </style>
+
+<style id="aurore-card-redesign-v2">
+/* ===== Aurore Instituts — nouveau système de petites cartes ===== */
+.promise,.modules,.grid,.space-tools-grid,.config-test-grid,.accepted-grid,.admin-grid,.configured-list{
+  width:min(760px,100%);
+  margin-left:auto; margin-right:auto;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+.promise article,.module,.card,.space-tool-card,.config-test-grid button,.accepted-card{
+  border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
+  background:
+    radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent2) 15%,transparent),transparent 45%),
+    linear-gradient(145deg,var(--panel2),var(--panel));
+  box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 8%,transparent);
+}
+.promise article,.module,.space-tool-card,.config-test-grid button{
+  aspect-ratio:1.08/1!important;
+  min-height:0!important;
+  height:auto!important;
+}
+.promise article,.module{padding:15px!important}
+.promise article:hover,.module:hover,.space-tool-card:hover,.card:hover,.accepted-card:hover{
+  border-color:color-mix(in srgb,var(--accent) 55%,var(--line));
+  box-shadow:0 14px 32px color-mix(in srgb,var(--accent) 14%,transparent);
+  transform:translateY(-2px);
+}
+.promise article .ico,.module .ico,.space-tool-icon{
+  width:38px!important;height:38px!important;border-radius:10px!important;
+  background:color-mix(in srgb,var(--accent) 13%,var(--panel2))!important;
+  border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line))!important;
+  color:var(--accent)!important;
+}
+.promise h3,.module h3{font-size:.86rem!important;margin-top:8px!important}
+.promise p,.module p{font-size:.69rem!important;line-height:1.4!important}
+.card .cover{aspect-ratio:1/1!important;height:auto!important;background:linear-gradient(145deg,var(--panel2),color-mix(in srgb,var(--accent) 6%,var(--panel)))!important}
+.card .body{padding:10px!important}
+.card h3{font-size:.88rem!important}
+.card .meta{font-size:.67rem!important}
+.card .foot{margin-top:9px!important;padding-top:9px!important}
+.space-tool-card{padding:15px!important;border-radius:12px!important}
+.space-tool-card h3{font-size:.84rem!important}
+.space-tool-card p{font-size:.66rem!important}
+.config-test{width:min(760px,100%);margin-left:auto;margin-right:auto;padding:13px!important;border-color:color-mix(in srgb,var(--accent) 25%,var(--line))!important;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 8%,var(--panel)),var(--panel))!important}
+.config-test-grid button{padding:12px!important;border-radius:11px!important;text-align:left!important}
+.accepted-card{border-radius:12px!important}
+.accepted-card-cover{aspect-ratio:1/1!important;height:auto!important;max-height:150px!important}
+.accepted-card-body{padding:10px 12px 8px!important}
+.accepted-card-body h3{font-size:.86rem!important}
+.accepted-description{font-size:.66rem!important}
+.accepted-card-footer{padding:8px 10px 10px!important}
+.admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.admin-card{padding:13px!important;border-radius:12px!important;background:linear-gradient(145deg,var(--panel2),var(--panel))!important}
+/* Compte : le bouton d'ouverture est hors de la carte d'information. Suppression tout en bas. */
+.configured-list{align-items:stretch}
+.configured-space-item{display:flex;flex-direction:column;gap:7px;min-width:0}
+.configured-row{min-height:112px!important;padding:13px!important;border-radius:12px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 7%,var(--panel2)),var(--panel2))!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important}
+.configured-main{display:flex!important;align-items:flex-start;gap:10px;min-width:0}
+.configured-main>div{min-width:0}
+.configured-number{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 15%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line));color:var(--accent);font-size:.65rem;font-weight:900}
+.configured-row strong{font-size:.78rem!important;line-height:1.3}
+.configured-row span{font-size:.65rem!important}
+.configured-space-actions{display:grid;grid-template-columns:1fr auto;gap:7px;align-items:center}
+.space-open-btn{border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:linear-gradient(135deg,var(--accent-strong),var(--accent2));color:#fff;border-radius:10px;padding:9px 11px;font-size:.69rem;font-weight:850;box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 16%,transparent)}
+.space-open-btn span{font-size:.9rem;margin-left:4px}
+.space-open-btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.space-delete-btn{background:transparent!important;color:var(--muted)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:8px 9px!important;font-size:.62rem!important;white-space:nowrap}
+.space-delete-btn:hover{color:#b91c1c!important;border-color:#b91c1c!important;background:color-mix(in srgb,#b91c1c 7%,var(--panel))!important}
+.configured-spaces{padding:14px!important;border-radius:14px!important;background:linear-gradient(145deg,var(--panel),var(--panel2))!important}
+@media(max-width:700px){
+ .promise,.modules,.grid,.space-tools-grid,.config-test-grid,.accepted-grid,.admin-grid,.configured-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%}
+ .promise article,.module,.card,.space-tool-card,.config-test-grid button{aspect-ratio:1.05/1!important}
+ .configured-space-actions{grid-template-columns:1fr}
+ .space-delete-btn{justify-self:end}
+}
+@media(max-width:480px){
+ .promise,.modules,.grid,.space-tools-grid,.config-test-grid,.accepted-grid,.admin-grid,.configured-list{grid-template-columns:1fr!important}
+ .promise article,.module,.card,.space-tool-card,.config-test-grid button{aspect-ratio:1.18/1!important;min-height:0!important}
+}
+</style>
 </head>
 <body>
 <header>
@@ -688,7 +768,7 @@ async function renderAccountHome(){
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
-  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace →</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{return `<div class="configured-space-item"><div class="configured-row"><div class="configured-main"><span class="configured-number">${String(spaces.indexOf(x)+1).padStart(2,'0')}</span><div><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div></div></div><div class="configured-space-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace <span>→</span></button><button class="admin-btn danger space-delete-btn" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer mon espace</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" onclick="openSpace('general')">Administration générale</button><button type="button" onclick="openSpace('administration')">Administration établissement</button><button type="button" onclick="openSpace('professeur')">Espace professeur</button><button type="button" onclick="openSpace('eleve')">Espace élève</button><button type="button" onclick="openSpace('parent')">Espace parent</button><button type="button" class="auth-secondary" onclick="renderOnboarding()">Reconfigurer / ajouter un espace</button></div></div>`:'';
   const configureBtn=(!roles.filter(r=>r!=='admin_general').length)?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer un espace</button></div>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
