@@ -303,7 +303,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 #homeView.directory-mode > .wrap > section:not(#etablissements){display:none!important}
 #homeView.directory-mode #etablissements{padding-top:10px}
 #homeView.directory-mode .section-head{margin-bottom:18px}
-#homeView.directory-mode .section-head .kicker:before{content:'← ';}
+#homeView.directory-mode .section-head .kicker:before{content:'';}
 .profile-hero{display:grid!important;grid-template-columns:230px 1fr!important;min-height:270px!important}.profile-cover{grid-column:1!important;grid-row:1!important;height:100%!important;min-height:270px!important}.profile-logo-wrap{grid-column:1!important;grid-row:1!important;align-self:center!important;justify-self:center!important;padding:0!important;z-index:2!important}.profile-logo{width:170px!important;height:170px!important;margin:0!important;border-radius:30px!important;background:var(--panel)!important;border:1px solid var(--line)!important;box-shadow:0 16px 35px rgba(0,0,0,.18)!important}.profile-content{grid-column:2!important;grid-row:1!important;padding:38px 36px!important;align-self:center!important}.profile-info-grid{grid-template-columns:.85fr 1.4fr!important}.profile-site{max-width:980px!important;margin:0 auto!important}.profile-library{grid-template-columns:1fr 150px!important;padding:24px 26px!important}.profile-library-mark{min-width:140px!important;height:140px!important}.profile-location{padding:24px!important}.profile-contact-block{padding:20px 22px!important}
 @media(max-width:760px){.profile-hero{grid-template-columns:1fr!important;min-height:0!important}.profile-cover{grid-column:1!important;grid-row:1!important;height:190px!important;min-height:190px!important}.profile-logo-wrap{grid-column:1!important;grid-row:1!important;align-self:end!important;justify-self:center!important;margin-bottom:-58px!important}.profile-logo{width:116px!important;height:116px!important;border-radius:22px!important}.profile-content{grid-column:1!important;grid-row:2!important;padding:78px 22px 24px!important}.profile-library{grid-template-columns:1fr!important;padding:22px!important}.profile-library-mark{min-width:100%!important;height:92px!important}.profile-info-grid{grid-template-columns:1fr!important}.profile-contact-block{align-items:flex-start!important;flex-direction:column!important}.profile-contact-actions{justify-content:flex-start!important;width:100%!important}.profile-contact-actions button{width:100%!important}}
 /* Seule l'administration générale porte le rouge. */
@@ -429,6 +429,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
   display:grid;place-items:center;background:var(--panel2);border:1px solid var(--line);
   font-family:Georgia,serif;font-weight:850;font-size:1.6rem;color:var(--accent2);
 }
+.seb-logo.adaptive-logo{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 24%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
 .seb-logo img{width:100%;height:100%;object-fit:contain;padding:9px;box-sizing:border-box;display:block}
 .seb-info{min-width:0}
 .seb-kicker{display:block;color:var(--accent2);font-size:.62rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
@@ -443,6 +444,16 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .accepted-card-withdrawn .accepted-card-cover{filter:grayscale(.35)}
 .accepted-status.withdrawn{background:rgba(148,141,163,.85)!important;color:#fff!important}
 .accepted-status.withdrawn i{background:#cfcad6!important}
+.accepted-card-suspended{opacity:.88}
+.accepted-card-suspended .accepted-card-cover{filter:grayscale(.2) sepia(.15)}
+.accepted-status.suspended{background:rgba(217,119,6,.9)!important;color:#fff!important}
+.accepted-status.suspended i{background:#fde68a!important}
+.accepted-card-banned{opacity:.75}
+.accepted-card-banned .accepted-card-cover{filter:grayscale(.6)}
+.accepted-status.banned{background:rgba(185,28,28,.92)!important;color:#fff!important}
+.accepted-status.banned i{background:#fecaca!important}
+.admin-btn.warning{background:#d97706;color:#fff;border-color:#d97706}
+.admin-btn.warning:hover{background:#b45309;border-color:#b45309}
 
 @media(max-width:560px){
   .promise,.accepted-grid,.grid,.space-tools-grid,.config-test-grid,.admin-grid,.configured-list{gap:9px!important}
@@ -454,14 +465,22 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 }
 </style>
 <style id="aurore-admin-compact-v2">
-/* Administration et espaces similaires : petites cases compactes, sans flèches. */
+/* Administration et tous les espaces similaires : en-tête unique (pas de libellé Aurore répété),
+   cases compactes et sans aucune flèche décorative. */
 .space-panel.page-mode{min-height:calc(100vh - 76px);padding-top:18px}
 .space-panel.page-mode .space-panel-head{padding-top:0;margin-bottom:10px}
 .space-panel.page-mode .space-panel-head h2{font-size:1.18rem;line-height:1.2;margin-bottom:3px}
 .space-panel.page-mode .space-panel-head p{font-size:.68rem;line-height:1.35}
 .space-tool-card .space-tool-arrow,.space-tool-arrow{display:none!important}
 .space-tools-grid{gap:7px!important}
-.space-tool-card{grid-template-columns:auto 1fr!important;gap:7px!important}
+
+/* Cases compactes pour TOUS les tableaux de bord (élève, administration, parent, général) */
+.space-tool-card{min-height:118px!important;padding:12px!important;border-radius:15px!important}
+.space-tool-card .space-tool-icon{width:34px!important;height:34px!important;border-radius:10px!important}
+.space-tool-card h3{font-size:.82rem!important;margin:5px 0 3px!important}
+.space-tool-card p{font-size:.66rem!important;line-height:1.4!important}
+.space-tool-card-wide{min-height:150px!important}
+
 .space-tool-card.admin-general-card{
   min-height:68px!important;padding:7px!important;border-radius:11px!important;
   grid-template-columns:28px minmax(0,1fr)!important;gap:7px!important;
@@ -476,6 +495,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
  .space-panel.page-mode{padding-top:12px}
  .space-panel.page-mode .space-panel-head h2{font-size:1rem}
  .space-panel.page-mode .space-panel-head p{font-size:.62rem}
+ .space-tool-card{min-height:96px!important;padding:10px!important}
  .space-tools-grid.admin-general-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
  .space-tool-card.admin-general-card{min-height:64px!important;padding:6px!important;grid-template-columns:25px minmax(0,1fr)!important;gap:6px!important}
  .space-tool-card.admin-general-card .space-tool-icon{width:25px!important;height:25px!important}
@@ -537,7 +557,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
     <section id="etablissements">
       <div class="section-head">
         <div><div class="kicker">Annuaire national</div><h2>Établissements</h2><p>Explorez les établissements présents sur la plateforme.</p></div>
-        <a class="link" href="#annuaire">Voir tout →</a>
+        <a class="link" href="#annuaire">Voir tout</a>
       </div>
       <div class="toolbar">
         <label class="control">⌕<input id="q" type="search" placeholder="Nom, ville, formation…"></label>
@@ -588,7 +608,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 <!-- Vue dédiée Aurore : connexion / inscription / profil -->
 <main class="auth-page" id="authView">
   <div class="auth-shell">
-    <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome()">← Retour à l’accueil</button></div>
+    <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome()">Retour à l’accueil</button></div>
     <div class="auth-card" id="authRoot"></div>
   </div>
 </main>
@@ -652,6 +672,20 @@ let currentAuroreProfile=null;
 let selectedOnboardingRole='';
 let currentSpaceEstablishment=null;
 let siteLogoOriginal=null;
+function applyDominantColorToBox(box,img){
+  if(!box||!img)return;
+  const apply=()=>{try{
+    const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});
+    c.width=32;c.height=32;ctx.drawImage(img,0,0,32,32);
+    const data=ctx.getImageData(0,0,32,32).data;let r=0,g=0,b=0,n=0;
+    for(let i=0;i<data.length;i+=4){if(data[i+3]<80)continue;const rr=data[i],gg=data[i+1],bb=data[i+2];if(Math.max(rr,gg,bb)-Math.min(rr,gg,bb)<12&&rr>235&&gg>235&&bb>235)continue;r+=rr;g+=gg;b+=bb;n++;}
+    if(n){r=Math.round(r/n);g=Math.round(g/n);b=Math.round(b/n);const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      if(max-min<18){r=Math.max(0,r-35);g=Math.max(0,g-35);b=Math.max(0,b-35);}
+      box.style.setProperty('--logo-dominant',`rgb(${r} ${g} ${b})`);
+    }
+  }catch(_){/* image distante sans CORS : le fond par défaut reste utilisé */}};
+  if(img.complete)apply();else img.addEventListener('load',apply,{once:true});
+}
 function setSpaceLogo(url,label){
   const el=document.querySelector('.brand .logo');
   if(!el)return;
@@ -659,35 +693,18 @@ function setSpaceLogo(url,label){
   if(url){
     el.innerHTML=`<img src="${esc(url)}" alt="Logo de ${esc(label||'établissement')}" style="width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box;border-radius:inherit;background:var(--panel2);display:block">`;
     el.classList.add('establishment-logo-adaptive');
-    const img=el.querySelector('img');
-    const applyDominant=()=>{
-      try{
-        const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});
-        c.width=32;c.height=32;ctx.drawImage(img,0,0,32,32);
-        const data=ctx.getImageData(0,0,32,32).data;let r=0,g=0,b=0,n=0;
-        for(let i=0;i<data.length;i+=4){if(data[i+3]<80)continue;const rr=data[i],gg=data[i+1],bb=data[i+2];if(Math.max(rr,gg,bb)-Math.min(rr,gg,bb)<12&&rr>235&&gg>235&&bb>235)continue;r+=rr;g+=gg;b+=bb;n++;}
-        if(n){r=Math.round(r/n);g=Math.round(g/n);b=Math.round(b/n);const max=Math.max(r,g,b),min=Math.min(r,g,b);
-          if(max-min<18){r=Math.max(0,r-35);g=Math.max(0,g-35);b=Math.max(0,b-35);}
-          el.style.setProperty('--logo-dominant',`rgb(${r} ${g} ${b})`);
-        }
-      }catch(_){/* image distante sans CORS : le fond par défaut reste utilisé */}
-    };
-    if(img.complete)applyDominant();else img.addEventListener('load',applyDominant,{once:true});
+    applyDominantColorToBox(el,el.querySelector('img'));
   }else{
     el.classList.remove('establishment-logo-adaptive');el.style.removeProperty('--logo-dominant');
     el.innerHTML=esc((label||'A').trim().slice(0,2).toUpperCase()||'A');
   }
 }
 function adaptProfileLogoColor(){
-  const box=document.querySelector('.profile-logo.adaptive-logo'),img=box?.querySelector('img');
-  if(!box||!img)return;
-  const apply=()=>{try{
-    const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});c.width=32;c.height=32;ctx.drawImage(img,0,0,32,32);
-    const d=ctx.getImageData(0,0,32,32).data;let r=0,g=0,b=0,n=0;
-    for(let i=0;i<d.length;i+=4){if(d[i+3]<80)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-    if(n)box.style.setProperty('--logo-dominant',`rgb(${Math.round(r/n)} ${Math.round(g/n)} ${Math.round(b/n)})`);
-  }catch(_){} };
-  if(img.complete)apply();else img.addEventListener('load',apply,{once:true});
+  const box=document.querySelector('.profile-logo.adaptive-logo');
+  applyDominantColorToBox(box,box?.querySelector('img'));
+}
+function adaptSebLogoColor(){
+  document.querySelectorAll('.seb-logo.adaptive-logo').forEach(box=>applyDominantColorToBox(box,box.querySelector('img')));
 }
 function restoreSiteLogo(){
   const el=document.querySelector('.brand .logo');
@@ -730,7 +747,7 @@ function authMessage(text){const el=$('authMessage');if(el){el.style.display='bl
 function renderAuthStart(){
   authViewVersion++;
   const root=$('authRoot'); if(!root)return;
-  root.innerHTML=`<div class="auth-grid"><section><div class="auth-step"><b>Connexion</b><span>ou</span><button class="auth-secondary" type="button" onclick="renderAuthSignup()">Créer mon compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreLogin()"><label>E-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@exemple.com"></label><label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" required placeholder="Votre mot de passe"></label><div class="auth-actions"><button class="auth-primary" type="submit">Se connecter →</button></div><div id="authMessage" class="auth-message"></div></form></section>
+  root.innerHTML=`<div class="auth-grid"><section><div class="auth-step"><b>Connexion</b><span>ou</span><button class="auth-secondary" type="button" onclick="renderAuthSignup()">Créer mon compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreLogin()"><label>E-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@exemple.com"></label><label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" required placeholder="Votre mot de passe"></label><div class="auth-actions"><button class="auth-primary" type="submit">Se connecter</button></div><div id="authMessage" class="auth-message"></div></form></section>
   </div>`;
 }
 
@@ -739,7 +756,7 @@ function renderAuthSignup(){
   const root=$('authRoot'); if(!root)return;
   root.innerHTML=`<div class="auth-grid">
     <aside class="auth-side"><span class="auth-kicker">Créer un compte</span><h3>Votre identité Aurore</h3><p>Nom et prénom seront enregistrés dans votre profil. Ensuite, vous choisirez votre rôle et, si nécessaire, votre établissement dans la liste Aurore.</p><div class="auth-points"><div class="auth-point"><b>✦</b><div><strong>Pas de nom d’établissement à saisir</strong><span>Vous choisissez parmi les établissements disponibles.</span></div></div><div class="auth-point"><b>✓</b><div><strong>Un compte peut évoluer</strong><span>Les accès peuvent être ajoutés sans recréer votre identité.</span></div></div></div></aside>
-    <section><div class="auth-step"><b>Inscription</b><span>·</span><button class="auth-secondary" type="button" onclick="renderAuthStart()">J’ai déjà un compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreSignup()"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>Prénom<input id="signupPrenom" required autocomplete="given-name"></label><label>Nom<input id="signupNom" required autocomplete="family-name"></label></div><label>E-mail<input id="signupEmail" type="email" required autocomplete="email"></label><label>Mot de passe<input id="signupPassword" type="password" minlength="6" required autocomplete="new-password"></label><div class="auth-actions"><button class="auth-primary" type="submit">Continuer →</button></div><div id="authMessage" class="auth-message"></div></form></section>
+    <section><div class="auth-step"><b>Inscription</b><span>·</span><button class="auth-secondary" type="button" onclick="renderAuthStart()">J’ai déjà un compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreSignup()"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>Prénom<input id="signupPrenom" required autocomplete="given-name"></label><label>Nom<input id="signupNom" required autocomplete="family-name"></label></div><label>E-mail<input id="signupEmail" type="email" required autocomplete="email"></label><label>Mot de passe<input id="signupPassword" type="password" minlength="6" required autocomplete="new-password"></label><div class="auth-actions"><button class="auth-primary" type="submit">Continuer</button></div><div id="authMessage" class="auth-message"></div></form></section>
   </div>`;
 }
 
@@ -827,7 +844,7 @@ async function renderAccountHome(){
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
-  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace →</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" onclick="openSpace('general')">Administration générale</button><button type="button" onclick="openSpace('administration')">Administration établissement</button><button type="button" onclick="openSpace('professeur')">Espace professeur</button><button type="button" onclick="openSpace('eleve')">Espace élève</button><button type="button" onclick="openSpace('parent')">Espace parent</button><button type="button" class="auth-secondary" onclick="renderOnboarding()">Reconfigurer / ajouter un espace</button></div></div>`:'';
   const configureBtn=(!roles.filter(r=>r!=='admin_general').length)?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer un espace</button></div>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
@@ -848,7 +865,7 @@ async function removeConfiguredSpace(etablissementId,role){
 function renderOnboarding(){
   authViewVersion++;
   const root=$('authRoot'); if(!root)return;
-  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">← Retour au compte</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
   if(selectedOnboardingRole)selectOnboardingRole(selectedOnboardingRole);
 }
 
@@ -870,7 +887,7 @@ async function finishOnboarding(){
 
 async function openEstablishmentRequestPage(){
   const root=$('authRoot');if(!root)return;
-  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">← Retour au compte</button><span>Nouvelle demande</span></div><div><span class="auth-kicker">Création d’un établissement</span><h2>Présenter un établissement à Aurore</h2><p class="auth-sub">Toute personne peut proposer un établissement. La demande reste privée jusqu’à sa validation par l’Administration générale Aurore.</p></div><div class="admin-card"><form class="request-form" id="establishmentRequestForm" onsubmit="submitEstablishmentRequest(event)"><div class="request-grid"><label>Nom de l’établissement<input id="reqNom" required placeholder="Nom officiel"></label><label>Type<select id="reqType"><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option><option>Centre de formation</option></select></label><label>Ville<input id="reqVille" placeholder="Ville"></label><label>Commune<input id="reqCommune" placeholder="Commune"></label><label>Adresse<input id="reqAdresse" placeholder="Adresse ou secteur"></label><label>Téléphone<input id="reqTelephone" placeholder="Numéro de contact"></label><label>E-mail de l’établissement<input id="reqEmail" type="email" placeholder="contact@etablissement.bf"></label><label>Site web<input id="reqSite" type="url" placeholder="https://…"></label><div class="request-logo-upload"><label>Photo / logo de l’établissement<input id="reqPhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="previewRequestLogo(event)"></label><img id="reqPhotoPreview" class="request-logo-preview" alt="Aperçu du logo"></div><label>Votre rôle dans cet établissement<select id="reqRole"><option value="administration">Administration</option><option value="proviseur">Proviseur</option><option value="professeur">Professeur</option><option value="eleve">Élève</option><option value="parent">Parent</option></select></label></div><label>Description<textarea id="reqDescription" placeholder="Présentez l’établissement, ses formations, son fonctionnement et les informations utiles."></textarea></label><label>Motif de la demande<textarea id="reqJustification" placeholder="Expliquez pourquoi cet établissement doit rejoindre Aurore."></textarea></label><div class="auth-actions"><button class="auth-primary" type="submit">Envoyer la demande</button></div><div id="requestMessage" class="auth-message"></div></form></div></section>`;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button><span>Nouvelle demande</span></div><div><span class="auth-kicker">Création d’un établissement</span><h2>Présenter un établissement à Aurore</h2><p class="auth-sub">Toute personne peut proposer un établissement. La demande reste privée jusqu’à sa validation par l’Administration générale Aurore.</p></div><div class="admin-card"><form class="request-form" id="establishmentRequestForm" onsubmit="submitEstablishmentRequest(event)"><div class="request-grid"><label>Nom de l’établissement<input id="reqNom" required placeholder="Nom officiel"></label><label>Type<select id="reqType"><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option><option>Centre de formation</option></select></label><label>Ville<input id="reqVille" placeholder="Ville"></label><label>Commune<input id="reqCommune" placeholder="Commune"></label><label>Adresse<input id="reqAdresse" placeholder="Adresse ou secteur"></label><label>Téléphone<input id="reqTelephone" placeholder="Numéro de contact"></label><label>E-mail de l’établissement<input id="reqEmail" type="email" placeholder="contact@etablissement.bf"></label><label>Site web<input id="reqSite" type="url" placeholder="https://…"></label><div class="request-logo-upload"><label>Photo / logo de l’établissement<input id="reqPhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="previewRequestLogo(event)"></label><img id="reqPhotoPreview" class="request-logo-preview" alt="Aperçu du logo"></div><label>Votre rôle dans cet établissement<select id="reqRole"><option value="administration">Administration</option><option value="proviseur">Proviseur</option><option value="professeur">Professeur</option><option value="eleve">Élève</option><option value="parent">Parent</option></select></label></div><label>Description<textarea id="reqDescription" placeholder="Présentez l’établissement, ses formations, son fonctionnement et les informations utiles."></textarea></label><label>Motif de la demande<textarea id="reqJustification" placeholder="Expliquez pourquoi cet établissement doit rejoindre Aurore."></textarea></label><div class="auth-actions"><button class="auth-primary" type="submit">Envoyer la demande</button></div><div id="requestMessage" class="auth-message"></div></form></div></section>`;
 }
 
 async function submitEstablishmentRequest(event){
@@ -993,7 +1010,7 @@ function render(){
         <h3>${esc(e.nom)}</h3>
         <div class="meta">${esc(e.ville)} · ${esc(e.province)}</div>
         <div class="meta">${esc(e.formation)}</div>
-        <div class="foot"><span>Établissement #${i+1}</span><button onclick="event.stopPropagation();openProfile('${esc(e.id)}')">Explorer l’établissement →</button></div>
+        <div class="foot"><span>Établissement #${i+1}</span><button onclick="event.stopPropagation();openProfile('${esc(e.id)}')">Explorer l’établissement</button></div>
       </div>
     </article>`).join(''):
     `<div class="notice" style="grid-column:1/-1">Aucun établissement ne correspond aux critères sélectionnés.</div>`;
@@ -1011,7 +1028,7 @@ async function openProfile(id,options={}){
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   window.scrollTo({top:0,behavior:'auto'});
 
-  $('profileRoot').innerHTML=`<button class="back-btn" type="button" onclick="history.back()">← Retour à l’annuaire</button>
+  $('profileRoot').innerHTML=`<button class="back-btn" type="button" onclick="history.back()">Retour à l’annuaire</button>
   <div class="profile-site" style="margin-top:14px">
     <section class="profile-hero">
       <div class="profile-cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.18),rgba(23,18,36,.86)),url('${esc(e.cover_url)}')"`:''}></div>
@@ -1029,7 +1046,7 @@ async function openProfile(id,options={}){
     </section>
 
     <section class="profile-library">
-      <div class="profile-library-main"><span class="profile-section-kicker">ESPACE ÉTABLISSEMENT</span><h2>Bibliothèque</h2><p>Retrouvez ici les documents, cours, ressources et publications pédagogiques mis à disposition par l’établissement.</p><button type="button" onclick="openProfileLibrary('${esc(e.id)}')">Ouvrir la bibliothèque →</button></div>
+      <div class="profile-library-main"><span class="profile-section-kicker">ESPACE ÉTABLISSEMENT</span><h2>Bibliothèque</h2><p>Retrouvez ici les documents, cours, ressources et publications pédagogiques mis à disposition par l’établissement.</p><button type="button" onclick="openProfileLibrary('${esc(e.id)}')">Ouvrir la bibliothèque</button></div>
     </section>
 
     <div class="profile-info-grid">
@@ -1064,7 +1081,7 @@ async function openProfileLibrary(id,options={}){
   const target='#etablissement/'+encodeURIComponent(e.slug||e.id)+'/bibliotheque';
   if(options.push!==false && location.hash!==target) pushRoute(target);
   window.scrollTo({top:0,behavior:'auto'});
-  $('profileRoot').innerHTML=`<button class="back-btn" type="button" onclick="history.back()">← Retour à ${esc(e.nom)}</button>
+  $('profileRoot').innerHTML=`<button class="back-btn" type="button" onclick="history.back()">Retour à ${esc(e.nom)}</button>
     <section class="profile-library-page" style="margin-top:14px">
       <div class="profile-library-page-head"><div><span class="profile-section-kicker">BIBLIOTHÈQUE</span><h1>${esc(e.nom)}</h1><p>Les ressources publiées par l’établissement seront réunies ici.</p></div></div>
       <div class="pdf-style-empty"><div class="pdf-empty-mark">PDF</div><div><h2>Bibliothèque de l’établissement</h2><p>Les cours, documents et ressources pédagogiques apparaîtront ici sous forme de cartes claires, avec leur aperçu, leur titre et les actions de lecture ou de téléchargement.</p></div></div>
@@ -1276,7 +1293,7 @@ async function openSpace(role,options={}){
   }else{
     restoreSiteLogo();
   }
-  const bannerHtml=etab?`<div class="space-establishment-banner"><div class="seb-logo">${etab.logo_url?`<img src="${esc(etab.logo_url)}" alt="Logo de ${esc(etab.nom||'établissement')}">`:esc((etab.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div class="seb-info"><span class="seb-kicker">Établissement</span><h3>${esc(etab.nom||'Établissement')}</h3><p>${esc([etab.type,etab.ville].filter(Boolean).join(' · ')||'Informations à compléter')}</p></div></div>`:'';
+  const bannerHtml=etab?`<div class="space-establishment-banner"><div class="seb-logo${etab.logo_url?' adaptive-logo':''}">${etab.logo_url?`<img src="${esc(etab.logo_url)}" alt="Logo de ${esc(etab.nom||'établissement')}">`:esc((etab.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div class="seb-info"><span class="seb-kicker">Établissement</span><h3>${esc(etab.nom||'Établissement')}</h3><p>${esc([etab.type,etab.ville].filter(Boolean).join(' · ')||'Informations à compléter')}</p></div></div>`:'';
   let panel=document.getElementById('spacePanel');
   if(!panel){
     panel=document.createElement('section');
@@ -1284,7 +1301,7 @@ async function openSpace(role,options={}){
     panel.className='space-panel';
     document.body.appendChild(panel);
   }
-  if(panel){panel.classList.add('page-mode');window.scrollTo({top:0,left:0,behavior:'auto'});panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div>${bannerHtml}<div class="space-tools-grid ${role==='general'?'admin-general-grid':''}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');}
+  if(panel){panel.classList.add('page-mode');window.scrollTo({top:0,left:0,behavior:'auto'});panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">Retour</button><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div>${bannerHtml}<div class="space-tools-grid ${role==='general'?'admin-general-grid':''}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();}
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
 }
 
@@ -1353,7 +1370,7 @@ function adminDocumentsView(){
   const root=document.getElementById('spaceDashboard'); if(!root)return;
   currentAdminSession=getSavedAdminSession();
   root.innerHTML=`<section class="space-dashboard">
-    <div class="space-dashboard-head"><div><span class="space-panel-label">Stockage sécurisé</span><h3>Documents et fichiers</h3><p>Les fichiers sont envoyés dans Cloudflare R2 via le Worker Aurore. Aucun secret serveur n'est exposé dans cette page.</p></div><button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button></div>
+    <div class="space-dashboard-head"><div><span class="space-panel-label">Stockage sécurisé</span><h3>Documents et fichiers</h3><p>Les fichiers sont envoyés dans Cloudflare R2 via le Worker Aurore. Aucun secret serveur n'est exposé dans cette page.</p></div><button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">Fermer</button></div>
     <div class="space-big-square">
       <div id="adminAuthArea"></div>
       <div id="adminUploadArea"></div>
@@ -1464,11 +1481,11 @@ function openSpaceTool(role,key){
   const panel=document.getElementById('spacePanel');
   if(!panel)return;
   panel.classList.add('page-mode','tool-page','visible');
-  panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour à ${role==='general'?'l’Administration générale':'l’espace'}</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${role==='general'?'Administration générale Aurore':'Espace'}</h2><p>Cette rubrique s’ouvre comme une page dédiée.</p></div><div id="spaceDashboard"></div>`;
+  panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">Retour à ${role==='general'?'l’Administration générale':'l’espace'}</button><h2>${role==='general'?'Administration générale Aurore':'Espace'}</h2><p>Cette rubrique s’ouvre comme une page dédiée.</p></div><div id="spaceDashboard"></div>`;
   window.scrollTo({top:0,left:0,behavior:'auto'});
   const root=document.getElementById('spaceDashboard'); if(!root)return;
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
-  const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">← Retour aux rubriques</button>`;
+  const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
@@ -1576,7 +1593,35 @@ async function decideEstablishmentRequest(id,statut,commentaire=null,fromModal=f
   }
 }
 
+let lastAdminStatusKind=null;
+async function refreshAdminStatusView(){
+  if($('adminStatusList')&&lastAdminStatusKind)await loadAdminStatusList(lastAdminStatusKind);
+  if($('adminAcceptedList'))await loadAdminAcceptedEstablishments();
+  await loadAdminOverview();
+  await loadInstituts();
+}
+async function updateEstablishmentStatus(id,name,statut,actif,confirmMsg,successMsg){
+  if(confirmMsg&&!confirm(confirmMsg))return;
+  const token=currentAuroreSession?.access_token||'';
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({statut,actif})});
+    const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Opération impossible.');
+    await refreshAdminStatusView();
+    if(successMsg)alert(successMsg);
+  }catch(err){alert(err.message||'Opération impossible.');}
+}
+async function suspendEstablishment(id,name){
+  await updateEstablishmentStatus(id,name,'suspendu',false,`Suspendre « ${name||'cet établissement'} » ?\n\nIl sera retiré de l’annuaire public jusqu’à sa réactivation.`,'Établissement suspendu.');
+}
+async function banEstablishment(id,name){
+  await updateEstablishmentStatus(id,name,'banni',false,`Bannir « ${name||'cet établissement'} » ?\n\nCette sanction interdit toute publication de cet établissement sur Aurore.`,'Établissement banni.');
+}
+async function reactivateEstablishment(id,name){
+  await updateEstablishmentStatus(id,name,'actif',true,`Réactiver « ${name||'cet établissement'} » et le republier dans l’annuaire ?`,'Établissement réactivé et republié.');
+}
+
 async function loadAdminStatusList(kind){
+  lastAdminStatusKind=kind;
   const list=$('adminStatusList');if(!list)return;
   const token=currentAuroreSession?.access_token||'';
   const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
@@ -1597,11 +1642,23 @@ function renderEstablishmentCard(e,mode){
   const initial=esc((e.nom||'ET').trim().slice(0,2).toUpperCase());
   const location=[e.ville,e.commune].filter(Boolean).join(' · ');
   const meta=[e.type||'Établissement',location].filter(Boolean).join(' · ');
-  const statusLabel=mode==='retire'?'Retiré':'Publié';
-  const actions=mode==='retire'
-    ?`<button class="admin-btn primary" type="button" onclick="republishEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">↺ Republier</button><button class="admin-btn" type="button" onclick="editPublishedEstablishment('${esc(e.id)}')">Modifier</button>`
-    :`<button class="admin-btn primary" type="button" onclick="openProfile('${esc(e.id)}')">Ouvrir la fiche <span>→</span></button><button class="admin-btn" type="button" onclick="editPublishedEstablishment('${esc(e.id)}')">Modifier</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer</button>`;
-  return `<article class="accepted-card ${mode==='retire'?'accepted-card-withdrawn':''}"><div class="accepted-card-cover">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}" loading="lazy">`:`<div class="accepted-logo-fallback">${initial}</div>`}<span class="accepted-status ${mode==='retire'?'withdrawn':''}"><i></i> ${statusLabel}</span></div><div class="accepted-card-body"><div class="accepted-kicker">ÉTABLISSEMENT</div><h3>${esc(e.nom||'Établissement')}</h3><p class="accepted-meta">${esc(meta)}</p>${e.adresse?`<p class="accepted-address">⌖ ${esc(e.adresse)}</p>`:''}<p class="accepted-description">${esc(e.presentation||'Présentation non renseignée.')}</p></div><div class="accepted-card-footer"><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;width:100%">${actions}</div></div></article>`;
+  const id=esc(e.id), nom=esc(e.nom||'cet établissement');
+  const labels={retire:'Retiré',suspended:'Suspendu',banned:'Banni'};
+  const statusLabel=labels[mode]||'Publié';
+  const statusClass=mode==='retire'?'withdrawn':mode==='suspended'?'suspended':mode==='banned'?'banned':'';
+  const btnOpen=`<button class="admin-btn primary" type="button" onclick="openProfile('${id}')">Ouvrir la fiche</button>`;
+  const btnEdit=`<button class="admin-btn" type="button" onclick="editPublishedEstablishment('${id}')">Modifier</button>`;
+  const btnWithdraw=`<button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${id}','${nom}')">Retirer</button>`;
+  const btnRepublish=`<button class="admin-btn primary" type="button" onclick="republishEstablishment('${id}','${nom}')">Republier</button>`;
+  const btnSuspend=`<button class="admin-btn warning" type="button" onclick="suspendEstablishment('${id}','${nom}')">Suspendre</button>`;
+  const btnBan=`<button class="admin-btn danger" type="button" onclick="banEstablishment('${id}','${nom}')">Bannir</button>`;
+  const btnReactivate=`<button class="admin-btn primary" type="button" onclick="reactivateEstablishment('${id}','${nom}')">Réactiver</button>`;
+  let actions;
+  if(mode==='retire') actions=`${btnRepublish}${btnEdit}${btnSuspend}${btnBan}`;
+  else if(mode==='suspended') actions=`${btnReactivate}${btnEdit}${btnBan}`;
+  else if(mode==='banned') actions=`${btnReactivate}${btnEdit}`;
+  else actions=`${btnOpen}${btnEdit}${btnSuspend}${btnBan}${btnWithdraw}`;
+  return `<article class="accepted-card ${statusClass?'accepted-card-'+statusClass:''}"><div class="accepted-card-cover">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}" loading="lazy">`:`<div class="accepted-logo-fallback">${initial}</div>`}<span class="accepted-status ${statusClass}"><i></i> ${statusLabel}</span></div><div class="accepted-card-body"><div class="accepted-kicker">ÉTABLISSEMENT</div><h3>${esc(e.nom||'Établissement')}</h3><p class="accepted-meta">${esc(meta)}</p>${e.adresse?`<p class="accepted-address">⌖ ${esc(e.adresse)}</p>`:''}<p class="accepted-description">${esc(e.presentation||'Présentation non renseignée.')}</p></div><div class="accepted-card-footer"><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;width:100%">${actions}</div></div></article>`;
 }
 async function loadAdminAcceptedEstablishments(){
   const list=$('adminAcceptedList');
@@ -1644,7 +1701,7 @@ async function editPublishedEstablishment(id){
     const e=rows[0];
     const panel=document.getElementById('spacePanel'); if(!panel)return;
     panel.classList.add('page-mode','tool-page','visible');
-    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="openSpace('general','')">← Retour aux établissements publiés</button><span class="space-panel-label">Administration générale</span><h2>Modifier l’établissement</h2><p>${esc(e.nom||'Établissement')}</p></div><div id="spaceDashboard"><section class="space-dashboard"><form class="establishment-edit-form" onsubmit="savePublishedEstablishment(event,'${esc(e.id)}')"><div class="establishment-edit-grid"><label>Nom<input id="editNom" required value="${esc(e.nom||'')}"></label><label>Type<select id="editType"><option ${e.type==='Lycée'?'selected':''}>Lycée</option><option ${e.type==='Collège'?'selected':''}>Collège</option><option ${e.type==='Université'?'selected':''}>Université</option><option ${e.type==='Institut'?'selected':''}>Institut</option><option ${e.type==='Centre de formation'?'selected':''}>Centre de formation</option></select></label><label>Ville<input id="editVille" value="${esc(e.ville||'')}"></label><label>Province<input id="editProvince" value="${esc(e.province||'')}"></label><label>Adresse<input id="editAdresse" value="${esc(e.adresse||'')}"></label><label>Téléphone<input id="editTelephone" value="${esc(e.telephone||'')}"></label><label>E-mail<input id="editEmail" type="email" value="${esc(e.email||'')}"></label><label>Site web<input id="editSite" value="${esc(e.site_web||'')}"></label></div><label>Présentation<textarea id="editPresentation">${esc(e.presentation||'')}</textarea></label><div class="edit-logo-upload"><img id="editLogoPreview" class="edit-logo-preview" src="${esc(e.logo_url||'')}" alt="Logo actuel" onerror="this.removeAttribute('src');this.alt='Aucun logo';"><div class="edit-logo-copy"><strong>Logo de l’établissement</strong><span class="admin-meta">PNG, JPG/JPEG ou WebP. L’image est normalisée en carré et reste entièrement visible.</span><input id="editLogoFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewEditLogo(event)"><input id="editLogo" type="hidden" value="${esc(e.logo_url||'')}"></div></div><div class="establishment-edit-actions"><button class="admin-btn primary" type="submit">Enregistrer les modifications</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer de la publication</button></div><div id="editEstablishmentMessage" class="auth-message"></div></form></section></div>`;
+    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="openSpace('general','')">Retour aux établissements publiés</button><span class="space-panel-label">Administration générale</span><h2>Modifier l’établissement</h2><p>${esc(e.nom||'Établissement')}</p></div><div id="spaceDashboard"><section class="space-dashboard"><form class="establishment-edit-form" onsubmit="savePublishedEstablishment(event,'${esc(e.id)}')"><div class="establishment-edit-grid"><label>Nom<input id="editNom" required value="${esc(e.nom||'')}"></label><label>Type<select id="editType"><option ${e.type==='Lycée'?'selected':''}>Lycée</option><option ${e.type==='Collège'?'selected':''}>Collège</option><option ${e.type==='Université'?'selected':''}>Université</option><option ${e.type==='Institut'?'selected':''}>Institut</option><option ${e.type==='Centre de formation'?'selected':''}>Centre de formation</option></select></label><label>Ville<input id="editVille" value="${esc(e.ville||'')}"></label><label>Province<input id="editProvince" value="${esc(e.province||'')}"></label><label>Adresse<input id="editAdresse" value="${esc(e.adresse||'')}"></label><label>Téléphone<input id="editTelephone" value="${esc(e.telephone||'')}"></label><label>E-mail<input id="editEmail" type="email" value="${esc(e.email||'')}"></label><label>Site web<input id="editSite" value="${esc(e.site_web||'')}"></label></div><label>Présentation<textarea id="editPresentation">${esc(e.presentation||'')}</textarea></label><div class="edit-logo-upload"><img id="editLogoPreview" class="edit-logo-preview" src="${esc(e.logo_url||'')}" alt="Logo actuel" onerror="this.removeAttribute('src');this.alt='Aucun logo';"><div class="edit-logo-copy"><strong>Logo de l’établissement</strong><span class="admin-meta">PNG, JPG/JPEG ou WebP. L’image est normalisée en carré et reste entièrement visible.</span><input id="editLogoFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewEditLogo(event)"><input id="editLogo" type="hidden" value="${esc(e.logo_url||'')}"></div></div><div class="establishment-edit-actions"><button class="admin-btn primary" type="submit">Enregistrer les modifications</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer de la publication</button></div><div id="editEstablishmentMessage" class="auth-message"></div></form></section></div>`;
     window.scrollTo({top:0,left:0,behavior:'auto'});
   }catch(err){alert(err.message||'Impossible d’ouvrir la modification.');}
 }
