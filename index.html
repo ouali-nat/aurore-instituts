@@ -721,7 +721,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
   @media(max-width:520px){.access-lock{padding:14px}.access-card-body{padding:24px 20px 20px}.access-tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.access-logo{width:52px;height:52px;flex-basis:52px;border-radius:14px}.signup-card{padding:23px 19px}}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style id="aurore-adaptive-theme-v3">
 /* Thème réellement adaptatif : aucune couleur fixe ne doit empêcher Clair/Sombre + les 25 palettes. */
 html[data-theme="light"]{--fond:#f7f7f9;--papier:#fff;--bordure:#ded9e6;--encre:#17131f;--gris:#625d69;--violet:var(--accent-strong);--bleu:var(--accent2)}
@@ -1293,6 +1293,13 @@ function personalRoleHelp(role){
   })[role]||'Renseignez les informations utiles à votre espace personnel.';
 }
 
+async function auroreFetchWithTimeout(url,options={},timeout=10000){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeout);
+  try{return await fetch(url,{...options,signal:controller.signal});}
+  finally{clearTimeout(timer);}
+}
+
 async function savePersonalProfile(){
   const token=currentAuroreSession?.access_token||'',id=currentAuroreSession?.user?.id||'';
   const msg=document.getElementById('personalProfileMessage'),btn=document.getElementById('personalProfileSave');
@@ -1320,7 +1327,7 @@ async function savePersonalProfile(){
       return;
     }
     // Le rôle et l'établissement deviennent immédiatement un espace Aurore.
-    const cfg=await fetch(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({p_role:role,p_etablissement_id:etabId})});
+    const cfg=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({p_role:role,p_etablissement_id:etabId})});
     if(!cfg.ok){const cb=await cfg.json().catch(()=>null);throw new Error(cb?.message||cb?.hint||'Impossible d’activer votre espace établissement.');}
     // Les champs scolaires complémentaires sont stockés dans les métadonnées du compte,
     // car la table profiles de Section Instituts ne contient volontairement que l’identité.
@@ -1328,11 +1335,11 @@ async function savePersonalProfile(){
     const metaPayload={prenom,nom,full_name:`${prenom} ${nom}`,role,etablissement_id:etabId,etablissement_nom:etabName,niveau:niveau||null,classe:classe||null,classe_id:classeId||null,filiere:filiere||null,discipline:discipline||null,fonction:fonction||null,enfant_informations:enfant||null};
     const updated=await client.auth.updateUser({data:metaPayload});
     if(updated.error)throw updated.error;
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers,body:JSON.stringify({prenom,nom,full_name:`${prenom} ${nom}`})});
+    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers,body:JSON.stringify({prenom,nom,full_name:`${prenom} ${nom}`})});
     if(!r.ok)throw new Error('Impossible d’enregistrer votre identité.');
     await loadAuroreProfile();
     if(role==='eleve' && classeId){
-      const dr=await fetch(`${SUPABASE_URL}/rest/v1/classe_demandes?on_conflict=classe_id,profile_id`,{method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({classe_id:classeId,profile_id:id,etablissement_id:etabId,statut:'en_attente'})});
+      const dr=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/classe_demandes?on_conflict=classe_id,profile_id`,{method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({classe_id:classeId,profile_id:id,etablissement_id:etabId,statut:'en_attente'})});
       if(!dr.ok && dr.status!==409){const db=await dr.json().catch(()=>null);throw new Error(db?.message||'Impossible d’envoyer la demande d’inscription dans la classe.');}
       if(msg){msg.textContent='Profil enregistré. Votre demande d’inscription dans la classe est en attente de validation.';msg.className='personal-profile-message ok';}
     }else if(msg){msg.textContent='Profil enregistré. Votre espace est maintenant personnalisé.';msg.className='personal-profile-message ok';}
@@ -2529,21 +2536,36 @@ function appliquerTheme(choix){
   }
   window.auroreUnlockAccess=unlockAccess;
 
+  let supabaseLoadPromise=null;
   async function getClient(){
     if(client)return client;
-    if(window.supabase?.createClient){
+    const make=()=>{
+      if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
       client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.localStorage}});
       return client;
+    };
+    if(window.supabase?.createClient)return make();
+    if(!supabaseLoadPromise){
+      supabaseLoadPromise=new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-aurore-supabase-fallback]');
+        if(existing){
+          existing.addEventListener('load',resolve,{once:true});
+          existing.addEventListener('error',()=>reject(new Error('Impossible de charger le service de connexion.')),{once:true});
+          return;
+        }
+        const s=document.createElement('script');
+        s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        s.async=true; s.dataset.auroreSupabaseFallback='1';
+        s.onload=resolve; s.onerror=()=>reject(new Error('Impossible de charger le service de connexion.'));
+        document.head.appendChild(s);
+      });
     }
-    if(!document.querySelector('script[data-aurore-supabase-fallback]')){
-      const s=document.createElement('script'); s.src='https://unpkg.com/@supabase/supabase-js@2'; s.async=true; s.dataset.auroreSupabaseFallback='1'; document.head.appendChild(s);
-    }
-    const started=Date.now();
-    while(!window.supabase?.createClient && Date.now()-started<3500) await new Promise(r=>setTimeout(r,40));
-    if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
-    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.localStorage}});
-    return client;
+    await supabaseLoadPromise;
+    return make();
   }
+  // Les fonctions de l'espace personnel sont dans un autre script global.
+  // On expose le même client pour éviter le ReferenceError « getClient is not defined ».
+  window.getClient=getClient;
 
   function setGoogleLoading(on){
     googleBusy=on; const btn=document.getElementById('accessGoogleBtn'); if(!btn)return;
@@ -2602,6 +2624,9 @@ function appliquerTheme(choix){
       // IMPORTANT : dès que la session Google est obtenue, l'écran d'inscription
       // ne doit plus pouvoir bloquer l'accès. Le chargement du profil et de
       // « Mon espace » se poursuit ensuite, sans être confondu avec l'OAuth.
+      // La session est désormais authentifiée : l'écran d'inscription ne doit
+      // plus pouvoir reprendre la main, même si le chargement du profil prend du temps.
+      window.__auroreAuthenticated=true;
       unlockAccess();
       closeSignup();
       setGoogleLoading(false);
