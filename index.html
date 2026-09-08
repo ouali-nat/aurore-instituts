@@ -851,7 +851,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
             <p>Retrouvez les établissements, leurs espaces et les services scolaires dans un environnement pensé pour vous.</p>
           </div>
           <div class="access-actions">
-            <button type="button" id="accessGoogleBtn" class="access-google-btn" aria-label="Continuer avec Google">
+            <button type="button" id="accessGoogleBtn" class="access-google-btn" aria-label="Continuer avec Google" onclick="auroreGoogleLogin(event)">
               <span class="google-mark" aria-hidden="true">G</span><span class="google-spinner" aria-hidden="true"></span>
               <span><strong>Continuer avec Google</strong><small>Accès recommandé à votre espace personnel</small></span>
             </button>
@@ -860,10 +860,10 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
         <section class="access-panel access-panel-alt" aria-label="Autres façons d'accéder à Aurore">
           <div class="access-alt-head"><span>Autres possibilités</span></div>
           <div class="access-alt-scroll">
-            <button type="button" id="accessSignupBtn" class="access-secondary-btn">
+            <button type="button" id="accessSignupBtn" class="access-secondary-btn" onclick="auroreOpenSignup(event)">
               <strong>Créer un compte</strong><small>Pour disposer de votre espace personnel</small>
             </button>
-            <button type="button" id="accessVisitorBtn" class="access-visitor-btn">
+            <button type="button" id="accessVisitorBtn" class="access-visitor-btn" onclick="auroreVisitor(event)">
               <strong>Visiter Aurore sans compte</strong><small>Découvrir les établissements en mode visiteur</small>
             </button>
           </div>
@@ -2136,204 +2136,129 @@ function appliquerTheme(choix){
 (function(){
   const SUPABASE_URL = window.SUPABASE_URL || 'https://fdstrbqvkemtjyxxaxbj.supabase.co';
   const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
-  let client = null;
-  let googleBusy = false;
+  let client=null, googleBusy=false;
+
+  function accessMessage(text,type='ok'){
+    const el=document.getElementById('accessMessage'); if(!el)return;
+    el.textContent=text; el.className='access-message '+type; el.style.display='block';
+  }
+  function unlockAccess(){
+    document.body.classList.remove('site-locked');
+    const lock=document.getElementById('accessLock'); if(lock)lock.style.display='none';
+  }
+  function showPortal(){
+    document.body.classList.add('site-locked');
+    const lock=document.getElementById('accessLock'); if(lock)lock.style.display='flex';
+  }
+  window.auroreUnlockAccess=unlockAccess;
 
   async function getClient(){
-    if(client) return client;
+    if(client)return client;
     if(window.supabase?.createClient){
       client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
       return client;
     }
-    // Secours réseau : si jsDelivr est lent/bloqué, charger le même SDK depuis un second CDN.
     if(!document.querySelector('script[data-aurore-supabase-fallback]')){
-      const s=document.createElement('script'); s.src='https://unpkg.com/@supabase/supabase-js@2'; s.defer=true; s.dataset.auroreSupabaseFallback='1'; document.head.appendChild(s);
+      const s=document.createElement('script'); s.src='https://unpkg.com/@supabase/supabase-js@2'; s.async=true; s.dataset.auroreSupabaseFallback='1'; document.head.appendChild(s);
     }
     const started=Date.now();
-    while(!window.supabase?.createClient && Date.now()-started<8000){
-      await new Promise(r=>setTimeout(r,50));
-    }
-    if(!window.supabase?.createClient) throw new Error('Le service de connexion est temporairement indisponible. Vérifiez votre connexion Internet puis réessayez.');
+    while(!window.supabase?.createClient && Date.now()-started<3500) await new Promise(r=>setTimeout(r,40));
+    if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
     client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
     return client;
   }
 
-  function accessMessage(text,type='ok'){
-    const el=document.getElementById('accessMessage');
-    if(!el)return;
-    el.textContent=text;
-    el.className='access-message '+type;
-    el.style.display='block';
+  function setGoogleLoading(on){
+    googleBusy=on; const btn=document.getElementById('accessGoogleBtn'); if(!btn)return;
+    btn.classList.toggle('is-loading',on); btn.setAttribute('aria-busy',String(on)); btn.disabled=on;
+    const strong=btn.querySelector('strong'); if(strong)strong.textContent=on?'Connexion à Google…':'Continuer avec Google';
   }
 
-  function unlockAccess(){
-    const lock=document.getElementById('accessLock');
-    document.body.classList.remove('site-locked');
-    if(lock)lock.style.display='none';
-  }
-  window.auroreUnlockAccess=unlockAccess;
-
-  function showPortal(){
-    const lock=document.getElementById('accessLock');
-    if(lock)lock.style.display='flex';
-    document.body.classList.add('site-locked');
-  }
-
-  async function startGoogle(){
+  function startGoogle(){
     if(googleBusy)return;
-    googleBusy=true;
-    const btn=document.getElementById('accessGoogleBtn');
-    if(btn){
-      btn.classList.add('is-loading');
-      btn.setAttribute('aria-busy','true');
-      const strong=btn.querySelector('strong');
-      if(strong)strong.textContent='Connexion à Google…';
-    }
-    accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
-    try{
-      const c=await getClient();
-      const redirectTo=window.location.origin+window.location.pathname;
-      const {error}=await c.auth.signInWithOAuth({
-        provider:'google',
-        options:{redirectTo}
-      });
-      if(error)throw error;
-    }catch(err){
-      console.error('[Google OAuth]',err);
-      accessMessage(err?.message||'Impossible de démarrer la connexion Google.','err');
-      googleBusy=false;
-      if(btn){
-        btn.classList.remove('is-loading');
-        btn.removeAttribute('aria-busy');
-        const strong=btn.querySelector('strong');
-        if(strong)strong.textContent='Continuer avec Google';
-      }
-    }
+    setGoogleLoading(true);
+    accessMessage('Ouverture de Google…','ok');
+    const redirectTo=window.location.origin+window.location.pathname;
+    const url=SUPABASE_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirectTo);
+    // Redirection directe : aucun SDK à attendre avant d'ouvrir Google.
+    window.location.assign(url);
   }
+  window.auroreGoogleLogin=function(e){e?.preventDefault();startGoogle();};
 
   async function handleGoogleReturn(){
-    const params=new URLSearchParams(window.location.search);
-    const code=params.get('code');
-    const oauthError=params.get('error');
-    if(oauthError){
-      accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');
-      return false;
-    }
+    const params=new URLSearchParams(location.search),code=params.get('code'),oauthError=params.get('error');
+    if(oauthError){showPortal();accessMessage('La connexion Google n’a pas abouti. Réessayez.','err');return true;}
     if(!code)return false;
     try{
-      showPortal();
-      accessMessage('Finalisation de votre connexion Google…','ok');
+      showPortal(); accessMessage('Finalisation de votre connexion…','ok');
       const c=await getClient();
-      const {data,error}=await c.auth.exchangeCodeForSession(code);
-      if(error)throw error;
-      if(!data?.session)throw new Error('Session Google introuvable après authentification.');
-      const session=data.session;
-      currentAuroreSession={
-        ...session,
-        expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000
-      };
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+      const {data,error}=await c.auth.exchangeCodeForSession(code); if(error)throw error;
+      const session=data?.session; if(!session)throw new Error('Session Google introuvable.');
+      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
       if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess();
-      history.replaceState({},document.title,window.location.pathname+window.location.hash);
-      return true;
-    }catch(err){
-      console.error('[Google OAuth return]',err);
-      accessMessage(err?.message||'La connexion Google n’a pas pu être finalisée.','err');
-      return false;
-    }
+      unlockAccess(); history.replaceState({},document.title,location.pathname+location.hash); return true;
+    }catch(err){accessMessage(err?.message||'La connexion n’a pas pu être finalisée.','err');return true;}
   }
 
   async function restoreGoogleSession(){
     try{
-      const c=await getClient();
-      const {data}=await c.auth.getSession();
-      if(data?.session){
-        const session=data.session;
-        currentAuroreSession={
-          ...session,
-          expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000
-        };
-        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        if(typeof renderAccountHome==='function')renderAccountHome();
-        unlockAccess();
-        return true;
-      }
-    }catch(err){console.warn('[Aurore Auth]',err);}
-    return false;
+      const c=await getClient(); const {data}=await c.auth.getSession();
+      if(!data?.session)return false;
+      const session=data.session;
+      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
+      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+      if(typeof renderAccountHome==='function')renderAccountHome();
+      unlockAccess(); return true;
+    }catch(_){return false;}
   }
 
   function openSignup(){
-    const modal=document.getElementById('signupModal');
-    if(!modal)return;
+    const modal=document.getElementById('signupModal'); if(!modal)return;
     modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
-    document.getElementById('signupMessage')?.style?.setProperty('display','none');
-    setTimeout(()=>document.getElementById('signupName')?.focus(),50);
+    const msg=document.getElementById('signupMessage'); if(msg)msg.style.display='none';
+    requestAnimationFrame(()=>document.getElementById('signupName')?.focus());
   }
-  function closeSignup(){
-    const modal=document.getElementById('signupModal');
-    if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
-  }
+  window.auroreOpenSignup=function(e){e?.preventDefault();openSignup();};
+  function closeSignup(){const m=document.getElementById('signupModal');if(m){m.style.display='none';m.setAttribute('aria-hidden','true');}}
+  window.auroreCloseSignup=closeSignup;
+
+  window.auroreVisitor=function(e){
+    e?.preventDefault();
+    try{localStorage.setItem('aurore_visitor_mode','1');}catch(_){ }
+    unlockAccess();
+  };
 
   async function signup(){
-    const name=document.getElementById('signupName')?.value.trim()||'';
-    const email=document.getElementById('signupEmail')?.value.trim()||'';
-    const password=document.getElementById('signupPassword')?.value||'';
-    const confirm=document.getElementById('signupPasswordConfirm')?.value||'';
-    const msg=document.getElementById('signupMessage');
-    const submit=document.getElementById('signupSubmit');
-    const show=(text,type='ok')=>{if(msg){msg.textContent=text;msg.className='access-message '+type;msg.style.display='block';}};
+    const name=document.getElementById('signupName')?.value.trim()||'',email=document.getElementById('signupEmail')?.value.trim()||'',password=document.getElementById('signupPassword')?.value||'',confirm=document.getElementById('signupPasswordConfirm')?.value||'';
+    const msg=document.getElementById('signupMessage'),submit=document.getElementById('signupSubmit');
+    const show=(t,type='ok')=>{if(msg){msg.textContent=t;msg.className='access-message '+type;msg.style.display='block';}};
     if(password!==confirm){show('Les deux mots de passe ne correspondent pas.','err');return;}
     if(password.length<8){show('Le mot de passe doit contenir au moins 8 caractères.','err');return;}
     if(submit){submit.disabled=true;submit.textContent='CRÉATION…';}
     try{
-      const c=await getClient();
-      const {data,error}=await c.auth.signUp({
-        email,password,
-        options:{
-          data:{full_name:name,nom_complet:name},
-          emailRedirectTo:window.location.origin+window.location.pathname
-        }
-      });
-      if(error)throw error;
-      if(data?.session){
-        currentAuroreSession={...data.session,expires_at:(data.session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        closeSignup(); unlockAccess();
-        if(typeof renderAccountHome==='function')renderAccountHome();
-      }else{
-        show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
-      }
+      const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
+      const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
+      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof renderAccountHome==='function')renderAccountHome();}
+      else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
   }
+  window.auroreSignup=signup;
 
-  async function initAccessPortal(){
-    document.getElementById('accessGoogleBtn')?.addEventListener('click',startGoogle);
-    document.getElementById('accessSignupBtn')?.addEventListener('click',openSignup);
-    document.getElementById('accessVisitorBtn')?.addEventListener('click',()=>{
-      try{localStorage.setItem('aurore_visitor_mode','1');}catch(_){}
-      unlockAccess();
-    });
+  function wire(){
+    // Les onclick sont volontairement présents sur les boutons : aucun délai de chargement du SDK ne bloque l'interface.
     document.getElementById('signupClose')?.addEventListener('click',closeSignup);
-    document.getElementById('showLoginBtn')?.addEventListener('click',()=>{
-      closeSignup();
-      if(typeof openAuthPage==='function')openAuthPage();
-    });
+    document.getElementById('showLoginBtn')?.addEventListener('click',()=>{closeSignup();if(typeof openAuthPage==='function')openAuthPage();});
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
-
-    const handled=await handleGoogleReturn();
-    if(!handled){
-      const restored=await restoreGoogleSession();
-      if(!restored)showPortal();
-    }
+    showPortal();
+    // Ne bloque jamais l'affichage de la page pendant la restauration de session.
+    handleGoogleReturn().then(handled=>{if(!handled)restoreGoogleSession();});
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initAccessPortal,{once:true});
-  else initAccessPortal();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
 </script>
 </body>
