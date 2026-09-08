@@ -914,6 +914,20 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
     <span id="auroreAuthWaitText">Aurore prépare votre espace…</span>
   </div>
 </div>
+<script>
+/* OAuth callback: show the finalisation state immediately, before the main app wiring runs. */
+(function(){
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get('code')){
+      var w=document.getElementById('auroreAuthWait');
+      var t=document.getElementById('auroreAuthWaitText');
+      if(t)t.textContent='Finalisation de votre connexion Google…';
+      if(w){w.classList.add('show');w.setAttribute('aria-hidden','false');}
+    }
+  }catch(_){}
+})();
+</script>
 
 <!-- ===== INSCRIPTION ===== -->
 <div id="signupModal" class="signup-modal" style="display:none;" aria-hidden="true">
@@ -2467,7 +2481,11 @@ function appliquerTheme(choix){
     if(oauthError){showPortal();cacherVeuillezPatienter();accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');return true;}
     if(!code)return false;
     try{
-      showPortal(); afficherVeuillezPatienter('Finalisation de votre connexion Google…'); accessMessage('Finalisation de votre connexion…','ok');
+      // Cet état est affiché avant toute opération réseau afin que la finalisation commence
+      // visuellement dès le retour de Google.
+      showPortal();
+      afficherVeuillezPatienter('Finalisation de votre connexion Google…');
+      accessMessage('Finalisation de votre connexion…','ok');
       const c=await getClient();
       let {data,error}=await c.auth.exchangeCodeForSession(code);
       // Si le SDK a déjà consommé le code pendant le retour, relire la session.
@@ -2538,14 +2556,14 @@ function appliquerTheme(choix){
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
     showPortal();
-    afficherVeuillezPatienter('Aurore prépare votre accès…');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      handleGoogleReturn().then(async handled=>{
-        if(!handled) await restoreGoogleSession();
-        // Si aucun retour OAuth n'est en cours, l'entrée initiale est terminée.
-        if(!new URLSearchParams(location.search).get('code')) cacherVeuillezPatienter();
-      });
-    }));
+    const hasGoogleCode=!!new URLSearchParams(location.search).get('code');
+    if(!hasGoogleCode) afficherVeuillezPatienter('Aurore prépare votre accès…');
+    // Aucun délai artificiel : le retour Google est traité dès que le DOM est prêt.
+    handleGoogleReturn().then(async handled=>{
+      if(!handled) await restoreGoogleSession();
+      // Si aucun retour OAuth n'est en cours, l'entrée initiale est terminée.
+      if(!hasGoogleCode) cacherVeuillezPatienter();
+    });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
