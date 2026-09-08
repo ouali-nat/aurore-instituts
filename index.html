@@ -294,7 +294,38 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .card .tags{margin-bottom:2px}.card h3{font-size:.94rem;margin-top:8px}.card .meta{font-size:.7rem}.card .foot{margin-top:12px;padding-top:11px}.card .foot span{font-size:.63rem}.card .foot button{font-size:.67rem}
 .profile-hero{display:grid!important;grid-template-columns:230px 1fr!important;min-height:270px!important}.profile-cover{grid-column:1!important;grid-row:1!important;height:100%!important;min-height:270px!important}.profile-logo-wrap{grid-column:1!important;grid-row:1!important;align-self:center!important;justify-self:center!important;padding:0!important;z-index:2!important}.profile-logo{width:170px!important;height:170px!important;margin:0!important;border-radius:30px!important;background:var(--panel)!important;border:1px solid var(--line)!important;box-shadow:0 16px 35px rgba(0,0,0,.18)!important}.profile-content{grid-column:2!important;grid-row:1!important;padding:38px 36px!important;align-self:center!important}.profile-info-grid{grid-template-columns:.85fr 1.4fr!important}.profile-site{max-width:980px!important;margin:0 auto!important}.profile-library{grid-template-columns:1fr 150px!important;padding:24px 26px!important}.profile-library-mark{min-width:140px!important;height:140px!important}.profile-location{padding:24px!important}.profile-contact-block{padding:20px 22px!important}
 @media(max-width:760px){.profile-hero{grid-template-columns:1fr!important;min-height:0!important}.profile-cover{grid-column:1!important;grid-row:1!important;height:190px!important;min-height:190px!important}.profile-logo-wrap{grid-column:1!important;grid-row:1!important;align-self:end!important;justify-self:center!important;margin-bottom:-58px!important}.profile-logo{width:116px!important;height:116px!important;border-radius:22px!important}.profile-content{grid-column:1!important;grid-row:2!important;padding:78px 22px 24px!important}.profile-library{grid-template-columns:1fr!important;padding:22px!important}.profile-library-mark{min-width:100%!important;height:92px!important}.profile-info-grid{grid-template-columns:1fr!important}.profile-contact-block{align-items:flex-start!important;flex-direction:column!important}.profile-contact-actions{justify-content:flex-start!important;width:100%!important}.profile-contact-actions button{width:100%!important}.accepted-grid{grid-template-columns:repeat(1,minmax(0,1fr))!important}}
-</style></head>
+</style>
+<style id="aurore-square-uniformity">
+/* Vue d'ensemble : cartes plus carrées et cadres cohérents. */
+.space-tools-grid,.config-test-grid,.accepted-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+.space-tool-card,.admin-card,.accepted-card,.configured-row,.config-test,.platform-kpi,.space-mini-card,.request-card{border-radius:12px!important;}
+.space-tool-card{min-height:170px!important;padding:22px!important;}
+.space-tool-icon{width:54px!important;height:54px!important;border-radius:10px!important;}
+.space-tool-arrow{border-radius:8px!important;}
+.space-panel-label{letter-spacing:.12em;}
+/* Seule l'administration générale porte le rouge. */
+.space-tool-card.admin-general-card,.platform-admin-access,.general-admin-access{border-color:rgba(220,38,38,.42)!important;}
+.space-tool-card.admin-general-card .space-tool-icon,.platform-admin-access,.general-admin-access{color:#fff!important;background:#b91c1c!important;}
+.space-tool-card.admin-general-card:hover{border-color:#ef4444!important;box-shadow:0 12px 30px rgba(185,28,28,.18)!important;}
+.admin-btn.danger{border-radius:10px!important;}
+.accepted-card-cover{height:210px!important;aspect-ratio:1/1!important;background:var(--panel2)!important;}
+.accepted-card-cover img{object-fit:contain!important;width:100%!important;height:100%!important;padding:22px!important;}
+.request-logo,.request-logo-preview{object-fit:contain!important;background:var(--panel2)!important;}
+.configured-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px!important;}
+.configured-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:16px!important;border:1px solid var(--line)!important;background:var(--panel2)!important;}
+.configured-row .configured-main{min-width:0;flex:1;}
+.configured-row .configured-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+.configured-row.admin-space{border-color:rgba(220,38,38,.45)!important;}
+.configured-row.admin-space .space-open-btn{background:#b91c1c!important;color:#fff!important;border-color:#b91c1c!important;}
+.establishment-edit-form{display:grid;gap:14px;max-width:900px;}
+.establishment-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.establishment-edit-form label{display:grid;gap:6px;font-size:.72rem;font-weight:700;}
+.establishment-edit-form input,.establishment-edit-form textarea,.establishment-edit-form select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);outline:none;}
+.establishment-edit-form textarea{min-height:130px;resize:vertical;}
+.establishment-edit-actions{display:flex;gap:8px;flex-wrap:wrap;}
+@media(max-width:680px){.establishment-edit-grid{grid-template-columns:1fr;}.accepted-card-cover{height:180px!important;}}
+</style>
+</head>
 <body>
 <header>
   <div class="wrap head">
@@ -572,7 +603,7 @@ async function renderAccountHome(){
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
-  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Espaces déjà configurés</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>`<div class="configured-row"><div><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div>`).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace →</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" onclick="openSpace('general')">Administration générale</button><button type="button" onclick="openSpace('administration')">Administration établissement</button><button type="button" onclick="openSpace('professeur')">Espace professeur</button><button type="button" onclick="openSpace('eleve')">Espace élève</button><button type="button" onclick="openSpace('parent')">Espace parent</button><button type="button" class="auth-secondary" onclick="renderOnboarding()">Reconfigurer / ajouter un espace</button></div></div>`:'';
   const configureBtn=(!roles.filter(r=>r!=='admin_general').length)?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer un espace</button></div>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
@@ -1011,7 +1042,7 @@ async function openSpace(role,options={}){
     general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Vue générale','Vue d’ensemble de la plateforme et des demandes à traiter.','AG','general-vue'],['Demandes d’établissements','Examiner les demandes de création et décider de leur validation.','DE','general-demandes'],['Établissements acceptés','Accéder à tous les établissements validés sur Aurore.','ET','general-etablissements']]}
   };
   const cfg=configs[role]; if(!cfg)return;
-  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${item[3]==='notes'||item[3]==='class'||item[3]==='professeurs'||item[3]==='camarades'?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
+  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${role==='general'?'admin-general-card ':''}${item[3]==='notes'||item[3]==='class'||item[3]==='professeurs'||item[3]==='camarades'?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
   let panel=document.getElementById('spacePanel');
   if(!panel){
     panel=document.createElement('section');
@@ -1223,7 +1254,7 @@ function openSpaceTool(role,key){
     loadAdminRequests();return;
   }
   if(role==='general' && key==='general-etablissements'){
-    root.innerHTML=`<section class="space-dashboard accepted-page"><div class="space-dashboard-head"><div><h3>Établissements acceptés</h3><p>Tous les établissements validés et actuellement publiés sur la plateforme.</p></div></div><div id="adminAcceptedList"></div></section>`;
+    root.innerHTML=`<section class="space-dashboard accepted-page"><div class="space-dashboard-head"><div><h3>Établissements publiés</h3><p>Gérez les établissements actuellement visibles sur Aurore : consultation, modification des informations et retrait de publication.</p></div></div><div id="adminAcceptedList"></div></section>`;
     loadAdminAcceptedEstablishments();return;
   }
   root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Aurore</span><h3>${key.replaceAll('-',' ')}</h3><p>Cette rubrique est prête pour son branchement aux données réelles.</p></div>${common}</div></section>`;
@@ -1318,10 +1349,52 @@ async function loadAdminAcceptedEstablishments(){
         const initial=esc((e.nom||'ET').trim().slice(0,2).toUpperCase());
         const location=[e.ville,e.commune].filter(Boolean).join(' · ');
         const meta=[e.type||'Établissement',location].filter(Boolean).join(' · ');
-        return `<article class="accepted-card"><div class="accepted-card-cover">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}" loading="lazy">`:`<div class="accepted-logo-fallback">${initial}</div>`}<span class="accepted-status"><i></i> Publié</span></div><div class="accepted-card-body"><div class="accepted-kicker">ÉTABLISSEMENT</div><h3>${esc(e.nom||'Établissement')}</h3><p class="accepted-meta">${esc(meta)}</p>${e.adresse?`<p class="accepted-address">⌖ ${esc(e.adresse)}</p>`:''}<p class="accepted-description">${esc(e.presentation||'Présentation non renseignée.')}</p></div><div class="accepted-card-footer"><span>Visible publiquement</span><button class="admin-btn primary" type="button" onclick="openProfile('${esc(e.id)}')">Ouvrir la fiche <span>→</span></button></div></article>`;
+        return `<article class="accepted-card"><div class="accepted-card-cover">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}" loading="lazy">`:`<div class="accepted-logo-fallback">${initial}</div>`}<span class="accepted-status"><i></i> Publié</span></div><div class="accepted-card-body"><div class="accepted-kicker">ÉTABLISSEMENT</div><h3>${esc(e.nom||'Établissement')}</h3><p class="accepted-meta">${esc(meta)}</p>${e.adresse?`<p class="accepted-address">⌖ ${esc(e.adresse)}</p>`:''}<p class="accepted-description">${esc(e.presentation||'Présentation non renseignée.')}</p></div><div class="accepted-card-footer"><span>Visible publiquement</span><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="admin-btn primary" type="button" onclick="openProfile('${esc(e.id)}')">Ouvrir la fiche <span>→</span></button><button class="admin-btn" type="button" onclick="editPublishedEstablishment('${esc(e.id)}')">Modifier</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer</button></div></div></article>`;
       }).join('')}</div>`;
     }catch(e){list.innerHTML=`<div class="admin-error"><strong>Impossible de charger les établissements.</strong><p>${esc(e.message||'Erreur Supabase.')}</p><button class="admin-btn" type="button" onclick="loadAdminAcceptedEstablishments()">Réessayer</button></div>`;}
   })();
+}
+
+async function editPublishedEstablishment(id){
+  const token=currentAuroreSession?.access_token||'';
+  if(!token){openAuthPage();return;}
+  try{
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(id)}&select=id,nom,type,ville,province,adresse,telephone,email,site_web,presentation,logo_url`,{headers:h,cache:'no-store'});
+    const rows=await r.json().catch(()=>[]); if(!r.ok||!rows[0])throw new Error('Impossible de récupérer cet établissement.');
+    const e=rows[0];
+    const panel=document.getElementById('spacePanel'); if(!panel)return;
+    panel.classList.add('page-mode','tool-page','visible');
+    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="openSpace('general','')">← Retour aux établissements publiés</button><span class="space-panel-label">Administration générale</span><h2>Modifier l’établissement</h2><p>${esc(e.nom||'Établissement')}</p></div><div id="spaceDashboard"><section class="space-dashboard"><form class="establishment-edit-form" onsubmit="savePublishedEstablishment(event,'${esc(e.id)}')"><div class="establishment-edit-grid"><label>Nom<input id="editNom" required value="${esc(e.nom||'')}"></label><label>Type<select id="editType"><option ${e.type==='Lycée'?'selected':''}>Lycée</option><option ${e.type==='Collège'?'selected':''}>Collège</option><option ${e.type==='Université'?'selected':''}>Université</option><option ${e.type==='Institut'?'selected':''}>Institut</option><option ${e.type==='Centre de formation'?'selected':''}>Centre de formation</option></select></label><label>Ville<input id="editVille" value="${esc(e.ville||'')}"></label><label>Province<input id="editProvince" value="${esc(e.province||'')}"></label><label>Adresse<input id="editAdresse" value="${esc(e.adresse||'')}"></label><label>Téléphone<input id="editTelephone" value="${esc(e.telephone||'')}"></label><label>E-mail<input id="editEmail" type="email" value="${esc(e.email||'')}"></label><label>Site web<input id="editSite" value="${esc(e.site_web||'')}"></label></div><label>Présentation<textarea id="editPresentation">${esc(e.presentation||'')}</textarea></label><label>URL du logo<input id="editLogo" value="${esc(e.logo_url||'')}" placeholder="URL publique de l'image"></label><div class="establishment-edit-actions"><button class="admin-btn primary" type="submit">Enregistrer les modifications</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer de la publication</button></div><div id="editEstablishmentMessage" class="auth-message"></div></form></section></div>`;
+    window.scrollTo({top:0,left:0,behavior:'auto'});
+  }catch(err){alert(err.message||'Impossible d’ouvrir la modification.');}
+}
+
+async function savePublishedEstablishment(event,id){
+  event.preventDefault();
+  const msg=$('editEstablishmentMessage');
+  const token=currentAuroreSession?.access_token||'';
+  if(!token)return;
+  const payload={nom:$('editNom')?.value.trim(),type:$('editType')?.value,ville:$('editVille')?.value.trim()||null,province:$('editProvince')?.value.trim()||null,adresse:$('editAdresse')?.value.trim()||null,telephone:$('editTelephone')?.value.trim()||null,email:$('editEmail')?.value.trim()||null,site_web:$('editSite')?.value.trim()||null,presentation:$('editPresentation')?.value.trim()||null,logo_url:$('editLogo')?.value.trim()||null};
+  if(!payload.nom){if(msg)msg.textContent='Le nom est obligatoire.';return;}
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
+    const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Modification impossible.');
+    if(msg)msg.textContent='✓ Modifications enregistrées.';
+    await Promise.all([loadAdminAcceptedEstablishments(),loadInstituts()]);
+    setTimeout(()=>openSpaceTool('general','general-etablissements'),250);
+  }catch(err){if(msg)msg.textContent=err.message||'Modification impossible.';}
+}
+
+async function withdrawPublishedEstablishment(id,name){
+  if(!confirm(`Retirer « ${name||'cet établissement'} » de la publication ?\n\nL’établissement ne sera plus visible dans l’annuaire public, mais ses données resteront conservées.`))return;
+  const token=currentAuroreSession?.access_token||'';
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({actif:false})});
+    const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Retrait impossible.');
+    await Promise.all([loadAdminAcceptedEstablishments(),loadAdminOverview(),loadInstituts()]);
+    alert('Établissement retiré de la publication.');
+  }catch(err){alert(err.message||'Retrait impossible.');}
 }
 
 function closeSpacePanel(){
