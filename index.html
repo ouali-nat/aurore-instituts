@@ -758,7 +758,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 
 <style>
 /* Aurore — rôles, classes et demandes d'inscription */
-.role-choice-wrap{max-width:920px;margin:0 auto;padding:8px 0 30px}.role-choice-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px}.role-choice-head h2{margin:5px 0 8px;font-size:clamp(1.35rem,3vw,2rem)}.role-choice-head p{margin:0;color:var(--muted);line-height:1.55;font-size:.82rem}.role-choice-badge{padding:8px 11px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;font-weight:850;white-space:nowrap}.role-choice-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.role-choice-card{appearance:none;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));color:var(--text);border-radius:20px;padding:18px;text-align:left;cursor:pointer;min-height:150px;box-shadow:var(--shadow);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.role-choice-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 16px 40px rgba(0,0,0,.12)}.role-choice-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(124,58,237,.12);color:var(--accent);font-weight:900;font-size:1.1rem;margin-bottom:14px}.role-choice-card strong{display:block;font-size:.9rem}.role-choice-card span{display:block;color:var(--muted);font-size:.7rem;line-height:1.45;margin-top:5px}.class-select-note{margin-top:8px;color:var(--muted);font-size:.68rem;line-height:1.4}.class-choice-status{margin-top:9px;padding:10px 12px;border-radius:12px;font-size:.7rem;background:var(--panel2);border:1px solid var(--line)}.class-choice-status.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.07)}.class-choice-status.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.07)}
+.role-choice-wrap{max-width:920px;margin:0 auto;padding:8px 0 30px}.role-choice-enter{animation:auroreRoleEnter .5s cubic-bezier(.16,1,.3,1)}@keyframes auroreRoleEnter{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}.role-choice-welcome{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.08)}.role-choice-welcome-ico{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(34,197,94,.18);color:#22c55e;font-weight:900}.role-choice-welcome strong{display:block;font-size:.88rem}.role-choice-welcome span{display:block;color:var(--muted);font-size:.76rem;margin-top:3px;line-height:1.5}.role-choice-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px}.role-choice-head h2{margin:5px 0 8px;font-size:clamp(1.35rem,3vw,2rem)}.role-choice-head p{margin:0;color:var(--muted);line-height:1.55;font-size:.82rem}.role-choice-badge{padding:8px 11px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;font-weight:850;white-space:nowrap}.role-choice-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.role-choice-card{appearance:none;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));color:var(--text);border-radius:20px;padding:18px;text-align:left;cursor:pointer;min-height:150px;box-shadow:var(--shadow);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.role-choice-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 16px 40px rgba(0,0,0,.12)}.role-choice-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(124,58,237,.12);color:var(--accent);font-weight:900;font-size:1.1rem;margin-bottom:14px}.role-choice-card strong{display:block;font-size:.9rem}.role-choice-card span{display:block;color:var(--muted);font-size:.7rem;line-height:1.45;margin-top:5px}.class-select-note{margin-top:8px;color:var(--muted);font-size:.68rem;line-height:1.4}.class-choice-status{margin-top:9px;padding:10px 12px;border-radius:12px;font-size:.7rem;background:var(--panel2);border:1px solid var(--line)}.class-choice-status.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.07)}.class-choice-status.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.07)}
 .admin-class-shell{display:grid;gap:16px}.admin-class-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}.admin-class-top h3{margin:3px 0 5px}.admin-class-top p{margin:0;color:var(--muted);font-size:.76rem;line-height:1.5}.admin-class-actions{display:flex;gap:8px;flex-wrap:wrap}.class-create-card,.class-request-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel2)}.class-create-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:9px;align-items:end}.class-create-grid label,.class-filter label{font-size:.68rem;font-weight:800}.class-create-grid input,.class-filter input,.class-filter select{width:100%;box-sizing:border-box;margin-top:6px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);font:inherit}.class-create-grid button{height:42px}.class-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}.class-board-card{position:relative;min-height:155px;padding:15px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(145deg,var(--panel),var(--panel2));cursor:grab;box-shadow:var(--shadow);transition:transform .18s,border-color .18s,box-shadow .18s}.class-board-card:active{cursor:grabbing}.class-board-card.dragging{opacity:.45;transform:scale(.98)}.class-board-card.drag-over{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.1),0 18px 40px rgba(0,0,0,.1)}.class-board-kicker{font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.class-board-card h4{margin:7px 0 4px;font-size:1rem}.class-board-meta{color:var(--muted);font-size:.68rem;line-height:1.45}.class-board-count{display:inline-flex;margin-top:12px;padding:6px 9px;border-radius:999px;background:rgba(124,58,237,.09);font-size:.63rem;font-weight:850}.class-board-menu{position:absolute;right:10px;top:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:9px;padding:4px 7px;cursor:pointer}.class-request-list{display:grid;gap:10px}.class-request-card{display:grid;grid-template-columns:1fr auto;gap:14px}.class-request-main strong{font-size:.85rem}.class-request-main span{display:block;color:var(--muted);font-size:.68rem;margin-top:4px}.class-request-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.class-request-status{align-self:start;padding:6px 9px;border-radius:999px;font-size:.62rem;font-weight:850;background:rgba(245,158,11,.12)}.class-request-status.ok{background:rgba(34,197,94,.1);color:#15803d}.class-request-status.no{background:rgba(239,68,68,.1);color:#b91c1c}.class-student-panel{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.class-student-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-top:7px}.class-student-row strong{font-size:.7rem}.class-student-row span{color:var(--muted);font-size:.62rem}.student-class-hero{padding:18px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));margin-top:14px}.student-class-hero h3{margin:4px 0}.student-class-hero p{margin:0;color:var(--muted);font-size:.74rem;line-height:1.5}.student-class-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.student-class-tile{padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}.student-class-tile strong{display:block;font-size:.72rem}.student-class-tile span{display:block;color:var(--muted);font-size:.64rem;margin-top:4px;line-height:1.4}
 @media(max-width:900px){.role-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.class-create-grid{grid-template-columns:1fr 1fr}.class-create-grid button{grid-column:1/-1}.student-class-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.role-choice-head{flex-direction:column}.role-choice-grid{grid-template-columns:1fr}.class-create-grid{grid-template-columns:1fr}.class-request-card{grid-template-columns:1fr}.student-class-grid{grid-template-columns:1fr}}
@@ -1360,11 +1360,19 @@ async function savePersonalProfile(){
   finally{if(btn){btn.disabled=false;btn.textContent='Envoyer mon dossier';}}
 }
 function hasSavedPersonalRole(){const p=currentAuroreProfile||{};return !!(p.etablissement_id&&p.profil_statut==='valide'&&['eleve','parent','professeur','administration','proviseur','personnel'].includes(String(p.role||'').toLowerCase()));}
-function renderRoleChoice(){
+// Un compte est considéré comme « déjà engagé » dès qu'un rôle a été choisi une fois,
+// même si l'établissement n'est pas encore sélectionné ou si le dossier est en attente.
+// Ces comptes ne doivent plus jamais revoir l'écran de choix de rôle : ils sont
+// redirigés directement vers leur espace personnel (formulaire d'établissement ou
+// écran d'attente selon le cas).
+function hasChosenRoleEver(){const p=currentAuroreProfile||{};return !!(String(p.role||'').trim()||p.etablissement_id);}
+function renderRoleChoice(isNewAccount=false){
   authViewVersion++;
   const root=$('authRoot');if(!root||!currentAuroreSession)return;
   const roles=[['eleve','♙','Élève','Ma scolarité, ma classe et mes résultats.'],['parent','♙','Parent','Suivi de la scolarité de votre enfant.'],['professeur','◉','Professeur','Enseignement, classes et évaluations.'],['administration','⚙','Administration','Gestion de votre établissement.'],['proviseur','⌂','Proviseur','Pilotage et vie du lycée.']];
-  root.innerHTML=`<section class="role-choice-wrap"><div class="role-choice-head"><div><span class="auth-kicker">Première étape</span><h2>Quel est votre rôle sur Aurore ?</h2><p>Choisissez votre profil. Aurore adaptera ensuite votre espace et les informations demandées.</p></div><span class="role-choice-badge">Compte connecté</span></div><div class="role-choice-grid">${roles.map(r=>`<button type="button" class="role-choice-card" onclick="choosePersonalRole('${r[0]}')"><div class="role-choice-icon">${r[1]}</div><strong>${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></section>`;
+  const prenom=currentAuroreProfile?.prenom?', '+esc(currentAuroreProfile.prenom):'';
+  const welcomeBanner=isNewAccount?`<div class="role-choice-welcome"><div class="role-choice-welcome-ico">✓</div><div><strong>Bienvenue sur Aurore${prenom} !</strong><span>Votre compte a bien été créé. Merci de nous rejoindre — choisissez votre profil pour continuer.</span></div></div>`:'';
+  root.innerHTML=`<section class="role-choice-wrap role-choice-enter">${welcomeBanner}<div class="role-choice-head"><div><span class="auth-kicker">Première étape</span><h2>Quel est votre rôle sur Aurore ?</h2><p>Choisissez votre profil. Aurore adaptera ensuite votre espace et les informations demandées.</p></div><span class="role-choice-badge">Compte connecté</span></div><div class="role-choice-grid">${roles.map(r=>`<button type="button" class="role-choice-card" onclick="choosePersonalRole('${r[0]}')"><div class="role-choice-icon">${r[1]}</div><strong>${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></section>`;
 }
 async function choosePersonalRole(role){
   if(!currentAuroreSession||!['eleve','parent','professeur','administration','proviseur'].includes(role))return;
@@ -1465,13 +1473,21 @@ function renderPersonalSpaceEdit(){
   renderPersonalSpace().catch(()=>{});
 }
 
-async function afterLoginToPersonalSpace(showWelcome=true){
+async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   if(!currentAuroreSession)return;
   const ctx=await getPersonalSpaceContext();
-  if(!hasSavedPersonalRole()){
+  if(!hasChosenRoleEver()){
+    // Compte réellement nouveau : jamais aucun rôle choisi -> écran d'accueil + choix de rôle.
     restoreSiteLogo();
     if(showWelcome){accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Choisissons votre rôle…`,'ok');if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… préparation de votre espace');await new Promise(r=>requestAnimationFrame(r));}
-    $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');renderRoleChoice();if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
+    $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');renderRoleChoice(isNewAccount);if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
+  }
+  if(!hasSavedPersonalRole()){
+    // Compte déjà engagé (rôle déjà choisi, établissement pas encore choisi ou dossier
+    // en attente) : jamais de retour au choix de rôle, direction l'espace personnel.
+    restoreSiteLogo();
+    if(showWelcome){accessMessage(`Bon retour${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Ouverture de votre espace personnel…`,'ok');if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Ouverture de votre espace personnel…');await new Promise(r=>requestAnimationFrame(r));}
+    $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');await renderPersonalSpace();if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
   }
   if(ctx.etab){setSpaceLogo(ctx.etab.logo_url,ctx.etab.nom);setSpaceBrand(ctx.etab,ctx.role);}
   if(showWelcome){
@@ -2733,24 +2749,33 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
 
-      // EXACTEMENT comme Archives : dès que l'authentification est obtenue,
-      // l'accès est libéré. Le profil ne peut plus remettre la page d'inscription.
+      // Important : on NE révèle PAS le site tout de suite. Tant que le profil et la
+      // destination (choix de rôle / espace personnel) ne sont pas prêts, l'écran reste
+      // verrouillé derrière l'animation « Finalisation… » avec fond flou. Cela évite tout
+      // accès instantané et non désiré à la page principale avant que le bon écran ne
+      // soit affiché.
       window.__auroreAuthenticated=true;
-      unlockAccess();
       closeSignup();
       setGoogleLoading(false);
       history.replaceState({},document.title,window.location.pathname+window.location.hash);
-      document.body.classList.remove('aurore-oauth-callback-pending');
 
       try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
-      // Les opérations secondaires ne bloquent jamais la connexion.
+      let isNewAccount=false;
       try{
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);
+        if(typeof loadAuroreProfile==='function'){
+          await loadAuroreProfile();
+          // Compte tout juste créé par Supabase si l'écart création/dernière connexion est minime.
+          const u=currentAuroreSession?.user||{};
+          isNewAccount=!!(u.created_at&&u.last_sign_in_at&&(new Date(u.last_sign_in_at)-new Date(u.created_at))<10000)&&!hasChosenRoleEver();
+        }
+        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,isNewAccount);
       }catch(postLoginErr){
         console.warn('[Google OAuth] profil/espace différé',postLoginErr);
-        unlockAccess();
       }finally{
+        // La destination est maintenant prête à l'écran : on peut lever le verrou et
+        // faire disparaître l'animation de finalisation.
+        document.body.classList.remove('aurore-oauth-callback-pending');
+        unlockAccess();
         cacherVeuillezPatienter();
       }
       return true;
@@ -2774,12 +2799,14 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
       window.__auroreAuthenticated=true;
-      unlockAccess();
       closeSignup();
+      // Même principe qu'au retour Google : on attend que la destination soit prête
+      // avant de lever le verrou, pour ne jamais laisser entrevoir la page principale.
       try{
         if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
         if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(false);
       }catch(e){console.warn('[Aurore Auth] profil/espace différé',e);}
+      unlockAccess();
       cacherVeuillezPatienter();
       return true;
     }catch(err){
@@ -2814,7 +2841,7 @@ function appliquerTheme(choix){
     try{
       const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
       const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);}
+      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();afficherVeuillezPatienter('Création de votre espace…');if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,true);unlockAccess();cacherVeuillezPatienter();}
       else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
