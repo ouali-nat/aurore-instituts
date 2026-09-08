@@ -728,7 +728,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
   @media(max-width:520px){.access-lock{padding:14px}.access-card-body{padding:24px 20px 20px}.access-tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.access-logo{width:52px;height:52px;flex-basis:52px;border-radius:14px}.signup-card{padding:23px 19px}}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style id="aurore-adaptive-theme-v3">
 /* Thème réellement adaptatif : aucune couleur fixe ne doit empêcher Clair/Sombre + les 25 palettes. */
 html[data-theme="light"]{--fond:#f7f7f9;--papier:#fff;--bordure:#ded9e6;--encre:#17131f;--gris:#625d69;--violet:var(--accent-strong);--bleu:var(--accent2)}
@@ -2796,12 +2796,29 @@ function appliquerTheme(choix){
   // ni retarder le traitement du retour Google. Un CDN de secours + timeout évitent
   // également les attentes infinies sur certains réseaux mobiles.
   function creerClientAuthGoogle(){
-    return window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+    const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
       auth:{flowType:'pkce',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,storage:window.localStorage}
     });
+    brancherEvenementsAuth(client);
+    return client;
   }
   let AURORE_SUPABASE_AUTH = window.supabase?.createClient ? creerClientAuthGoogle() : null;
   let supabaseLoadPromise=null;
+  let authEventsBound=false;
+
+  function brancherEvenementsAuth(c){
+    if(authEventsBound||!c?.auth)return;
+    authEventsBound=true;
+    c.auth.onAuthStateChange((event,session)=>{
+      if(session){
+        currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+      }else if(event==='SIGNED_OUT'){
+        currentAuroreSession=null;
+        try{localStorage.removeItem('aurore-session');}catch(_){}
+      }
+    });
+  }
 
   function chargerScriptSupabase(url,delaiMs=8000){
     return new Promise((resolve,reject)=>{
@@ -2819,18 +2836,23 @@ function appliquerTheme(choix){
   }
 
   async function assurerClientAuthGoogle(){
-    if(AURORE_SUPABASE_AUTH)return AURORE_SUPABASE_AUTH;
-    if(!window.supabase?.createClient){
-      try{await chargerScriptSupabase('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',8000);}catch(e){
-        console.warn('[Aurore] jsDelivr indisponible, tentative unpkg',e);
-        try{await chargerScriptSupabase('https://unpkg.com/@supabase/supabase-js@2',8000);}catch(e2){
-          throw new Error('Impossible de charger le service de connexion.');
+    if(AURORE_SUPABASE_AUTH){brancherEvenementsAuth(AURORE_SUPABASE_AUTH);return AURORE_SUPABASE_AUTH;}
+    if(supabaseLoadPromise)return supabaseLoadPromise;
+    supabaseLoadPromise=(async()=>{
+      if(!window.supabase?.createClient){
+        try{await chargerScriptSupabase('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',8000);}catch(e){
+          console.warn('[Aurore] jsDelivr indisponible, tentative unpkg',e);
+          try{await chargerScriptSupabase('https://unpkg.com/@supabase/supabase-js@2',8000);}catch(e2){
+            throw new Error('Impossible de charger le service de connexion.');
+          }
         }
       }
-    }
-    if(window.supabase?.createClient&&!AURORE_SUPABASE_AUTH)AURORE_SUPABASE_AUTH=creerClientAuthGoogle();
-    if(!AURORE_SUPABASE_AUTH)throw new Error('Service de connexion momentanément indisponible.');
-    return AURORE_SUPABASE_AUTH;
+      if(window.supabase?.createClient&&!AURORE_SUPABASE_AUTH)AURORE_SUPABASE_AUTH=creerClientAuthGoogle();
+      if(!AURORE_SUPABASE_AUTH)throw new Error('Service de connexion momentanément indisponible.');
+      brancherEvenementsAuth(AURORE_SUPABASE_AUTH);
+      return AURORE_SUPABASE_AUTH;
+    })();
+    try{return await supabaseLoadPromise;}finally{if(!AURORE_SUPABASE_AUTH)supabaseLoadPromise=null;}
   }
 
   // Compatibilité avec tout le code de Mon espace qui appelle getClient().
