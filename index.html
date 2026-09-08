@@ -837,7 +837,9 @@ async function openSpace(role){
     if(!isAdminGeneral){openAuthPage();authMessage('Accès réservé à l’Administration générale Aurore.');return;}
   }
   document.body.classList.add('spaces-focus');
-  $('homeView')?.classList.add('hide-home');
+  // Le panneau d'espace est contenu dans #homeView : ne pas masquer #homeView ici.
+  // La classe spaces-focus masque déjà les sections d'accueil et laisse #spacePanel visible.
+  $('homeView')?.classList.remove('hide-home');
   const configs={
     eleve:{title:'Espace élèves',subtitle:'Tout ce qui concerne votre vie scolaire.',items:[
       ['Ma classe','Votre classe, votre groupe et les informations essentielles.','⌂','class'],
