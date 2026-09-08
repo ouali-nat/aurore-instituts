@@ -271,6 +271,21 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 
 .profile-library-page{display:grid;gap:16px;max-width:980px;margin:0 auto}.profile-library-page-head{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.profile-library-page-head h1{font-size:clamp(1.8rem,4vw,3rem);margin-top:7px}.profile-library-page-head p{color:var(--muted);font-size:.82rem;margin-top:7px}.profile-library-page-logo{width:118px;height:118px;border-radius:24px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;color:var(--accent2);font-weight:900;font-size:1.8rem}.profile-library-page-logo img{width:100%;height:100%;object-fit:contain;padding:12px}.pdf-style-empty{display:grid;grid-template-columns:90px 1fr;gap:18px;align-items:center;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.pdf-empty-mark{width:76px;height:96px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;color:var(--accent2);font-weight:900;font-size:.72rem}.pdf-style-empty h2{font-size:1rem}.pdf-style-empty p{color:var(--muted);font-size:.78rem;line-height:1.65;margin-top:6px}@media(max-width:600px){.profile-library-page-head{align-items:flex-start;flex-direction:column}.profile-library-page-logo{width:100%;height:100px}.pdf-style-empty{grid-template-columns:1fr}.pdf-empty-mark{width:64px;height:80px}}
 </style>
+<style id="aurore-uniform-logo-and-pages">
+/* Logos : même cadre partout, image toujours entièrement visible et jamais déformée. */
+.cover,.accepted-card-cover,.profile-logo,.request-logo-preview{display:grid;place-items:center;overflow:hidden}
+.cover .badge img,.accepted-card-cover img,.profile-logo img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;padding:12px!important;box-sizing:border-box!important;background:var(--panel2)!important;display:block!important}
+.cover .badge img{padding:22px!important}
+.profile-logo img{padding:16px!important}
+.request-logo-preview{object-fit:contain!important;object-position:center!important;background:var(--panel2)!important;padding:12px!important;box-sizing:border-box!important}
+.profile-library-page-head{justify-content:flex-start!important}
+.profile-library-page-logo,.profile-library-mark{display:none!important}
+/* Chaque outil d'administration devient une vraie vue de page dans l'application, sans ancrage ni défilement vers un bloc. */
+.space-panel.tool-page{min-height:calc(100dvh - 76px);padding-bottom:60px}
+.space-panel.tool-page .space-tools-grid{display:none!important}
+.space-panel.tool-page .space-dashboard{margin-top:0!important}
+.space-panel.tool-page .space-dashboard-head{margin-top:0!important}
+</style>
 <style id="aurore-instituts-refinement">
 #homeView.directory-mode > .wrap > section:not(#etablissements){display:none!important}
 #homeView.directory-mode #etablissements{padding-top:10px}
@@ -646,11 +661,42 @@ function previewRequestLogo(event){
   const file=event.target.files?.[0];
   const input=event.target;
   const preview=$('reqPhotoPreview');
-  if(!file){input.dataset.dataUrl='';if(preview)preview.style.display='none';return;}
-  if(!file.type.startsWith('image/')){input.value='';input.dataset.dataUrl='';if(preview)preview.style.display='none';return;}
-  if(file.size>2*1024*1024){input.value='';input.dataset.dataUrl='';if(preview)preview.style.display='none';alert('Le logo doit faire au maximum 2 Mo.');return;}
+  const reset=()=>{input.value='';input.dataset.dataUrl='';if(preview){preview.removeAttribute('src');preview.style.display='none';}};
+  if(!file){reset();return;}
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)){
+    reset();
+    alert('Format refusé. Utilisez uniquement PNG, JPG/JPEG ou WebP pour garantir une présentation uniforme.');
+    return;
+  }
+  if(file.size>2*1024*1024){reset();alert('Le logo doit faire au maximum 2 Mo.');return;}
   const reader=new FileReader();
-  reader.onload=()=>{input.dataset.dataUrl=reader.result||'';if(preview){preview.src=reader.result;preview.style.display='block';}};
+  reader.onerror=()=>{reset();alert('Impossible de lire cette image.');};
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const maxSide=Math.max(img.naturalWidth,img.naturalHeight);
+      const minSide=Math.min(img.naturalWidth,img.naturalHeight);
+      if(!img.naturalWidth||!img.naturalHeight||minSide<96||maxSide>8000){reset();alert('Image refusée : dimensions insuffisantes ou excessives. Utilisez un logo net d’au moins 96 px et de moins de 8000 px.');return;}
+      const canvas=document.createElement('canvas');
+      const size=1024; canvas.width=size; canvas.height=size;
+      const ctx=canvas.getContext('2d');
+      if(!ctx){reset();alert('Votre navigateur ne permet pas de préparer ce logo.');return;}
+      ctx.clearRect(0,0,size,size);
+      const scale=Math.min((size*0.86)/img.naturalWidth,(size*0.86)/img.naturalHeight);
+      const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
+      const x=Math.round((size-w)/2),y=Math.round((size-h)/2);
+      ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+      ctx.drawImage(img,x,y,w,h);
+      let normalized='';
+      try{normalized=canvas.toDataURL('image/webp',0.92);}catch(_){normalized=canvas.toDataURL('image/png');}
+      if(!normalized||normalized.length>2.8*1024*1024){reset();alert('Logo refusé : le fichier normalisé reste trop lourd. Choisissez une image plus simple.');return;}
+      input.dataset.dataUrl=normalized;
+      input.dataset.originalType=file.type;
+      if(preview){preview.src=normalized;preview.style.display='block';}
+    };
+    img.onerror=()=>{reset();alert('Image refusée : fichier illisible ou endommagé.');};
+    img.src=reader.result;
+  };
   reader.readAsDataURL(file);
 }
 
@@ -728,7 +774,6 @@ async function openProfile(id,options={}){
 
     <section class="profile-library">
       <div class="profile-library-main"><span class="profile-section-kicker">ESPACE ÉTABLISSEMENT</span><h2>Bibliothèque</h2><p>Retrouvez ici les documents, cours, ressources et publications pédagogiques mis à disposition par l’établissement.</p><button type="button" onclick="openProfileLibrary('${esc(e.id)}')">Ouvrir la bibliothèque →</button></div>
-      <div class="profile-library-mark">BIB<br><span>AURORE</span></div>
     </section>
 
     <div class="profile-info-grid">
@@ -763,7 +808,7 @@ async function openProfileLibrary(id,options={}){
   window.scrollTo({top:0,behavior:'auto'});
   $('profileRoot').innerHTML=`<button class="back-btn" type="button" onclick="history.back()">← Retour à ${esc(e.nom)}</button>
     <section class="profile-library-page" style="margin-top:14px">
-      <div class="profile-library-page-head"><div><span class="profile-section-kicker">BIBLIOTHÈQUE</span><h1>${esc(e.nom)}</h1><p>Les ressources publiées par l’établissement seront réunies ici.</p></div><div class="profile-library-page-logo">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}">`:esc(initials(e.nom))}</div></div>
+      <div class="profile-library-page-head"><div><span class="profile-section-kicker">BIBLIOTHÈQUE</span><h1>${esc(e.nom)}</h1><p>Les ressources publiées par l’établissement seront réunies ici.</p></div></div>
       <div class="pdf-style-empty"><div class="pdf-empty-mark">PDF</div><div><h2>Bibliothèque de l’établissement</h2><p>Les cours, documents et ressources pédagogiques apparaîtront ici sous forme de cartes claires, avec leur aperçu, leur titre et les actions de lecture ou de téléchargement.</p></div></div>
     </section>`;
 }
@@ -935,6 +980,8 @@ async function openSpace(role,options={}){
   const route=`#espace/${encodeURIComponent(role)}${options.tool?'/'+encodeURIComponent(options.tool):''}`;
   if(push && location.hash!==route) pushRoute(route);
   document.body.classList.add('spaces-focus');
+  const existingSpacePanel=document.getElementById('spacePanel');
+  existingSpacePanel?.classList.remove('tool-page');
   $('authView')?.classList.remove('show');
   $('profileView')?.classList.remove('show');
   // Le panneau d'espace est contenu dans #homeView : ne pas masquer #homeView ici.
@@ -972,7 +1019,7 @@ async function openSpace(role,options={}){
     panel.className='space-panel';
     document.body.appendChild(panel);
   }
-  if(panel){panel.classList.add('page-mode');panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'auto',block:'start'});}
+  if(panel){panel.classList.add('page-mode');window.scrollTo({top:0,left:0,behavior:'auto'});panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');}
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
 }
 
@@ -1147,11 +1194,16 @@ async function uploadAdminDocument(){
 }
 
 function openSpaceTool(role,key){
-  const root=document.getElementById('spaceDashboard'); if(!root)return;
   const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}`;
   if(location.hash!==route) pushRoute(route);
+  const panel=document.getElementById('spacePanel');
+  if(!panel)return;
+  panel.classList.add('page-mode','tool-page','visible');
+  panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour à ${role==='general'?'l’Administration générale':'l’espace'}</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${role==='general'?'Administration générale Aurore':'Espace'}</h2><p>Cette rubrique s’ouvre comme une page dédiée.</p></div><div id="spaceDashboard"></div>`;
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+  const root=document.getElementById('spaceDashboard'); if(!root)return;
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
-  const common=`<button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button>`;
+  const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">← Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
