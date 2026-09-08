@@ -763,7 +763,25 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 @media(max-width:900px){.role-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.class-create-grid{grid-template-columns:1fr 1fr}.class-create-grid button{grid-column:1/-1}.student-class-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.role-choice-head{flex-direction:column}.role-choice-grid{grid-template-columns:1fr}.class-create-grid{grid-template-columns:1fr}.class-request-card{grid-template-columns:1fr}.student-class-grid{grid-template-columns:1fr}}
 </style>
-</head>
+<style id="aurore-profile-workflow-v2">
+.personal-profile-form{position:relative;padding:0!important;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:0 24px 70px rgba(0,0,0,.18)}
+.personal-profile-form .profile-form-top{display:flex;align-items:center;gap:16px;padding:22px 24px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)}
+.personal-avatar-editor{display:flex;align-items:center;gap:14px;padding:18px 24px;border-bottom:1px solid var(--line)}
+.personal-avatar-frame{width:86px;height:86px;flex:0 0 86px;border-radius:24px;padding:4px;background:linear-gradient(145deg,var(--accent),var(--accent2));box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 25%,transparent);overflow:hidden}
+.personal-avatar-frame img,.personal-avatar-frame .fallback{width:100%;height:100%;border-radius:20px;object-fit:cover;background:var(--panel2);display:grid;place-items:center;font-weight:900;color:var(--accent2)}
+.personal-profile-form .form-inner{padding:20px 24px}
+.personal-profile-form input,.personal-profile-form select,.personal-profile-form textarea{border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:var(--panel2);color:var(--text);outline:none}
+.personal-profile-form input:focus,.personal-profile-form select:focus,.personal-profile-form textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}
+.personal-profile-pending{padding:26px;border:1px solid color-mix(in srgb,#eab308 25%,var(--line));border-radius:22px;background:color-mix(in srgb,#eab308 6%,var(--panel));display:flex;gap:15px;align-items:flex-start}
+.personal-profile-pending .pending-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,#eab308 14%,transparent);color:#ca8a04;font-weight:900}
+.personal-profile-pending h3{font-size:1rem;margin-bottom:4px}.personal-profile-pending p{color:var(--muted);font-size:.78rem;line-height:1.6}
+.member-request-card{display:grid;grid-template-columns:auto 1fr auto;gap:15px;align-items:center;padding:18px;border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:0 12px 30px rgba(0,0,0,.08)}
+.member-request-avatar{width:58px;height:58px;border-radius:18px;overflow:hidden;background:var(--panel2);display:grid;place-items:center;font-weight:900;color:var(--accent2)}
+.member-request-avatar img{width:100%;height:100%;object-fit:cover}
+.member-request-main strong{display:block;font-size:.9rem}.member-request-main span{display:block;color:var(--muted);font-size:.72rem;margin-top:3px}.member-request-details{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.member-request-details i{font-style:normal;padding:4px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:.64rem;color:var(--muted)}
+.member-request-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.member-request-actions .approve{border:0;background:#16a34a;color:#fff}.member-request-actions .reject{border:1px solid rgba(220,38,38,.3);background:transparent;color:#dc2626}.member-request-actions button{border-radius:11px;padding:9px 12px;font-weight:800;font-size:.7rem}
+@media(max-width:650px){.member-request-card{grid-template-columns:auto 1fr}.member-request-actions{grid-column:1/-1;justify-content:stretch}.member-request-actions button{flex:1}.personal-avatar-editor{align-items:flex-start;flex-direction:column}}
+</style></head>
 <body>
 <header>
   <div class="wrap head">
@@ -1300,59 +1318,47 @@ async function auroreFetchWithTimeout(url,options={},timeout=10000){
   finally{clearTimeout(timer);}
 }
 
+async function uploadPersonalAvatar(file,id){
+  if(!file)return null;
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('Photo refusée. Utilisez JPG, PNG ou WebP.');
+  if(file.size>3*1024*1024)throw new Error('La photo de profil doit faire au maximum 3 Mo.');
+  const client=await getClient();
+  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  const path=`${id}/avatar-${Date.now()}.${ext}`;
+  const {error}=await client.storage.from('profiles').upload(path,file,{upsert:true,contentType:file.type,cacheControl:'31536000'});
+  if(error)throw error;
+  return client.storage.from('profiles').getPublicUrl(path).data?.publicUrl||null;
+}
 async function savePersonalProfile(){
   const token=currentAuroreSession?.access_token||'',id=currentAuroreSession?.user?.id||'';
   const msg=document.getElementById('personalProfileMessage'),btn=document.getElementById('personalProfileSave');
   if(!token||!id)return;
-  const role=document.getElementById('personalRole')?.value||'eleve';
-  const nom=document.getElementById('personalNom')?.value.trim()||'';
-  const prenom=document.getElementById('personalPrenom')?.value.trim()||'';
-  const etabId=document.getElementById('personalEtab')?.value||'';
-  const etabName=document.getElementById('personalEtab')?.selectedOptions?.[0]?.dataset?.name||'';
-  const niveau=document.getElementById('personalNiveau')?.value.trim()||'';
-  const classe=document.getElementById('personalClasse')?.value.trim()||'';
-  const classeId=document.getElementById('personalClasseId')?.value||'';
-  const filiere=document.getElementById('personalFiliere')?.value.trim()||'';
-  const discipline=document.getElementById('personalDiscipline')?.value.trim()||'';
-  const fonction=document.getElementById('personalFonction')?.value.trim()||'';
-  const enfant=document.getElementById('personalEnfant')?.value.trim()||'';
-  if(!nom||!prenom||!etabId){if(msg){msg.textContent='Veuillez renseigner au minimum votre nom, prénom et établissement.';msg.className='personal-profile-message err';}return;}
-  if(btn){btn.disabled=true;btn.textContent='Enregistrement…';}
-  if(msg){msg.textContent='Enregistrement de votre espace…';msg.className='personal-profile-message';}
+  const role=document.getElementById('personalRole')?.value||selectedOnboardingRole||'eleve';
+  const nom=document.getElementById('personalNom')?.value.trim()||'',prenom=document.getElementById('personalPrenom')?.value.trim()||'';
+  const etabId=document.getElementById('personalEtab')?.value||'',etabName=document.getElementById('personalEtab')?.selectedOptions?.[0]?.dataset?.name||'';
+  const niveau=document.getElementById('personalNiveau')?.value.trim()||'',classe=document.getElementById('personalClasse')?.selectedOptions?.[0]?.dataset?.name||'';
+  const classeId=document.getElementById('personalClasseId')?.value||document.getElementById('personalClasse')?.value||'';
+  const filiere=document.getElementById('personalFiliere')?.value.trim()||'',discipline=document.getElementById('personalDiscipline')?.value.trim()||'',fonction=document.getElementById('personalFonction')?.value.trim()||'',enfant=document.getElementById('personalEnfant')?.value.trim()||'';
+  const telephone=document.getElementById('personalTelephone')?.value.trim()||'',adresse=document.getElementById('personalAdresse')?.value.trim()||'',dateNaissance=document.getElementById('personalDateNaissance')?.value||'';
+  const avatarFile=document.getElementById('personalAvatarFile')?.files?.[0]||null;
+  if(!nom||!prenom||!etabId){if(msg){msg.textContent='Veuillez renseigner votre nom, votre prénom et votre établissement.';msg.className='personal-profile-message err';}return;}
+  if(role==='eleve'&&!classeId){if(msg){msg.textContent='Choisissez une classe proposée par votre établissement.';msg.className='personal-profile-message err';}return;}
+  if(btn){btn.disabled=true;btn.textContent='Envoi du dossier…';}
   try{
-    const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=representation'};
-    if(role==='eleve' && !classeId){
-      if(msg){msg.textContent='Choisissez une classe proposée par votre établissement.';msg.className='personal-profile-message err';}
-      if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}
-      return;
-    }
-    // Le rôle et l'établissement deviennent immédiatement un espace Aurore.
-    const cfg=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({p_role:role,p_etablissement_id:etabId})});
-    if(!cfg.ok){const cb=await cfg.json().catch(()=>null);throw new Error(cb?.message||cb?.hint||'Impossible d’activer votre espace établissement.');}
-    // Les champs scolaires complémentaires sont stockés dans les métadonnées du compte,
-    // car la table profiles de Section Instituts ne contient volontairement que l’identité.
-    const client=await getClient();
-    const metaPayload={prenom,nom,full_name:`${prenom} ${nom}`,role,etablissement_id:etabId,etablissement_nom:etabName,niveau:niveau||null,classe:classe||null,classe_id:classeId||null,filiere:filiere||null,discipline:discipline||null,fonction:fonction||null,enfant_informations:enfant||null};
-    const updated=await client.auth.updateUser({data:metaPayload});
-    if(updated.error)throw updated.error;
-    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers,body:JSON.stringify({prenom,nom,full_name:`${prenom} ${nom}`})});
-    if(!r.ok)throw new Error('Impossible d’enregistrer votre identité.');
-    await loadAuroreProfile();
-    if(role==='eleve' && classeId){
-      const dr=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/classe_demandes?on_conflict=classe_id,profile_id`,{method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({classe_id:classeId,profile_id:id,etablissement_id:etabId,statut:'en_attente'})});
-      if(!dr.ok && dr.status!==409){const db=await dr.json().catch(()=>null);throw new Error(db?.message||'Impossible d’envoyer la demande d’inscription dans la classe.');}
-      if(msg){msg.textContent='Votre profil a bien été enregistré. Merci ! Votre demande d’inscription dans la classe a été transmise à l’administration du lycée et sera examinée prochainement.';msg.className='personal-profile-message ok';}
-    }else if(msg){msg.textContent='Votre profil a bien été enregistré. Merci ! Votre espace personnel est maintenant configuré.';msg.className='personal-profile-message ok';}
+    let avatarUrl=currentAuroreProfile?.avatar_url||null;
+    if(avatarFile){if(msg)msg.textContent='Téléversement de votre photo…';avatarUrl=await uploadPersonalAvatar(avatarFile,id);}
+    const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,enfant_informations:enfant,telephone,adresse,date_naissance:dateNaissance};
+    const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/soumettre_demande_membre`,{method:'POST',headers,body:JSON.stringify({p_etablissement_id:etabId,p_role:role,p_classe_id:role==='eleve'?classeId:null,p_informations:informations,p_avatar_url:avatarUrl})},12000);
+    const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Impossible d’envoyer votre dossier.');
+    const client=await getClient();const updated=await client.auth.updateUser({data:{prenom,nom,full_name:`${prenom} ${nom}`,avatar_url:avatarUrl||null}});if(updated.error)console.warn(updated.error);
+    await loadAuroreProfile();selectedOnboardingRole=role;
+    if(msg){msg.textContent='Votre dossier a bien été transmis à l’administration du lycée. Vous recevrez une notification dès qu’il sera accepté ou refusé.';msg.className='personal-profile-message ok';}
     await renderPersonalSpace();
-  }catch(e){if(msg){msg.textContent=e.message||'Impossible d’enregistrer votre profil.';msg.className='personal-profile-message err';}}
-  finally{if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}}
+  }catch(e){if(msg){msg.textContent=e.message||'Impossible d’envoyer votre dossier.';msg.className='personal-profile-message err';}}
+  finally{if(btn){btn.disabled=false;btn.textContent='Envoyer mon dossier';}}
 }
-
-function hasSavedPersonalRole(){
-  const p=currentAuroreProfile||{};
-  const role=String(p.role||'').toLowerCase();
-  return ['eleve','parent','professeur','administration','proviseur'].includes(role);
-}
+function hasSavedPersonalRole(){const p=currentAuroreProfile||{};return !!(p.etablissement_id&&p.profil_statut==='valide'&&['eleve','parent','professeur','administration','proviseur','personnel'].includes(String(p.role||'').toLowerCase()));}
 function renderRoleChoice(){
   authViewVersion++;
   const root=$('authRoot');if(!root||!currentAuroreSession)return;
@@ -1361,30 +1367,27 @@ function renderRoleChoice(){
 }
 async function choosePersonalRole(role){
   if(!currentAuroreSession||!['eleve','parent','professeur','administration','proviseur'].includes(role))return;
-  currentAuroreProfile=currentAuroreProfile||{};currentAuroreProfile.role=role;
-  try{const c=await getClient();await c.auth.updateUser({data:{role}});}catch(_){ }
-  await renderPersonalSpace();
+  selectedOnboardingRole=role;currentAuroreProfile=currentAuroreProfile||{};currentAuroreProfile.role=role;await renderPersonalSpace();
 }
 
 async function renderPersonalSpace(){
   const root=$('authRoot'); if(!root||!currentAuroreSession)return;
   authViewVersion++;
   const ctx=await getPersonalSpaceContext();
-  const role=ctx.role||'eleve', etab=ctx.etab;
+  const role=ctx.role||selectedOnboardingRole||currentAuroreProfile?.role||'eleve', etab=ctx.etab;
   if(etab){setSpaceLogo(etab.logo_url,etab.nom);setSpaceBrand(etab,role);}
   const p=currentAuroreProfile||{};
   const roleLabels={eleve:'Élève',professeur:'Professeur',proviseur:'Proviseur',administration:'Administration',parent:'Parent'};
-  const complete=profilPersonnelEstComplet()&&!!etab;
+  const profileStatus=String(p.profil_statut||'').toLowerCase();
+  const complete=hasSavedPersonalRole()&&profilPersonnelEstComplet()&&!!etab;
+  const pending=profileStatus==='en_attente'&&!complete;
   const name=(p.prenom&&p.nom)?`${p.prenom} ${p.nom}`:(p.full_name||currentAuroreSession.user?.email||'Votre espace');
   const roleHelp=personalRoleHelp(role);
   let roleFields='';
-  if(role==='eleve'){
-    roleFields=`<div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(p.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<select id="personalClasse" required><option value="">Sélectionnez d’abord votre établissement…</option></select><input type="hidden" id="personalClasseId" value="${esc(p.classe_id||'')}"></label></div><div id="personalClassStatus" class="class-choice-status">Les classes disponibles apparaîtront après le choix de l’établissement.</div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(p.filiere||'')}" placeholder="Ex. Série D"></label>`;
-  }else if(role==='parent'){
-    roleFields=`<label>Informations sur votre enfant (facultatif)<textarea id="personalEnfant" placeholder="Nom, classe ou toute information utile">${esc(p.enfant_informations||'')}</textarea>`;
-  }else{
-    roleFields=`<div class="personal-profile-grid"><label>Discipline${role==='professeur'?'':' (facultatif)'}<input id="personalDiscipline" value="${esc(p.discipline||'')}" placeholder="Ex. Mathématiques"></label><label>Fonction${role==='proviseur'||role==='administration'?'':' (facultatif)'}<input id="personalFonction" value="${esc(p.fonction||'')}" placeholder="Ex. Proviseur, censeur…"></label></div>`;
-  }
+  if(role==='eleve'){roleFields=`<div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(p.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<select id="personalClasse" required><option value="">Sélectionnez d’abord votre établissement…</option></select><input type="hidden" id="personalClasseId" value="${esc(p.classe_id||'')}"></label></div><div id="personalClassStatus" class="class-choice-status">Les classes disponibles apparaîtront après le choix de l’établissement.</div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(p.filiere||'')}" placeholder="Ex. Série D"></label>`;}
+  else if(role==='parent'){roleFields=`<label>Informations sur votre enfant<textarea id="personalEnfant" placeholder="Nom, classe et toute information utile">${esc(p.enfant_informations||'')}</textarea></label>`;}
+  else{roleFields=`<div class="personal-profile-grid"><label>Discipline${role==='professeur'?'':' (facultatif)'}<input id="personalDiscipline" value="${esc(p.discipline||'')}" placeholder="Ex. Mathématiques"></label><label>Fonction${role==='proviseur'||role==='administration'?'':' (facultatif)'}<input id="personalFonction" value="${esc(p.fonction||'')}" placeholder="Ex. Proviseur, censeur…"></label></div>`;}
+  roleFields+=`<div class="personal-profile-grid"><label>Téléphone (facultatif)<input id="personalTelephone" value="${esc(p.telephone||'')}" autocomplete="tel" placeholder="+226 …"></label><label>Date de naissance (facultatif)<input id="personalDateNaissance" type="date" value="${esc(p.date_naissance||'')}"></label></div><label>Adresse (facultatif)<input id="personalAdresse" value="${esc(p.adresse||'')}" placeholder="Ville / secteur / adresse"></label>`;
   const tiles={
     eleve:[['📚','Ma scolarité','Classe, devoirs, notes et bulletins.']],
     professeur:[['◉','Mon enseignement','Classes, matières, évaluations et suivi.']],
@@ -1395,8 +1398,11 @@ async function renderPersonalSpace(){
   const dashboard=tiles.map(x=>`<article class="personal-dashboard-tile"><div class="ico">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('');
   const body=complete
     ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
-    : `<div class="personal-role-context"><strong>Informations adaptées à votre profil : ${esc(roleLabels[role]||role)}</strong>${esc(roleHelp)}</div><form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><label>Votre profil<select id="personalRole"><option value="eleve" ${role==='eleve'?'selected':''}>Élève</option><option value="professeur" ${role==='professeur'?'selected':''}>Professeur</option><option value="proviseur" ${role==='proviseur'?'selected':''}>Proviseur</option><option value="administration" ${role==='administration'?'selected':''}>Administration</option><option value="parent" ${role==='parent'?'selected':''}>Parent</option></select></label><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Enregistrer mon profil</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></form>`;
+    : pending
+      ? `<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
+      : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><label>Votre profil<select id="personalRole"><option value="eleve" ${role==='eleve'?'selected':''}>Élève</option><option value="professeur" ${role==='professeur'?'selected':''}>Professeur</option><option value="proviseur" ${role==='proviseur'?'selected':''}>Proviseur</option><option value="administration" ${role==='administration'?'selected':''}>Administration</option><option value="parent" ${role==='parent'?'selected':''}>Parent</option></select></label><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
   root.innerHTML=`<section class="personal-space-view"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
+  document.getElementById('personalAvatarFile')?.addEventListener('change',e=>{const f=e.target.files?.[0],img=document.getElementById('personalAvatarPreview');if(!f||!img)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>3*1024*1024){e.target.value='';return;}const r=new FileReader();r.onload=()=>{if(img.tagName==='IMG')img.src=r.result;else{img.innerHTML='';img.style.backgroundImage=`url(${r.result})`;img.style.backgroundSize='cover';img.style.backgroundPosition='center';}};r.readAsDataURL(f);});
   if(!complete){
     try{
       const token=currentAuroreSession.access_token;
@@ -2164,11 +2170,47 @@ async function loadClassRequests(ids){const token=currentAuroreSession?.access_t
 }
 async function decideClassRequest(id,decision){const comment=decision==='refuse'?prompt('Motif du refus (facultatif) :','Informations à compléter')||null:null;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Décision impossible.');}await loadAdminClasses();}catch(e){alert(e.message||'Impossible de traiter la demande.');}}
 
+async function adminInscriptionsView(){
+  const root=$('spaceDashboard');if(!root)return;
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Inscriptions</span><h3>Demandes de profils</h3><p>Examinez chaque dossier, consultez les informations et acceptez ou refusez l’accès à l’établissement.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des dossiers…</div></div></section>`;
+  await loadMemberRequestsAdmin();
+}
+async function loadMemberRequestsAdmin(){
+  const box=$('memberRequestsAdmin');if(!box)return;
+  const ids=await getAdminInstituteIds(),token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+  if(!ids.length){box.innerHTML='<div class="admin-card">Aucun établissement administré n’est associé à ce compte.</div>';return;}
+  try{
+    const all=[];
+    for(const id of ids){
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&select=*,profiles(prenom,nom,full_name,avatar_url,role),classes(nom,niveau,annee_scolaire)&order=created_at.asc`,{headers:h,cache:'no-store'});
+      if(r.ok)all.push(...await r.json());
+    }
+    const groups=[['eleve','Élèves','♙'],['parent','Parents','♧'],['professeur','Professeurs','◉'],['proviseur','Proviseurs','⌂'],['administration','Administration','⚙']];
+    const roleNames={eleve:'Élève',parent:'Parent',professeur:'Professeur',administration:'Administration',proviseur:'Proviseur',personnel:'Personnel'};
+    const card=d=>{
+      const p=d.profiles||{},i=d.informations||{},name=p.full_name||[p.prenom,p.nom].filter(Boolean).join(' ')||'Utilisateur',avatar=p.avatar_url||d.avatar_url;
+      const details=[d.classes?.nom||i.classe,i.filiere,i.discipline,i.fonction,i.telephone,i.adresse].filter(Boolean);
+      return `<article class="member-request-card"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>${esc(roleNames[d.role]||d.role)}${d.classes?.nom?' · '+esc(d.classes.nom):''}</span><div class="member-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div><span style="margin-top:7px">Dossier reçu le ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span></div><div class="member-request-actions"><button class="approve" type="button" onclick="decideMemberRequest('${esc(d.id)}','valide')">✓ Accepter</button><button class="reject" type="button" onclick="decideMemberRequest('${esc(d.id)}','refuse')">Refuser</button></div></article>`;
+    };
+    if(!all.length){box.innerHTML='<div class="personal-profile-success-card"><div class="success-icon">✓</div><div><h3>Aucun dossier en attente</h3><p>Toutes les demandes ont été traitées. Les nouveaux dossiers apparaîtront ici automatiquement.</p></div></div>';return;}
+    const summary=groups.map(g=>{const n=all.filter(x=>x.role===g[0]).length;return `<button type="button" class="config-chip" onclick="document.getElementById('member-group-${g[0]}')?.scrollIntoView({behavior:'smooth',block:'start'})"><span class="config-chip-ico">${g[2]}</span><span>${g[1]} <b style="margin-left:4px">${n}</b></span></button>`}).join('');
+    box.innerHTML=`<div class="config-test-grid" style="margin-bottom:18px">${summary}</div>`+groups.map(g=>{const rows=all.filter(x=>x.role===g[0]);return rows.length?`<section id="member-group-${g[0]}" style="scroll-margin-top:90px;margin-top:16px"><div class="space-panel-head"><span class="space-panel-label">${g[2]} ${g[1]}</span><h4 style="margin-top:5px">${rows.length} dossier${rows.length>1?'s':''} à examiner</h4></div><div style="display:grid;gap:11px;margin-top:10px">${rows.map(card).join('')}</div></section>`:'';}).join('');
+  }catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les dossiers.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p></div>`;}
+}
+async function decideMemberRequest(id,decision){
+  let comment=null;if(decision==='refuse')comment=prompt('Motif du refus (facultatif) :','Informations à compléter ou à vérifier')||null;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_membre`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});
+    const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Décision impossible.');
+    await Promise.all([loadMemberRequestsAdmin(),loadAdminClasses()]);
+  }catch(e){alert(e.message||'Impossible de traiter ce dossier.');}
+}
+
 
 async function renderStudentClassDashboard(root,common){
   const p=currentAuroreProfile||{},classId=p.classe_id||'';root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>Ma classe et ma vie scolaire</h3><p>Retrouvez ici les informations qui concernent directement votre classe.</p></div>${common}</div><div id="studentClassContent"><div class="admin-card">Chargement de votre classe…</div></div></section>`;
   if(!classId){$('studentClassContent').innerHTML='<div class="class-choice-status">Aucune classe n’est encore rattachée à votre compte. Choisissez une classe dans Mon espace puis attendez la validation de l’administration.</div>';return;}
-  try{const token=currentAuroreSession.access_token,h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,nom,niveau,annee_scolaire,etablissement_id`,{headers:h});const c=(r.ok?(await r.json()):[])[0];if(!c){$('studentClassContent').innerHTML='<div class="class-choice-status err">Votre classe n’est plus disponible.</div>';return;}const er=await fetch(`${SUPABASE_URL}/rest/v1/eleves?profile_id=eq.${encodeURIComponent(currentAuroreSession.user.id)}&select=matricule,nom,prenom,classe_id`,{headers:h});const me=(er.ok?(await er.json()):[])[0];const cr=await fetch(`${SUPABASE_URL}/rest/v1/eleves?classe_id=eq.${encodeURIComponent(classId)}&select=id`,{headers:h});const effectif=cr.ok?(await cr.json()).length:0;$('studentClassContent').innerHTML=`<div class="student-class-hero"><span class="class-board-kicker">${esc(c.niveau||'Classe')}</span><h3>${esc(c.nom)}</h3><p>${esc([c.annee_scolaire,effectif?effectif+' élève'+(effectif>1?'s':''):'Effectif en cours'].filter(Boolean).join(' · '))}</p><div class="student-class-grid"><div class="student-class-tile"><strong>Mon identité</strong><span>${esc([me?.prenom||p.prenom,me?.nom||p.nom].filter(Boolean).join(' ')||'Profil Aurore')}</span></div><div class="student-class-tile"><strong>Mon niveau</strong><span>${esc(c.niveau||p.niveau||'À compléter')}</span></div><div class="student-class-tile"><strong>Ma filière / série</strong><span>${esc(p.filiere||'À compléter')}</span></div><div class="student-class-tile"><strong>Effectif</strong><span>${effectif||'—'} élève${effectif>1?'s':''}</span></div><div class="student-class-tile"><strong>Mes devoirs</strong><span>Les devoirs publiés par vos enseignants apparaîtront ici.</span></div><div class="student-class-tile"><strong>Mes résultats</strong><span>Notes, tests et bulletins publiés pour votre profil.</span></div></div></div>`;}catch(e){$('studentClassContent').innerHTML=`<div class="class-choice-status err">${esc(e.message||'Impossible de charger votre classe.')}</div>`;}
+  try{const token=currentAuroreSession.access_token,h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,nom,niveau,annee_scolaire,etablissement_id`,{headers:h});const c=(r.ok?(await r.json()):[])[0];if(!c){$('studentClassContent').innerHTML='<div class="class-choice-status err">Votre classe n’est plus disponible.</div>';return;}const er=await fetch(`${SUPABASE_URL}/rest/v1/eleves?profile_id=eq.${encodeURIComponent(currentAuroreSession.user.id)}&select=matricule,nom,prenom,classe_id`,{headers:h});const me=(er.ok?(await er.json()):[])[0];const cr=await fetch(`${SUPABASE_URL}/rest/v1/rpc/classe_profils`,{method:'POST',headers:{...h,'Content-Type':'application/json'},body:JSON.stringify({p_classe_id:classId})});const classmates=cr.ok?(await cr.json()):[];const effectif=classmates.length;$('studentClassContent').innerHTML=`<div class="student-class-hero"><span class="class-board-kicker">${esc(c.niveau||'Classe')}</span><h3>${esc(c.nom)}</h3><p>${esc([c.annee_scolaire,effectif?effectif+' élève'+(effectif>1?'s':''):'Effectif en cours'].filter(Boolean).join(' · '))}</p><div class="student-class-grid"><div class="student-class-tile"><strong>Mon identité</strong><span>${esc([me?.prenom||p.prenom,me?.nom||p.nom].filter(Boolean).join(' ')||'Profil Aurore')}</span></div><div class="student-class-tile"><strong>Mon niveau</strong><span>${esc(c.niveau||p.niveau||'À compléter')}</span></div><div class="student-class-tile"><strong>Ma filière / série</strong><span>${esc(p.filiere||'À compléter')}</span></div><div class="student-class-tile"><strong>Effectif</strong><span>${effectif||'—'} élève${effectif>1?'s':''}</span></div><div class="student-class-tile"><strong>Mes devoirs</strong><span>Les devoirs publiés par vos enseignants apparaîtront ici.</span></div><div class="student-class-tile"><strong>Mes résultats</strong><span>Notes, tests et bulletins publiés pour votre profil.</span></div></div><div class="space-panel" style="margin-top:16px;padding:20px"><span class="space-panel-label">Profils de la classe</span><h4 style="margin-top:6px">Élèves disponibles</h4><div class="space-list" style="margin-top:12px">${classmates.map(x=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${x.avatar_url?`<img src="${esc(x.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`:esc(initials(x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève'))}</div><div><strong>${esc(x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève')}</strong><span>${esc(x.role==='eleve'?'Élève':'Membre')}</span></div></div></div>`).join('')||'<div class="class-select-note">Aucun profil validé dans cette classe.</div>'}</div></div></div>`;}catch(e){$('studentClassContent').innerHTML=`<div class="class-choice-status err">${esc(e.message||'Impossible de charger votre classe.')}</div>`;}
 }
 
 function openSpaceTool(role,key){
@@ -2182,6 +2224,7 @@ function openSpaceTool(role,key){
   const root=document.getElementById('spaceDashboard'); if(!root)return;
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
   if(role==='administration' && key==='admin-eleves'){ adminElevesView(); return; }
+  if(role==='administration' && key==='inscriptions'){ adminInscriptionsView(); return; }
   const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
