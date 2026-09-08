@@ -272,8 +272,18 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .profile-library-page{display:grid;gap:16px;max-width:980px;margin:0 auto}.profile-library-page-head{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.profile-library-page-head h1{font-size:clamp(1.8rem,4vw,3rem);margin-top:7px}.profile-library-page-head p{color:var(--muted);font-size:.82rem;margin-top:7px}.profile-library-page-logo{width:118px;height:118px;border-radius:24px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;color:var(--accent2);font-weight:900;font-size:1.8rem}.profile-library-page-logo img{width:100%;height:100%;object-fit:contain;padding:12px}.pdf-style-empty{display:grid;grid-template-columns:90px 1fr;gap:18px;align-items:center;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}.pdf-empty-mark{width:76px;height:96px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;color:var(--accent2);font-weight:900;font-size:.72rem}.pdf-style-empty h2{font-size:1rem}.pdf-style-empty p{color:var(--muted);font-size:.78rem;line-height:1.65;margin-top:6px}@media(max-width:600px){.profile-library-page-head{align-items:flex-start;flex-direction:column}.profile-library-page-logo{width:100%;height:100px}.pdf-style-empty{grid-template-columns:1fr}.pdf-empty-mark{width:64px;height:80px}}
 
 body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,body>footer{width:100%}body>main{flex:1}footer{margin-top:auto}
-.space-tool-card.admin-general-card{min-height:118px;padding:12px;border-radius:15px}.space-tool-card.admin-general-card .space-tool-icon{width:34px;height:34px;font-size:.72rem}.space-tool-card.admin-general-card h3{font-size:.82rem}.space-tool-card.admin-general-card p{font-size:.68rem;line-height:1.35}.space-tool-card.admin-general-card .space-tool-kicker{font-size:.58rem}.space-tool-card.admin-general-card .space-tool-arrow{font-size:.9rem}
-.establishment-logo-adaptive{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 22%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
+.space-tools-grid.admin-general-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.space-tool-card.admin-general-card{min-height:92px;padding:9px;border-radius:13px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.space-tool-card.admin-general-card .space-tool-icon{width:30px;height:30px;font-size:.62rem;border-radius:9px}
+.space-tool-card.admin-general-card .space-tool-counter{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font-size:.58rem;font-weight:900;margin-top:3px}
+.space-tool-card.admin-general-card h3{font-size:.76rem;line-height:1.15;margin:2px 0 0}
+.space-tool-card.admin-general-card p{font-size:.6rem;line-height:1.25;margin:2px 0 0}
+.space-tool-card.admin-general-card .space-tool-kicker{font-size:.5rem}
+.space-tool-card.admin-general-card .space-tool-arrow{font-size:.78rem}
+@media(max-width:900px){.space-tools-grid.admin-general-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:560px){.space-tools-grid.admin-general-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.space-tool-card.admin-general-card{min-height:82px;padding:8px}.space-tool-card.admin-general-card .space-tool-icon{width:27px;height:27px}}
+.space-tool-card.admin-general-card .space-tool-icon{width:34px;height:34px;font-size:.72rem}.space-tool-card.admin-general-card h3{font-size:.82rem}.space-tool-card.admin-general-card p{font-size:.68rem;line-height:1.35}.space-tool-card.admin-general-card .space-tool-kicker{font-size:.58rem}.space-tool-card.admin-general-card .space-tool-arrow{font-size:.9rem}
+.profile-logo.adaptive-logo,.establishment-logo-adaptive{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 22%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
 #decisionReasonCode{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}
 </style>
 <style id="aurore-functional-fixes">
@@ -638,6 +648,17 @@ function setSpaceLogo(url,label){
     el.innerHTML=esc((label||'A').trim().slice(0,2).toUpperCase()||'A');
   }
 }
+function adaptProfileLogoColor(){
+  const box=document.querySelector('.profile-logo.adaptive-logo'),img=box?.querySelector('img');
+  if(!box||!img)return;
+  const apply=()=>{try{
+    const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});c.width=32;c.height=32;ctx.drawImage(img,0,0,32,32);
+    const d=ctx.getImageData(0,0,32,32).data;let r=0,g=0,b=0,n=0;
+    for(let i=0;i<d.length;i+=4){if(d[i+3]<80)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+    if(n)box.style.setProperty('--logo-dominant',`rgb(${Math.round(r/n)} ${Math.round(g/n)} ${Math.round(b/n)})`);
+  }catch(_){} };
+  if(img.complete)apply();else img.addEventListener('load',apply,{once:true});
+}
 function restoreSiteLogo(){
   const el=document.querySelector('.brand .logo');
   if(el&&siteLogoOriginal!==null){el.innerHTML=siteLogoOriginal;}
@@ -964,7 +985,7 @@ async function openProfile(id,options={}){
   <div class="profile-site" style="margin-top:14px">
     <section class="profile-hero">
       <div class="profile-cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.18),rgba(23,18,36,.86)),url('${esc(e.cover_url)}')"`:''}></div>
-      <div class="profile-logo-wrap"><div class="profile-logo">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}">`:esc(initials(e.nom))}</div></div>
+      <div class="profile-logo-wrap"><div class="profile-logo adaptive-logo">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}">`:esc(initials(e.nom))}</div></div>
       <div class="profile-content">
         <div class="tags"><span class="tag">${esc(e.type)}</span><span class="tag green">Établissement vérifié</span></div>
         <h1>${esc(e.nom)}</h1>
@@ -1002,6 +1023,7 @@ async function openProfile(id,options={}){
     </div>
   </div>`;
 
+  adaptProfileLogoColor();
   // La fiche reste volontairement légère : les blocs métier s’ouvrent sur leurs propres pages.
 }
 
@@ -1217,7 +1239,7 @@ async function openSpace(role,options={}){
     general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned']]}
   };
   const cfg=configs[role]; if(!cfg)return;
-  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${role==='general'?'admin-general-card ':''}${item[1].length>58?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
+  const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${role==='general'?'admin-general-card ':''}${item[1].length>58?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p>${role==='general'?`<span class="space-tool-counter" id="adminCounter-${item[3]}">—</span>`:''}</div><span class="space-tool-arrow">→</span></article>`).join('');
   const etab=await loadSpaceEstablishmentBanner(role);
   if(etab){
     setSpaceLogo(etab.logo_url,etab.nom);
@@ -1232,7 +1254,7 @@ async function openSpace(role,options={}){
     panel.className='space-panel';
     document.body.appendChild(panel);
   }
-  if(panel){panel.classList.add('page-mode');window.scrollTo({top:0,left:0,behavior:'auto'});panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div>${bannerHtml}<div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');}
+  if(panel){panel.classList.add('page-mode');window.scrollTo({top:0,left:0,behavior:'auto'});panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div>${bannerHtml}<div class="space-tools-grid ${role==='general'?'admin-general-grid':''}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');}
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
 }
 
@@ -1451,19 +1473,25 @@ async function loadAdminOverview(){
     const token=currentAuroreSession?.access_token||'';
     const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
     const [rq,et]=await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?select=statut`,{headers:h}),
-      fetch(`${SUPABASE_URL}/rest/v1/etablissements?select=validation_statut,actif`,{headers:h})
+      fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?select=statut`,{headers:h,cache:'no-store'}),
+      fetch(`${SUPABASE_URL}/rest/v1/etablissements?select=validation_statut,statut,actif`,{headers:h,cache:'no-store'})
     ]);
     const rb=rq.ok?await rq.json():[], eb=et.ok?await et.json():[];
-    if($('adminReqCount'))$('adminReqCount').textContent=rb.filter(x=>x.statut==='en_attente').length;
-    if($('adminEtabCount'))$('adminEtabCount').textContent=eb.filter(x=>x.validation_statut==='valide'&&x.actif!==false).length;
-  }catch(_){ }
+    const counts={
+      'general-demandes':rb.filter(x=>x.statut==='en_attente').length,
+      'general-accepted':eb.filter(x=>x.validation_statut==='valide'&&x.statut==='actif'&&x.actif!==false).length,
+      'general-refused':rb.filter(x=>x.statut==='refusee').length,
+      'general-suspended':eb.filter(x=>x.validation_statut==='valide'&&x.statut==='suspendu').length,
+      'general-banned':eb.filter(x=>x.validation_statut==='valide'&&x.statut==='banni').length
+    };
+    Object.entries(counts).forEach(([key,n])=>{const el=$(`adminCounter-${key}`);if(el)el.textContent=n;});
+  }catch(err){console.error('Aurore — compteurs administration:',err);}
 }
 
 async function loadAdminRequests(){
   try{
     const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`};
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?select=*&order=created_at.desc`,{headers:h});
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&select=*&order=created_at.desc`,{headers:h});
     if(!r.ok)throw new Error('Impossible de charger les demandes.');
     const rows=await r.json(); const list=$('adminRequestsList');
     if(!rows.length){list.innerHTML='<div class="admin-card">Aucune demande pour le moment.</div>';return;}
