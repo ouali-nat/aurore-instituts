@@ -325,6 +325,40 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .establishment-edit-actions{display:flex;gap:8px;flex-wrap:wrap;}
 @media(max-width:680px){.establishment-edit-grid{grid-template-columns:1fr;}.accepted-card-cover{height:180px!important;}}
 </style>
+<style id="aurore-final-layout">
+/* Vue d'ensemble : deux cartes carrées par ligne, compactes et régulières. */
+.space-tools-grid,.config-test-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.space-tool-card{aspect-ratio:1/1!important;min-height:0!important;height:auto!important;padding:18px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+.space-tool-card .space-tool-icon{width:46px!important;height:46px!important}
+.config-test-grid button{min-height:0!important;aspect-ratio:1/1!important;padding:14px!important;border-radius:12px!important}
+/* L'administration générale reste la seule zone rouge. */
+.space-tool-card.admin-general-card{border-color:rgba(220,38,38,.28)!important}
+.space-tool-card.admin-general-card .space-tool-icon{background:#b91c1c!important;color:#fff!important}
+.platform-admin-access{background:#b91c1c!important;color:#fff!important;border-color:#b91c1c!important}
+/* Cartes établissements : deux par ligne, bloc logo carré mais compact. */
+.accepted-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.accepted-card{border-radius:12px!important}
+.accepted-card-cover{height:auto!important;aspect-ratio:1/1!important;max-height:155px!important}
+.accepted-card-cover img{padding:18px!important}
+.accepted-card-body{padding:13px 14px 9px!important}
+.accepted-card-body h3{font-size:1rem!important}
+.accepted-description{margin-top:7px!important}
+.accepted-card-footer{padding:10px 14px 12px!important;align-items:center!important}
+.accepted-card-footer>span{display:none!important}
+.accepted-card-footer .admin-btn{padding:7px 9px!important;font-size:.68rem!important}
+/* Modification : formulaire compact pour garder une vue d'ensemble. */
+.establishment-edit-form{max-width:760px!important;gap:10px!important}
+.establishment-edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.establishment-edit-form label{gap:4px!important;font-size:.68rem!important}
+.establishment-edit-form input,.establishment-edit-form textarea,.establishment-edit-form select{padding:8px 10px!important;border-radius:8px!important;font-size:.78rem!important}
+.establishment-edit-form textarea{min-height:82px!important}
+.establishment-edit-actions{gap:6px!important}
+/* Champ logo d'administration : aperçu carré uniforme. */
+.edit-logo-upload{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;padding:9px;border:1px dashed var(--line);border-radius:10px;background:var(--panel2)}
+.edit-logo-preview{width:92px;height:92px;object-fit:contain;object-position:center;padding:8px;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;background:var(--panel);display:block}
+.edit-logo-copy{display:grid;gap:5px}
+@media(max-width:760px){.space-tools-grid,.config-test-grid,.accepted-grid{grid-template-columns:1fr!important}.space-tool-card,.config-test-grid button{aspect-ratio:auto!important;min-height:150px!important}.accepted-card-cover{max-height:none!important}.establishment-edit-grid{grid-template-columns:1fr!important}.edit-logo-upload{grid-template-columns:82px 1fr}.edit-logo-preview{width:82px;height:82px}}
+</style>
 </head>
 <body>
 <header>
@@ -1365,9 +1399,30 @@ async function editPublishedEstablishment(id){
     const e=rows[0];
     const panel=document.getElementById('spacePanel'); if(!panel)return;
     panel.classList.add('page-mode','tool-page','visible');
-    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="openSpace('general','')">← Retour aux établissements publiés</button><span class="space-panel-label">Administration générale</span><h2>Modifier l’établissement</h2><p>${esc(e.nom||'Établissement')}</p></div><div id="spaceDashboard"><section class="space-dashboard"><form class="establishment-edit-form" onsubmit="savePublishedEstablishment(event,'${esc(e.id)}')"><div class="establishment-edit-grid"><label>Nom<input id="editNom" required value="${esc(e.nom||'')}"></label><label>Type<select id="editType"><option ${e.type==='Lycée'?'selected':''}>Lycée</option><option ${e.type==='Collège'?'selected':''}>Collège</option><option ${e.type==='Université'?'selected':''}>Université</option><option ${e.type==='Institut'?'selected':''}>Institut</option><option ${e.type==='Centre de formation'?'selected':''}>Centre de formation</option></select></label><label>Ville<input id="editVille" value="${esc(e.ville||'')}"></label><label>Province<input id="editProvince" value="${esc(e.province||'')}"></label><label>Adresse<input id="editAdresse" value="${esc(e.adresse||'')}"></label><label>Téléphone<input id="editTelephone" value="${esc(e.telephone||'')}"></label><label>E-mail<input id="editEmail" type="email" value="${esc(e.email||'')}"></label><label>Site web<input id="editSite" value="${esc(e.site_web||'')}"></label></div><label>Présentation<textarea id="editPresentation">${esc(e.presentation||'')}</textarea></label><label>URL du logo<input id="editLogo" value="${esc(e.logo_url||'')}" placeholder="URL publique de l'image"></label><div class="establishment-edit-actions"><button class="admin-btn primary" type="submit">Enregistrer les modifications</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer de la publication</button></div><div id="editEstablishmentMessage" class="auth-message"></div></form></section></div>`;
+    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="openSpace('general','')">← Retour aux établissements publiés</button><span class="space-panel-label">Administration générale</span><h2>Modifier l’établissement</h2><p>${esc(e.nom||'Établissement')}</p></div><div id="spaceDashboard"><section class="space-dashboard"><form class="establishment-edit-form" onsubmit="savePublishedEstablishment(event,'${esc(e.id)}')"><div class="establishment-edit-grid"><label>Nom<input id="editNom" required value="${esc(e.nom||'')}"></label><label>Type<select id="editType"><option ${e.type==='Lycée'?'selected':''}>Lycée</option><option ${e.type==='Collège'?'selected':''}>Collège</option><option ${e.type==='Université'?'selected':''}>Université</option><option ${e.type==='Institut'?'selected':''}>Institut</option><option ${e.type==='Centre de formation'?'selected':''}>Centre de formation</option></select></label><label>Ville<input id="editVille" value="${esc(e.ville||'')}"></label><label>Province<input id="editProvince" value="${esc(e.province||'')}"></label><label>Adresse<input id="editAdresse" value="${esc(e.adresse||'')}"></label><label>Téléphone<input id="editTelephone" value="${esc(e.telephone||'')}"></label><label>E-mail<input id="editEmail" type="email" value="${esc(e.email||'')}"></label><label>Site web<input id="editSite" value="${esc(e.site_web||'')}"></label></div><label>Présentation<textarea id="editPresentation">${esc(e.presentation||'')}</textarea></label><div class="edit-logo-upload"><img id="editLogoPreview" class="edit-logo-preview" src="${esc(e.logo_url||'')}" alt="Logo actuel" onerror="this.removeAttribute('src');this.alt='Aucun logo';"><div class="edit-logo-copy"><strong>Logo de l’établissement</strong><span class="admin-meta">PNG, JPG/JPEG ou WebP. L’image est normalisée en carré et reste entièrement visible.</span><input id="editLogoFile" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewEditLogo(event)"><input id="editLogo" type="hidden" value="${esc(e.logo_url||'')}"></div></div><div class="establishment-edit-actions"><button class="admin-btn primary" type="submit">Enregistrer les modifications</button><button class="admin-btn danger" type="button" onclick="withdrawPublishedEstablishment('${esc(e.id)}','${esc(e.nom||'cet établissement')}')">Retirer de la publication</button></div><div id="editEstablishmentMessage" class="auth-message"></div></form></section></div>`;
     window.scrollTo({top:0,left:0,behavior:'auto'});
   }catch(err){alert(err.message||'Impossible d’ouvrir la modification.');}
+}
+
+function previewEditLogo(event){
+  const file=event.target.files?.[0], input=event.target, preview=$('editLogoPreview');
+  const reset=()=>{input.value='';input.dataset.dataUrl='';if(preview){preview.removeAttribute('src');preview.alt='Aucun logo';}};
+  if(!file){reset();return;}
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)){reset();alert('Format refusé. Utilisez PNG, JPG/JPEG ou WebP.');return;}
+  if(file.size>2*1024*1024){reset();alert('Le logo doit faire au maximum 2 Mo.');return;}
+  const reader=new FileReader();
+  reader.onerror=()=>{reset();alert('Impossible de lire cette image.');};
+  reader.onload=()=>{const img=new Image();img.onload=()=>{
+    const w=img.naturalWidth,h=img.naturalHeight,minSide=Math.min(w,h),maxSide=Math.max(w,h);
+    if(!w||!h||minSide<96||maxSide>8000){reset();alert('Image refusée : utilisez un logo net d’au moins 96 px et de moins de 8000 px.');return;}
+    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=1024;const ctx=canvas.getContext('2d');
+    if(!ctx){reset();alert('Votre navigateur ne permet pas de préparer ce logo.');return;}
+    ctx.clearRect(0,0,1024,1024);const scale=Math.min(880/w,880/h),dw=Math.round(w*scale),dh=Math.round(h*scale),x=Math.round((1024-dw)/2),y=Math.round((1024-dh)/2);
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,x,y,dw,dh);
+    let normalized='';try{normalized=canvas.toDataURL('image/webp',.92)}catch(_){normalized=canvas.toDataURL('image/png')}
+    if(normalized.length>2.8*1024*1024){reset();alert('Logo refusé : le fichier normalisé reste trop lourd.');return;}
+    input.dataset.dataUrl=normalized;if(preview){preview.src=normalized;preview.alt='Aperçu du nouveau logo';}
+  };img.onerror=()=>{reset();alert('Image refusée : fichier illisible ou endommagé.');};img.src=reader.result;};reader.readAsDataURL(file);
 }
 
 async function savePublishedEstablishment(event,id){
@@ -1375,7 +1430,7 @@ async function savePublishedEstablishment(event,id){
   const msg=$('editEstablishmentMessage');
   const token=currentAuroreSession?.access_token||'';
   if(!token)return;
-  const payload={nom:$('editNom')?.value.trim(),type:$('editType')?.value,ville:$('editVille')?.value.trim()||null,province:$('editProvince')?.value.trim()||null,adresse:$('editAdresse')?.value.trim()||null,telephone:$('editTelephone')?.value.trim()||null,email:$('editEmail')?.value.trim()||null,site_web:$('editSite')?.value.trim()||null,presentation:$('editPresentation')?.value.trim()||null,logo_url:$('editLogo')?.value.trim()||null};
+  const payload={nom:$('editNom')?.value.trim(),type:$('editType')?.value,ville:$('editVille')?.value.trim()||null,province:$('editProvince')?.value.trim()||null,adresse:$('editAdresse')?.value.trim()||null,telephone:$('editTelephone')?.value.trim()||null,email:$('editEmail')?.value.trim()||null,site_web:$('editSite')?.value.trim()||null,presentation:$('editPresentation')?.value.trim()||null,logo_url:$('editLogoFile')?.dataset.dataUrl || $('editLogo')?.value.trim() || null};
   if(!payload.nom){if(msg)msg.textContent='Le nom est obligatoire.';return;}
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)});
