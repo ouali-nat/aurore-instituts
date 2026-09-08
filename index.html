@@ -286,6 +286,25 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .profile-logo.adaptive-logo,.establishment-logo-adaptive,.cover.adaptive-logo{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 22%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
 #decisionReasonCode{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}
 </style>
+<style id="aurore-visual-fixes-v2">
+/* Centre de contrôle : contraste renforcé en mode sombre. */
+.config-test{background:var(--panel)!important;border-color:color-mix(in srgb,var(--accent) 28%,var(--line))!important}
+.config-test h3,.config-test .auth-kicker,.config-test p{color:var(--text)}
+.config-test p{color:var(--muted)!important}
+.config-test-grid button.config-chip,.config-test-grid button.config-chip-secondary{background:var(--panel2)!important;color:var(--text)!important;border-color:var(--line)!important;box-shadow:none!important}
+.config-test-grid button.config-chip:hover,.config-test-grid button.config-chip:focus-visible{background:color-mix(in srgb,var(--accent) 12%,var(--panel2))!important;border-color:var(--accent)!important;color:var(--text)!important}
+.config-chip-ico{background:color-mix(in srgb,var(--accent) 16%,var(--panel2))!important;color:var(--accent)!important}
+.config-test-grid button.config-chip-secondary{background:var(--panel)!important}
+.config-test-grid button.config-chip-secondary .config-chip-ico{color:var(--accent2)!important}
+[data-theme="sombre"] .config-test,html[data-theme="sombre"] .config-test{background:#151820!important}
+[data-theme="sombre"] .config-test-grid button.config-chip,html[data-theme="sombre"] .config-test-grid button.config-chip{background:#1b1f29!important;color:#f3f4f6!important;border-color:#343a48!important}
+[data-theme="sombre"] .config-test-grid button.config-chip:hover,html[data-theme="sombre"] .config-test-grid button.config-chip:hover{background:#252b38!important;color:#fff!important}
+[data-theme="sombre"] .config-chip-ico,html[data-theme="sombre"] .config-chip-ico{background:#2a3040!important;color:#c4b5fd!important}
+/* En-tête d'un espace : le nom de l'établissement remplace Aurore / Section Instituts. */
+.brand-space-active strong{max-width:240px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand-space-active small{max-width:240px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:620px){.brand-space-active strong,.brand-space-active small{max-width:150px}}
+</style>
 <style id="aurore-functional-fixes">
 /* Logos : même cadre partout, image toujours entièrement visible et jamais déformée. */
 .cover,.accepted-card-cover,.profile-logo,.request-logo-preview{display:grid;place-items:center;overflow:hidden}
@@ -582,13 +601,109 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .auth-page:has(#establishmentRequestForm){padding-bottom:54px}
 .auth-page:has(#establishmentRequestForm) .auth-card{overflow:visible}
 </style>
+<style id="aurore-access-portal">
+  .access-lock{position:fixed;inset:0;z-index:9999;background:var(--fond,#F6F5F2);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;}
+  .access-card{width:100%;max-width:460px;background:var(--papier,#fff);border:1px solid var(--bordure,#E4E1D8);border-radius:24px;box-shadow:0 26px 70px rgba(32,36,46,.16);overflow:hidden;}
+  .access-card-body{padding:30px 30px 24px;text-align:left}.access-institution{display:flex;align-items:center;gap:14px;padding-bottom:22px}.access-logo{width:58px;height:58px;flex:0 0 58px;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--violet),var(--bleu));border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 28px rgba(124,58,237,.20)}.access-logo img{width:100%;height:100%;object-fit:cover;display:block}.access-brand{margin:0 0 3px;font-size:1.08rem;line-height:1.25}.access-tagline{font-size:.76rem;color:var(--gris);line-height:1.4}.access-tabs{display:flex;border-bottom:1px solid var(--bordure);margin:0 -30px 24px;padding:0 30px}.access-tab{padding:11px 2px 10px;font-size:.79rem;font-weight:700;color:var(--encre);position:relative}.access-tab:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--violet)}.access-heading h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.55rem,5vw,1.9rem);line-height:1.2;margin:0 0 8px;color:var(--encre)}.access-heading p{font-size:.88rem;color:var(--gris);line-height:1.55;margin:0 0 22px}.access-actions{display:grid;gap:10px}.access-google-btn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 15px;border:1px solid #D8D3DF;border-radius:13px;background:#fff;color:#1F1B2E;cursor:pointer;box-shadow:0 7px 18px rgba(55,36,82,.07);transition:transform .15s,box-shadow .15s}.access-google-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(55,36,82,.10)}.access-google-btn span:last-child{display:flex;flex-direction:column;gap:2px}.access-google-btn strong{font-size:.9rem}.access-google-btn small{font-size:.7rem;color:#6B6478}.google-mark{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1rem;background:#fff;border:1px solid #E1DCE6;color:#4285F4}.access-secondary-btn,.access-visitor-btn{width:100%;padding:12px 15px;border-radius:12px;font:inherit;font-size:.84rem;font-weight:700;cursor:pointer}.access-secondary-btn{border:1px solid var(--bordure);background:var(--fond);color:var(--encre)}.access-visitor-btn{border:0;background:transparent;color:var(--gris);font-weight:600}.access-visitor-btn:hover{text-decoration:underline;color:var(--encre)}.access-message{margin:12px 0 0;padding:10px 12px;border-radius:11px;font-size:.78rem;line-height:1.5}.access-message.ok{background:#ECFDF3;color:#166534;border:1px solid #86EFAC}.access-message.err{background:#FFF7F7;color:#991B1B;border:1px solid #FCA5A5}.access-note{text-align:center;margin-top:18px;font-size:.72rem;color:var(--gris)}.access-footer{text-align:center;padding:14px 20px;border-top:1px solid var(--bordure);font-size:.7rem;color:var(--gris)}
+  .signup-modal{position:fixed;inset:0;z-index:10000;background:rgba(15,12,25,.48);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}.signup-card{position:relative;width:100%;max-width:430px;background:var(--papier);color:var(--encre);border:1px solid var(--bordure);border-radius:22px;padding:27px;box-shadow:0 28px 80px rgba(0,0,0,.24)}.signup-close{position:absolute;right:14px;top:12px;width:34px;height:34px;border:0;border-radius:50%;background:var(--fond);color:var(--gris);font-size:1.35rem;cursor:pointer}.signup-card h2{font-family:Georgia,'Times New Roman',serif;font-size:1.55rem;margin:5px 0 8px}.signup-intro,.signup-footnote{font-size:.82rem;color:var(--gris);line-height:1.55}.signup-form{display:grid;gap:8px;margin-top:18px}.signup-form label{font-size:.76rem;font-weight:700;margin-top:3px}.signup-form input{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid var(--bordure);border-radius:11px;background:var(--fond);color:var(--encre);outline:none}.signup-form input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,.10)}.signup-footnote{margin:14px 0 0;text-align:center;font-size:.72rem;color:var(--gris);line-height:1.55;padding:11px 13px;border:1px solid var(--bordure);border-radius:14px;background:var(--fond);box-sizing:border-box}.account-login-switch{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:15px;font-size:.73rem;color:var(--gris)}.account-login-switch{padding:10px 12px;border:1px solid var(--bordure);border-radius:14px;background:var(--fond);box-sizing:border-box}.account-login-switch button{border:0;background:transparent;color:var(--violet);font:inherit;font-weight:800;cursor:pointer;padding:5px 8px;border-radius:9px}.account-login-switch button:hover{background:rgba(124,58,237,.08)}.modal-secondary-link{justify-self:stretch;border:1px solid var(--bordure);background:var(--fond);color:var(--violet);font:inherit;font-weight:800;cursor:pointer;padding:10px 13px;border-radius:11px;transition:opacity .15s,transform .15s,background .15s}.modal-secondary-link:hover:not(:disabled){background:rgba(124,58,237,.08);transform:translateY(-1px)}.modal-secondary-link:disabled{opacity:.58;cursor:not-allowed;transform:none}.resend-box{margin-top:10px;padding:13px;border:1px solid var(--bordure);border-radius:16px;background:var(--fond);box-sizing:border-box;display:grid;gap:8px}.resend-box-title{font-size:.78rem;font-weight:800;color:var(--encre)}.resend-box-help{font-size:.72rem;line-height:1.45;color:var(--gris)}.resend-countdown{padding:9px 11px;border:1px solid rgba(124,58,237,.22);border-radius:11px;background:rgba(124,58,237,.08);color:var(--violet);font-size:.73rem;font-weight:800;text-align:center;line-height:1.4}
+  [data-theme="light"] .access-lock{background:radial-gradient(circle at 15% 10%,rgba(109,40,217,.08),transparent 34%),radial-gradient(circle at 88% 88%,rgba(192,132,252,.10),transparent 36%),#F7F4FB}[data-theme="light"] .access-card{background:#fff;border-color:#DDD3E8;box-shadow:0 24px 60px rgba(55,36,82,.12)}[data-theme="light"] .access-google-btn{background:#fff;border-color:#DDD3E8}[data-theme="light"] .access-secondary-btn{background:#F7F4FB}
+  /* Accès Google : bloc compact, sans grand panneau qui pousse la page. */
+  .access-card{max-width:400px;border-radius:20px}
+  .access-card-body{padding:22px 22px 18px}
+  .access-institution{padding-bottom:16px;gap:10px}.access-logo{width:46px;height:46px;flex-basis:46px}.access-brand{font-size:.95rem}.access-tagline{font-size:.68rem}
+  .access-panels{display:block}.access-panel{border:0;background:transparent;border-radius:0}.access-panel-main{padding:0}.access-panel-alt{margin-top:10px;border-top:1px solid var(--bordure);padding-top:10px;min-height:0;background:transparent}.access-alt-scroll{max-height:none;padding:8px 0 0;gap:7px}.access-heading h1{font-size:1.45rem}.access-heading p{font-size:.78rem;margin-bottom:15px}.access-google-btn{padding:11px 13px;border-radius:11px;box-shadow:none}.access-google-btn strong{font-size:.82rem}.access-google-btn small{font-size:.64rem}.access-secondary-btn,.access-visitor-btn{padding:10px 12px}.access-note{margin-top:12px;font-size:.65rem}.access-footer{padding:10px 15px;font-size:.62rem}
+  /* Portail d'accès : deux espaces côte à côte, avec le bloc secondaire défilant. */
+  .access-card{max-width:900px;}
+  .access-card-body{padding:28px 30px 24px;}
+  .access-panels{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:14px;align-items:stretch;}
+  .access-panel{border:1px solid var(--bordure);border-radius:18px;background:var(--papier);min-width:0;}
+  .access-panel-main{padding:0 22px 22px;}
+  .access-panel-alt{display:flex;flex-direction:column;min-height:100%;background:var(--fond);overflow:hidden;}
+  .access-panel-alt .access-alt-head{padding:13px 16px;border-bottom:1px solid var(--bordure);font-size:.76rem;font-weight:800;color:var(--encre);text-transform:uppercase;letter-spacing:.05em;}
+  .access-alt-scroll{padding:14px;display:flex;flex-direction:column;gap:10px;overflow:auto;max-height:270px;}
+  .access-panel .access-tabs{margin:0 -22px 22px;padding:0 22px;}
+  .access-secondary-btn,.access-visitor-btn{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:4px;}
+  .access-secondary-btn small,.access-visitor-btn small{font-size:.7rem;font-weight:500;color:var(--gris);line-height:1.4;}
+  .access-visitor-btn{border:1px solid var(--bordure);background:var(--papier);padding:12px 15px;}
+  .access-visitor-btn:hover{background:var(--papier);text-decoration:none;}
+  .access-logo{background:transparent;border:0;box-shadow:none;}
+  .access-logo:empty{background:transparent;}
+  .access-logo img{object-fit:contain;}
+  .profile-personal-edit .label{margin-bottom:12px;}
+  .profile-fields-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .profile-fields-grid label{display:flex;flex-direction:column;gap:6px;font-size:.75rem;font-weight:700;color:var(--encre);}
+  .profile-fields-grid label span{color:#B91C1C;}
+  .profile-fields-grid label small{font-weight:500;color:var(--gris);}
+  .profile-fields-grid input{width:100%;box-sizing:border-box;background:var(--fond);border:1px solid var(--bordure);border-radius:10px;padding:10px 11px;color:var(--encre);font-size:.86rem;outline:none;}
+  .profile-fields-grid input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,.10);}
+  .profile-required-note{margin-top:10px;font-size:.72rem;color:var(--gris);line-height:1.45;}
+  .profile-save-row{display:flex;align-items:center;gap:12px;margin-top:13px;flex-wrap:wrap;}
+  #profilRoleInput{width:100%;padding:11px 12px;border:1px solid var(--bordure);border-radius:10px;background:var(--fond);color:var(--encre);font:inherit;outline:none;}
+  #profilRoleInput:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,.10);}
+  #profilLyceeSave{border:0;border-radius:10px;padding:10px 14px;background:var(--violet);color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;}
+  #profilLyceeSave:disabled{opacity:.65;cursor:wait;}
+  #profilSaveMessage{font-size:.76rem;font-weight:700;}
+  #profilSaveMessage.ok{color:#166534;}
+  #profilSaveMessage.err{color:#991B1B;}
+  .profile-completion-banner{margin:0 0 16px;padding:13px 14px;border:1px solid rgba(124,58,237,.24);background:rgba(124,58,237,.07);border-radius:13px;color:var(--encre);font-size:.8rem;line-height:1.5;}
+
+  /* === Profil : sélecteur compact + fenêtre dédiée par rôle === */
+  body.profile-modal-open{overflow:hidden}
+  .profile-profile-launcher{grid-column:1/-1!important;padding:0!important;overflow:hidden;background:var(--papier);border:1px solid var(--bordure);border-radius:18px;box-shadow:0 14px 36px rgba(45,30,75,.07)}
+  .profile-launcher-head{display:flex;justify-content:space-between;gap:15px;padding:20px 20px 16px;border-bottom:1px solid var(--bordure);align-items:flex-start}
+  .profile-launcher-head strong{display:block;color:var(--encre);font-size:.94rem;margin-top:2px}.profile-launcher-head small{display:block;color:var(--gris);font-size:.68rem;line-height:1.45;margin-top:4px;max-width:580px}
+  .profile-launcher-badge{white-space:nowrap;padding:6px 9px;border-radius:999px;background:rgba(124,58,237,.09);color:var(--violet);font-size:.58rem;font-weight:850;text-transform:uppercase;letter-spacing:.07em}
+  .profile-launcher-roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:15px 20px 12px}
+  .profile-launcher-role{min-width:0;display:grid;grid-template-columns:32px 1fr 15px;align-items:center;gap:8px;padding:11px 9px;border:1px solid var(--bordure);border-radius:13px;background:var(--fond);color:var(--encre);text-align:left;cursor:pointer;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s}
+  .profile-launcher-role:hover{transform:translateY(-1px);border-color:rgba(124,58,237,.45)}.profile-launcher-role[aria-pressed="true"]{border-color:rgba(124,58,237,.68);background:rgba(124,58,237,.09);box-shadow:0 8px 20px rgba(124,58,237,.09)}
+  .profile-launcher-role .role-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(124,58,237,.10);color:var(--violet);font-weight:900;font-size:.72rem}.profile-launcher-role b{display:block;font-size:.66rem;line-height:1.15}.profile-launcher-role small{display:block;color:var(--gris);font-size:.52rem;margin-top:3px;line-height:1.2}.profile-launcher-role i{font-style:normal;color:var(--gris);font-size:.82rem;text-align:right}
+  .profile-launcher-current{margin:0 20px 17px;padding:10px 12px;border-radius:11px;background:rgba(124,58,237,.055);border:1px solid rgba(124,58,237,.13);font-size:.68rem;color:var(--gris);line-height:1.45}.profile-launcher-current strong{color:var(--encre)}.profile-launcher-current span{display:block;margin-top:2px}
+  .profile-form-modal{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:18px}.profile-form-modal.show{display:flex}.profile-form-modal-backdrop{position:absolute;inset:0;background:rgba(10,8,16,.58);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+  .profile-form-modal-card{position:relative;width:min(720px,calc(100vw - 28px));max-height:min(90vh,760px);overflow:auto;background:var(--papier);border:1px solid var(--bordure);border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.28);color:var(--encre)}
+  .profile-form-modal-close{position:absolute;right:14px;top:13px;width:35px;height:35px;border:0;border-radius:50%;background:var(--fond);color:var(--gris);font-size:1.35rem;line-height:1;cursor:pointer;z-index:2}.profile-form-modal-close:hover{color:var(--encre)}
+  .profile-form-modal-head{display:flex;align-items:center;gap:13px;padding:23px 58px 18px 22px;border-bottom:1px solid var(--bordure);background:linear-gradient(135deg,rgba(124,58,237,.10),rgba(255,255,255,.01))}.profile-form-modal-icon{width:43px;height:43px;flex:0 0 43px;border-radius:13px;display:grid;place-items:center;background:rgba(124,58,237,.12);color:var(--violet);font-size:.9rem;font-weight:900}.profile-form-modal-head h3{margin:1px 0 3px;font-size:1.12rem;color:var(--encre)}.profile-form-modal-head p{margin:0;color:var(--gris);font-size:.68rem;line-height:1.4}.profile-modal-section{margin:16px 20px 0!important}.profile-form-modal-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:17px 20px 20px;padding-top:15px;border-top:1px dashed var(--bordure)}
+  .profile-form-modal .profile-save-row{margin-top:0}.profile-form-modal #profilSaveMessage{max-width:245px}.profile-form-modal #profilLyceeSave{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:12px;padding:11px 15px;background:linear-gradient(135deg,#7c3aed,#5b3cc4);color:#fff;font-size:.76rem;font-weight:800;cursor:pointer;box-shadow:0 9px 22px rgba(124,58,237,.2)}.profile-form-modal #profilLyceeSave b{font-size:.95rem}.profile-form-modal #profilLyceeSave:disabled{opacity:.65;cursor:wait}
+  @media(max-width:900px){.profile-launcher-roles{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-launcher-role:last-child{grid-column:1/-1}}
+  @media(max-width:760px){.profile-launcher-head{padding:17px 14px 14px}.profile-launcher-roles{padding:12px 14px 10px}.profile-launcher-current{margin-left:14px;margin-right:14px}.profile-form-modal{padding:10px}.profile-form-modal-card{width:100%;max-height:94vh;border-radius:20px}.profile-form-modal-head{padding:19px 52px 16px 17px}.profile-modal-section{margin:12px 14px 0!important}.profile-form-modal-footer{margin:14px 14px 17px;flex-direction:column;align-items:stretch}.profile-form-modal-footer .profile-required-note{max-width:none}.profile-form-modal .profile-save-row{flex-direction:column;align-items:stretch}.profile-form-modal #profilLyceeSave{width:100%;justify-content:center}.profile-form-modal #profilSaveMessage{max-width:none;text-align:center}}
+
+  /* === Accès / espace personnel : stabilité visuelle === */
+  .access-google-btn.is-loading{opacity:.72;pointer-events:none;transform:none!important;}
+  .access-google-btn .google-spinner{width:15px;height:15px;border:2px solid rgba(66,133,244,.22);border-top-color:#4285F4;border-radius:50%;animation:auroreSpin .7s linear infinite;display:none;flex:0 0 auto;}
+  .access-google-btn.is-loading .google-mark{display:none;}
+  .access-google-btn.is-loading .google-spinner{display:block;}
+  @keyframes auroreSpin{to{transform:rotate(360deg)}}
+  .profile-required-banner{margin:0 0 16px;}
+  .profile-card,.profile-meta{max-width:920px;margin-left:auto;margin-right:auto;}
+
+  @media(max-width:760px){.access-card{max-width:560px}.access-panels{grid-template-columns:1fr}.access-panel-alt{min-height:0}.access-alt-scroll{max-height:220px}.profile-fields-grid{grid-template-columns:1fr;}}
+
+  .modal-secondary-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border:1px solid var(--bordure);border-radius:13px;background:var(--fond);color:var(--encre);font:inherit;font-size:.78rem;font-weight:700;line-height:1.25;text-align:center;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,opacity .15s ease;box-shadow:0 7px 18px rgba(55,36,82,.06)}
+  .modal-secondary-link:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(167,139,250,.55);box-shadow:0 10px 24px rgba(55,36,82,.10)}
+  .modal-secondary-link:disabled{cursor:not-allowed;opacity:.72}
+  .modal-secondary-link.is-counting{font-variant-numeric:tabular-nums}
+  .aurore-auth-wait{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,6,11,.58);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .aurore-auth-wait.show{display:flex}
+  .aurore-auth-wait-card{width:min(390px,calc(100vw - 36px));padding:28px 24px;border:1px solid var(--bordure,rgba(216,180,254,.16));border-radius:24px;background:var(--surface,#111019);box-shadow:0 24px 70px rgba(0,0,0,.28);text-align:center;color:var(--texte,#F8F7FF)}
+  [data-theme="light"] .aurore-auth-wait{background:rgba(248,247,252,.58)}
+  [data-theme="light"] .aurore-auth-wait-card{background:#fff;box-shadow:0 24px 70px rgba(65,45,90,.16)}
+  .aurore-auth-wait-icon{width:58px;height:58px;margin:0 auto 15px;border-radius:18px;display:grid;place-items:center;background:rgba(139,92,246,.12);color:var(--violet,#8B5CF6);border:1px solid rgba(139,92,246,.18)}
+  .aurore-auth-wait-icon svg{width:27px;height:27px;animation:auroreWaitSpin 1.05s linear infinite}
+  .aurore-auth-wait-card strong{display:block;font-size:1.05rem;letter-spacing:-.01em}
+  .aurore-auth-wait-card span{display:block;margin-top:7px;color:var(--gris,#A9A3B8);font-size:.82rem;line-height:1.5}
+  @keyframes auroreWaitSpin{to{transform:rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.aurore-auth-wait-icon svg{animation:none}}
+  .access-message{border-radius:13px !important}
+  @media(max-width:520px){.access-lock{padding:14px}.access-card-body{padding:24px 20px 20px}.access-tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.access-logo{width:52px;height:52px;flex-basis:52px;border-radius:14px}.signup-card{padding:23px 19px}}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header>
   <div class="wrap head">
     <a class="brand" href="#accueil" onclick="showHome()">
       <div class="logo">A</div>
-      <div><strong>Aurore</strong><small>Section Instituts</small></div>
+      <div><strong id="brandTitle">Aurore</strong><small id="brandSubtitle">Section Instituts</small></div>
     </a>
     <nav>
       <a class="active" href="#accueil" data-nav="accueil" onclick="document.body.classList.remove('spaces-focus');document.getElementById('spacePanel')?.classList.remove('visible')">Accueil</a>
@@ -684,7 +799,74 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 </main>
 
 
-<!-- Vue dédiée Aurore : connexion / inscription / profil -->
+<!-- ===== PORTAIL D’ACCÈS Aurore — même architecture que Section Archives ===== -->
+<div id="accessLock" class="access-lock">
+  <div class="access-card access-card-redesign">
+    <div class="access-card-body">
+      <div class="access-institution">
+        <div class="access-logo" id="accessBrandLogo" aria-hidden="true">AI</div>
+        <div class="access-brand-wrap">
+          <div class="access-brand">Aurore — Section Instituts</div>
+          <div class="access-tagline">Plateforme nationale des établissements d’enseignement</div>
+        </div>
+      </div>
+      <div class="access-panels">
+        <section class="access-panel access-panel-main">
+          <div class="access-tabs"><div class="access-tab active">Accès à la plateforme</div></div>
+          <div class="access-heading">
+            <h1>Bienvenue sur Aurore</h1>
+            <p>Retrouvez les établissements, leurs espaces et les services scolaires dans un environnement pensé pour vous.</p>
+          </div>
+          <div class="access-actions">
+            <button type="button" id="accessGoogleBtn" class="access-google-btn" aria-label="Continuer avec Google">
+              <span class="google-mark" aria-hidden="true">G</span><span class="google-spinner" aria-hidden="true"></span>
+              <span><strong>Continuer avec Google</strong><small>Accès recommandé à votre espace personnel</small></span>
+            </button>
+          </div>
+        </section>
+        <section class="access-panel access-panel-alt" aria-label="Autres façons d'accéder à Aurore">
+          <div class="access-alt-head"><span>Autres possibilités</span></div>
+          <div class="access-alt-scroll">
+            <button type="button" id="accessSignupBtn" class="access-secondary-btn">
+              <strong>Créer un compte</strong><small>Pour disposer de votre espace personnel</small>
+            </button>
+            <button type="button" id="accessVisitorBtn" class="access-visitor-btn">
+              <strong>Visiter Aurore sans compte</strong><small>Découvrir les établissements en mode visiteur</small>
+            </button>
+          </div>
+        </section>
+      </div>
+      <p id="accessMessage" class="access-message" style="display:none;"></p>
+      <div class="access-note">Connexion sécurisée · Aurore — Section Instituts</div>
+    </div>
+    <div class="access-footer">© 2026 Aurore — Section Instituts</div>
+  </div>
+</div>
+
+<!-- ===== INSCRIPTION ===== -->
+<div id="signupModal" class="signup-modal" style="display:none;" aria-hidden="true">
+  <div class="signup-card" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <button type="button" class="signup-close" id="signupClose" aria-label="Fermer">×</button>
+    <p class="eyebrow">Créer votre espace</p>
+    <h2 id="signupTitle">Bienvenue sur Aurore</h2>
+    <p class="signup-intro">Créez votre compte avec votre adresse e-mail. Nous vous demanderons ensuite uniquement les informations utiles à votre espace personnel.</p>
+    <form id="signupForm" class="signup-form" autocomplete="on">
+      <label for="signupName">Nom complet</label>
+      <input id="signupName" type="text" autocomplete="name" placeholder="Votre nom et prénom" required maxlength="120">
+      <label for="signupEmail">Adresse e-mail</label>
+      <input id="signupEmail" type="email" autocomplete="email" placeholder="vous@exemple.com" required maxlength="180">
+      <label for="signupPassword">Mot de passe</label>
+      <input id="signupPassword" type="password" autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8" required>
+      <label for="signupPasswordConfirm">Confirmer le mot de passe</label>
+      <input id="signupPasswordConfirm" type="password" autocomplete="new-password" placeholder="Répétez le mot de passe" minlength="8" required>
+      <button type="submit" class="access-btn" id="signupSubmit">CRÉER MON COMPTE</button>
+      <p id="signupMessage" class="access-message" style="display:none;"></p>
+      <div class="account-login-switch"><span>Vous avez déjà un compte ?</span><button type="button" id="showLoginBtn">Se connecter</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Vue dédiée au compte : conservée pour l’espace personnel après connexion -->
 <main class="auth-page" id="authView">
   <div class="auth-shell">
     <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome()">Retour à l’accueil</button></div>
@@ -765,6 +947,20 @@ function applyDominantColorToBox(box,img){
   }catch(_){/* image distante sans CORS : le fond par défaut reste utilisé */}};
   if(img.complete)apply();else img.addEventListener('load',apply,{once:true});
 }
+function setSpaceBrand(etab,role){
+  const title=document.getElementById('brandTitle'),subtitle=document.getElementById('brandSubtitle'),brand=document.querySelector('.brand');
+  if(!title||!subtitle||!brand)return;
+  if(etab){
+    title.textContent=etab.nom||'Établissement';
+    const roleLabels={administration:'Administration lycée',proviseur:'Espace proviseur',professeur:'Espace professeur',eleve:'Espace élève',parent:'Espace parent'};
+    subtitle.textContent=roleLabels[role]||'Section Instituts';
+    brand.classList.add('brand-space-active');
+  }else{
+    title.textContent='Aurore';
+    subtitle.textContent='Section Instituts';
+    brand.classList.remove('brand-space-active');
+  }
+}
 function setSpaceLogo(url,label){
   const el=document.querySelector('.brand .logo');
   if(!el)return;
@@ -775,7 +971,8 @@ function setSpaceLogo(url,label){
     applyDominantColorToBox(el,el.querySelector('img'));
   }else{
     el.classList.remove('establishment-logo-adaptive');el.style.removeProperty('--logo-dominant');
-    el.innerHTML=esc((label||'A').trim().slice(0,2).toUpperCase()||'A');
+    /* Sans logo fourni : les premières lettres du nom de l'établissement deviennent le logo. */
+    el.innerHTML=esc(initials(label||'A'));
   }
 }
 function adaptProfileLogoColor(){
@@ -787,7 +984,8 @@ function adaptSebLogoColor(){
 }
 function restoreSiteLogo(){
   const el=document.querySelector('.brand .logo');
-  if(el&&siteLogoOriginal!==null){el.innerHTML=siteLogoOriginal;}
+  if(el&&siteLogoOriginal!==null){el.innerHTML=siteLogoOriginal;el.classList.remove('establishment-logo-adaptive');el.style.removeProperty('--logo-dominant');}
+  setSpaceBrand(null,null);
 }
 async function loadSpaceEstablishmentBanner(role){
   currentSpaceEstablishment=null;
@@ -1376,6 +1574,7 @@ async function openSpace(role,options={}){
   const etab=await loadSpaceEstablishmentBanner(role);
   if(etab){
     setSpaceLogo(etab.logo_url,etab.nom);
+    setSpaceBrand(etab,role);
   }else{
     restoreSiteLogo();
   }
@@ -1896,5 +2095,198 @@ function appliquerTheme(choix){
 </script>
 
 <div class="decision-modal" id="decisionModal" aria-hidden="true"><div class="decision-backdrop" onclick="closeDecisionModal()"></div><div class="decision-dialog" role="dialog" aria-modal="true" aria-labelledby="decisionTitle"><button class="decision-close" type="button" onclick="closeDecisionModal()" aria-label="Fermer">×</button><span class="auth-kicker">Administration générale</span><h3 id="decisionTitle">Motif du refus</h3><p id="decisionContext"></p><label>Motif du refus<select id="decisionReasonCode"><option value="">Choisir un motif…</option><option value="informations_incompletes">Informations incomplètes</option><option value="etablissement_deja_existant">Établissement déjà existant</option><option value="informations_non_verifiables">Informations non vérifiables</option><option value="etablissement_non_conforme">Établissement non conforme</option><option value="autre">Autre</option></select></label><label id="decisionReasonWrap" style="display:none">Précision obligatoire<textarea id="decisionReason" maxlength="1000" rows="4" placeholder="Expliquez clairement le motif."></textarea></label><div id="decisionMessage" class="auth-message"></div><div class="decision-actions"><button class="auth-secondary" type="button" onclick="closeDecisionModal()">Annuler</button><button class="admin-btn danger" type="button" onclick="confirmRefusal()">Confirmer le refus</button></div></div></div>
+
+<script id="aurore-access-portal-logic">
+(function(){
+  const SUPABASE_URL = window.SUPABASE_URL || 'https://fdstrbqvkemtjyxxaxbj.supabase.co';
+  const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
+  let client = null;
+  let googleBusy = false;
+
+  async function getClient(){
+    if(client) return client;
+    if(!window.supabase?.createClient) throw new Error('Le service de connexion n’est pas encore chargé.');
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
+    });
+    return client;
+  }
+
+  function accessMessage(text,type='ok'){
+    const el=document.getElementById('accessMessage');
+    if(!el)return;
+    el.textContent=text;
+    el.className='access-message '+type;
+    el.style.display='block';
+  }
+
+  function unlockAccess(){
+    const lock=document.getElementById('accessLock');
+    document.body.classList.remove('site-locked');
+    if(lock)lock.style.display='none';
+  }
+  window.auroreUnlockAccess=unlockAccess;
+
+  function showPortal(){
+    const lock=document.getElementById('accessLock');
+    if(lock)lock.style.display='flex';
+    document.body.classList.add('site-locked');
+  }
+
+  async function startGoogle(){
+    if(googleBusy)return;
+    googleBusy=true;
+    const btn=document.getElementById('accessGoogleBtn');
+    if(btn){
+      btn.classList.add('is-loading');
+      btn.setAttribute('aria-busy','true');
+      const strong=btn.querySelector('strong');
+      if(strong)strong.textContent='Connexion à Google…';
+    }
+    accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
+    try{
+      const c=await getClient();
+      const redirectTo=window.location.origin+window.location.pathname;
+      const {error}=await c.auth.signInWithOAuth({
+        provider:'google',
+        options:{redirectTo}
+      });
+      if(error)throw error;
+    }catch(err){
+      console.error('[Google OAuth]',err);
+      accessMessage(err?.message||'Impossible de démarrer la connexion Google.','err');
+      googleBusy=false;
+      if(btn){
+        btn.classList.remove('is-loading');
+        btn.removeAttribute('aria-busy');
+        const strong=btn.querySelector('strong');
+        if(strong)strong.textContent='Continuer avec Google';
+      }
+    }
+  }
+
+  async function handleGoogleReturn(){
+    const params=new URLSearchParams(window.location.search);
+    const code=params.get('code');
+    const oauthError=params.get('error');
+    if(oauthError){
+      accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');
+      return false;
+    }
+    if(!code)return false;
+    try{
+      showPortal();
+      accessMessage('Finalisation de votre connexion Google…','ok');
+      const c=await getClient();
+      const {data,error}=await c.auth.exchangeCodeForSession(code);
+      if(error)throw error;
+      if(!data?.session)throw new Error('Session Google introuvable après authentification.');
+      const session=data.session;
+      currentAuroreSession={
+        ...session,
+        expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000
+      };
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+      if(typeof renderAccountHome==='function')renderAccountHome();
+      unlockAccess();
+      history.replaceState({},document.title,window.location.pathname+window.location.hash);
+      return true;
+    }catch(err){
+      console.error('[Google OAuth return]',err);
+      accessMessage(err?.message||'La connexion Google n’a pas pu être finalisée.','err');
+      return false;
+    }
+  }
+
+  async function restoreGoogleSession(){
+    try{
+      const c=await getClient();
+      const {data}=await c.auth.getSession();
+      if(data?.session){
+        const session=data.session;
+        currentAuroreSession={
+          ...session,
+          expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000
+        };
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+        if(typeof renderAccountHome==='function')renderAccountHome();
+        unlockAccess();
+        return true;
+      }
+    }catch(err){console.warn('[Aurore Auth]',err);}
+    return false;
+  }
+
+  function openSignup(){
+    const modal=document.getElementById('signupModal');
+    if(!modal)return;
+    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+    document.getElementById('signupMessage')?.style?.setProperty('display','none');
+    setTimeout(()=>document.getElementById('signupName')?.focus(),50);
+  }
+  function closeSignup(){
+    const modal=document.getElementById('signupModal');
+    if(modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}
+  }
+
+  async function signup(){
+    const name=document.getElementById('signupName')?.value.trim()||'';
+    const email=document.getElementById('signupEmail')?.value.trim()||'';
+    const password=document.getElementById('signupPassword')?.value||'';
+    const confirm=document.getElementById('signupPasswordConfirm')?.value||'';
+    const msg=document.getElementById('signupMessage');
+    const submit=document.getElementById('signupSubmit');
+    const show=(text,type='ok')=>{if(msg){msg.textContent=text;msg.className='access-message '+type;msg.style.display='block';}};
+    if(password!==confirm){show('Les deux mots de passe ne correspondent pas.','err');return;}
+    if(password.length<8){show('Le mot de passe doit contenir au moins 8 caractères.','err');return;}
+    if(submit){submit.disabled=true;submit.textContent='CRÉATION…';}
+    try{
+      const c=await getClient();
+      const {data,error}=await c.auth.signUp({
+        email,password,
+        options:{
+          data:{full_name:name,nom_complet:name},
+          emailRedirectTo:window.location.origin+window.location.pathname
+        }
+      });
+      if(error)throw error;
+      if(data?.session){
+        currentAuroreSession={...data.session,expires_at:(data.session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+        closeSignup(); unlockAccess();
+        if(typeof renderAccountHome==='function')renderAccountHome();
+      }else{
+        show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
+      }
+    }catch(err){show(err?.message||'Création du compte impossible.','err');}
+    finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
+  }
+
+  document.addEventListener('DOMContentLoaded',async()=>{
+    document.getElementById('accessGoogleBtn')?.addEventListener('click',startGoogle);
+    document.getElementById('accessSignupBtn')?.addEventListener('click',openSignup);
+    document.getElementById('accessVisitorBtn')?.addEventListener('click',()=>{
+      try{localStorage.setItem('aurore_visitor_mode','1');}catch(_){}
+      unlockAccess();
+    });
+    document.getElementById('signupClose')?.addEventListener('click',closeSignup);
+    document.getElementById('showLoginBtn')?.addEventListener('click',()=>{
+      closeSignup();
+      if(typeof openAuthPage==='function')openAuthPage();
+    });
+    document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
+
+    const handled=await handleGoogleReturn();
+    if(!handled){
+      const restored=await restoreGoogleSession();
+      if(!restored)showPortal();
+    }
+  });
+})();
+</script>
 </body>
 </html>
