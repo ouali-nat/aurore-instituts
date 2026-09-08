@@ -433,6 +433,7 @@ function showHome(push=true){
 let currentAuroreSession=null;
 let currentAuroreProfile=null;
 let selectedOnboardingRole='';
+let authViewVersion=0;
 
 function openAuthPage(options={}){
   const push=options.push!==false;
@@ -449,12 +450,14 @@ function openAuthPage(options={}){
 function authMessage(text){const el=$('authMessage');if(el){el.style.display='block';el.textContent=text;}}
 
 function renderAuthStart(){
+  authViewVersion++;
   const root=$('authRoot'); if(!root)return;
   root.innerHTML=`<div class="auth-grid"><section><div class="auth-step"><b>Connexion</b><span>ou</span><button class="auth-secondary" type="button" onclick="renderAuthSignup()">Créer mon compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreLogin()"><label>E-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@exemple.com"></label><label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" required placeholder="Votre mot de passe"></label><div class="auth-actions"><button class="auth-primary" type="submit">Se connecter →</button></div><div id="authMessage" class="auth-message"></div></form></section>
   </div>`;
 }
 
 function renderAuthSignup(){
+  authViewVersion++;
   const root=$('authRoot'); if(!root)return;
   root.innerHTML=`<div class="auth-grid">
     <aside class="auth-side"><span class="auth-kicker">Créer un compte</span><h3>Votre identité Aurore</h3><p>Nom et prénom seront enregistrés dans votre profil. Ensuite, vous choisirez votre rôle et, si nécessaire, votre établissement dans la liste Aurore.</p><div class="auth-points"><div class="auth-point"><b>✦</b><div><strong>Pas de nom d’établissement à saisir</strong><span>Vous choisissez parmi les établissements disponibles.</span></div></div><div class="auth-point"><b>✓</b><div><strong>Un compte peut évoluer</strong><span>Les accès peuvent être ajoutés sans recréer votre identité.</span></div></div></div></aside>
@@ -521,6 +524,7 @@ async function saveOwnProfile(prenom,nom){
 }
 
 async function renderAccountHome(){
+  const viewVersion=++authViewVersion;
   const root=$('authRoot'); if(!root)return;
   const name=currentAuroreProfile?.full_name||[currentAuroreProfile?.prenom,currentAuroreProfile?.nom].filter(Boolean).join(' ')||currentAuroreSession?.user?.email||'Compte Aurore';
   const roles=[]; let spaces=[];
@@ -534,6 +538,7 @@ async function renderAccountHome(){
     const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:'{}'});
     if(r.ok)spaces=await r.json();
   }catch(_){ }
+  if(viewVersion!==authViewVersion)return;
   const roleNames={eleve:'Élève',professeur:'Professeur',parent:'Parent',administration:'Administration établissement',proviseur:'Proviseur',admin_general:'Administration générale Aurore'};
   const accountEmail=(currentAuroreSession?.user?.email||'').trim().toLowerCase();
   const isPlatformAdmin=roles.includes('admin_general') || accountEmail==='oualikevin9@gmail.com';
@@ -559,6 +564,7 @@ async function removeConfiguredSpace(etablissementId,role){
 }
 
 function renderOnboarding(){
+  authViewVersion++;
   const root=$('authRoot'); if(!root)return;
   root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">← Retour au compte</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
   if(selectedOnboardingRole)selectOnboardingRole(selectedOnboardingRole);
@@ -1143,7 +1149,7 @@ function openSpaceTool(role,key){
     loadAdminRequests();return;
   }
   if(role==='general' && key==='general-etablissements'){
-    root.innerHTML=`<section class="space-dashboard accepted-page"><div class="space-dashboard-head"><div><span class="space-panel-label">Répertoire Aurore</span><h3>Établissements acceptés</h3><p>Tous les établissements validés et actuellement publiés sur la plateforme.</p></div>${common}</div><div id="adminAcceptedList"></div></section>`;
+    root.innerHTML=`<section class="space-dashboard accepted-page"><div class="space-dashboard-head"><div><h3>Établissements acceptés</h3><p>Tous les établissements validés et actuellement publiés sur la plateforme.</p></div></div><div id="adminAcceptedList"></div></section>`;
     loadAdminAcceptedEstablishments();return;
   }
   root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Aurore</span><h3>${key.replaceAll('-',' ')}</h3><p>Cette rubrique est prête pour son branchement aux données réelles.</p></div>${common}</div></section>`;
@@ -1229,7 +1235,7 @@ async function loadAdminAcceptedEstablishments(){
     try{
       const token=currentAuroreSession?.access_token||'';
       const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
-      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,slug,type,ville,commune,adresse,telephone,email,site_web,logo_url,presentation,created_at,validation_statut,actif&order=nom.asc`,{headers:h,cache:'no-store'});
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,slug,type,ville,province,adresse,telephone,email,site_web,logo_url,presentation,created_at,validation_statut,actif&order=nom.asc`,{headers:h,cache:'no-store'});
       const b=await r.json().catch(()=>null);
       if(!r.ok)throw new Error(b?.message||b?.hint||`Supabase ${r.status}`);
       const rows=Array.isArray(b)?b:[];
