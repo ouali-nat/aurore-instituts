@@ -2736,7 +2736,23 @@ function appliquerTheme(choix){
   }
   function showPortal(){
     document.body.classList.add('site-locked');
-    const lock=document.getElementById('accessLock'); if(lock)lock.style.display='flex';
+    document.body.classList.remove('aurore-oauth-callback-pending');
+    const lock=document.getElementById('accessLock');
+    if(lock){lock.style.display='flex';lock.style.visibility='visible';lock.style.opacity='1';}
+  }
+  function recoverAuthScreen(message='Votre connexion est prête. Vous pouvez réessayer.'){
+    try{
+      document.body.classList.remove('aurore-oauth-callback-pending','aurore-transitioning');
+      document.body.classList.add('site-locked');
+      const wait=document.getElementById('auroreAuthWait');
+      if(wait){wait.classList.remove('show');wait.setAttribute('aria-hidden','true');}
+      const lock=document.getElementById('accessLock');
+      if(lock){lock.style.display='flex';lock.style.visibility='visible';lock.style.opacity='1';}
+      document.body.classList.remove('auth-initializing');
+      if(typeof openAuthPage==='function')openAuthPage({push:false});
+      if(typeof renderAuthStart==='function')renderAuthStart();
+      accessMessage(message,'err');
+    }catch(e){console.error('[Aurore] récupération écran connexion impossible',e);}
   }
   window.auroreUnlockAccess=unlockAccess;
 
@@ -2869,16 +2885,14 @@ function appliquerTheme(choix){
         document.body.classList.remove('aurore-oauth-callback-pending');
         // Jamais de déverrouillage si la destination n'est pas réellement prête.
         if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
-        else{showPortal();afficherVeuillezPatienter('Impossible de préparer votre espace. Réessayez.');}
+        else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
       }
       return true;
     }catch(err){
       try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
       console.error('[Google OAuth PKCE] callback impossible',err);
       setGoogleLoading(false);
-      cacherVeuillezPatienter();
-      showPortal();
-      accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');
+      recoverAuthScreen('La connexion Google n’a pas pu être finalisée. Réessayez.');
       return true;
     }
   }
@@ -2936,7 +2950,14 @@ function appliquerTheme(choix){
     try{
       const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
       const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();afficherVeuillezPatienter('Création de votre espace…');if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,true);unlockAccess();cacherVeuillezPatienter();}
+      if(body.access_token){
+        currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
+        closeSignup(); afficherVeuillezPatienter('Création de votre espace…');
+        let ready=false;
+        try{if(typeof loadAuroreProfile==='function')await loadAuroreProfile();if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,true);ready=true;}catch(e){console.warn('[Aurore] création/espace impossible à préparer',e);}
+        if(ready){unlockAccess();cacherVeuillezPatienter();}else recoverAuthScreen('Votre compte a été créé, mais votre espace n’a pas pu être préparé. Réessayez.');
+      }
       else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
