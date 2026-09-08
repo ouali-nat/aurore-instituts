@@ -755,6 +755,14 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
   new MutationObserver(syncThemeMeta).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-color-theme']});
 })();
 </script>
+
+<style>
+/* Aurore — rôles, classes et demandes d'inscription */
+.role-choice-wrap{max-width:920px;margin:0 auto;padding:8px 0 30px}.role-choice-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px}.role-choice-head h2{margin:5px 0 8px;font-size:clamp(1.35rem,3vw,2rem)}.role-choice-head p{margin:0;color:var(--muted);line-height:1.55;font-size:.82rem}.role-choice-badge{padding:8px 11px;border:1px solid var(--line);border-radius:999px;font-size:.68rem;font-weight:850;white-space:nowrap}.role-choice-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.role-choice-card{appearance:none;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));color:var(--text);border-radius:20px;padding:18px;text-align:left;cursor:pointer;min-height:150px;box-shadow:var(--shadow);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.role-choice-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 16px 40px rgba(0,0,0,.12)}.role-choice-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(124,58,237,.12);color:var(--accent);font-weight:900;font-size:1.1rem;margin-bottom:14px}.role-choice-card strong{display:block;font-size:.9rem}.role-choice-card span{display:block;color:var(--muted);font-size:.7rem;line-height:1.45;margin-top:5px}.class-select-note{margin-top:8px;color:var(--muted);font-size:.68rem;line-height:1.4}.class-choice-status{margin-top:9px;padding:10px 12px;border-radius:12px;font-size:.7rem;background:var(--panel2);border:1px solid var(--line)}.class-choice-status.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.07)}.class-choice-status.err{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.07)}
+.admin-class-shell{display:grid;gap:16px}.admin-class-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}.admin-class-top h3{margin:3px 0 5px}.admin-class-top p{margin:0;color:var(--muted);font-size:.76rem;line-height:1.5}.admin-class-actions{display:flex;gap:8px;flex-wrap:wrap}.class-create-card,.class-request-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel2)}.class-create-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:9px;align-items:end}.class-create-grid label,.class-filter label{font-size:.68rem;font-weight:800}.class-create-grid input,.class-filter input,.class-filter select{width:100%;box-sizing:border-box;margin-top:6px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);font:inherit}.class-create-grid button{height:42px}.class-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}.class-board-card{position:relative;min-height:155px;padding:15px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(145deg,var(--panel),var(--panel2));cursor:grab;box-shadow:var(--shadow);transition:transform .18s,border-color .18s,box-shadow .18s}.class-board-card:active{cursor:grabbing}.class-board-card.dragging{opacity:.45;transform:scale(.98)}.class-board-card.drag-over{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.1),0 18px 40px rgba(0,0,0,.1)}.class-board-kicker{font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.class-board-card h4{margin:7px 0 4px;font-size:1rem}.class-board-meta{color:var(--muted);font-size:.68rem;line-height:1.45}.class-board-count{display:inline-flex;margin-top:12px;padding:6px 9px;border-radius:999px;background:rgba(124,58,237,.09);font-size:.63rem;font-weight:850}.class-board-menu{position:absolute;right:10px;top:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:9px;padding:4px 7px;cursor:pointer}.class-request-list{display:grid;gap:10px}.class-request-card{display:grid;grid-template-columns:1fr auto;gap:14px}.class-request-main strong{font-size:.85rem}.class-request-main span{display:block;color:var(--muted);font-size:.68rem;margin-top:4px}.class-request-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.class-request-status{align-self:start;padding:6px 9px;border-radius:999px;font-size:.62rem;font-weight:850;background:rgba(245,158,11,.12)}.class-request-status.ok{background:rgba(34,197,94,.1);color:#15803d}.class-request-status.no{background:rgba(239,68,68,.1);color:#b91c1c}.class-student-panel{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.class-student-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-top:7px}.class-student-row strong{font-size:.7rem}.class-student-row span{color:var(--muted);font-size:.62rem}.student-class-hero{padding:18px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));margin-top:14px}.student-class-hero h3{margin:4px 0}.student-class-hero p{margin:0;color:var(--muted);font-size:.74rem;line-height:1.5}.student-class-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.student-class-tile{padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}.student-class-tile strong{display:block;font-size:.72rem}.student-class-tile span{display:block;color:var(--muted);font-size:.64rem;margin-top:4px;line-height:1.4}
+@media(max-width:900px){.role-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.class-create-grid{grid-template-columns:1fr 1fr}.class-create-grid button{grid-column:1/-1}.student-class-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.role-choice-head{flex-direction:column}.role-choice-grid{grid-template-columns:1fr}.class-create-grid{grid-template-columns:1fr}.class-request-card{grid-template-columns:1fr}.student-class-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <header>
@@ -1219,7 +1227,7 @@ async function loadAuroreProfile(){
     avatar_url:dbProfile?.avatar_url||meta.avatar_url||meta.picture||'',
     ...dbProfile
   };
-  const profileFields=['role','etablissement_id','etablissement_nom','etablissement_logo_url','niveau','classe','filiere','discipline','fonction','enfant_informations'];
+  const profileFields=['role','etablissement_id','etablissement_nom','etablissement_logo_url','niveau','classe','classe_id','filiere','discipline','fonction','enfant_informations'];
   profileFields.forEach(k=>{if(currentAuroreProfile[k]===undefined||currentAuroreProfile[k]===null||currentAuroreProfile[k]==='') currentAuroreProfile[k]=meta[k]??'';});
   // Le spread DB reste prioritaire, mais les champs essentiels vides récupèrent
   // explicitement les métadonnées Auth.
@@ -1247,7 +1255,8 @@ function profilPersonnelEstComplet(){
   const nom=String(p.nom||'').trim(), prenom=String(p.prenom||'').trim();
   const etab=String(p.etablissement_nom||'').trim();
   const etabId=String(p.etablissement_id||'').trim();
-  return !!(nom&&prenom&&etab&&etabId);
+  const classeOk=role==='eleve'?String(p.classe_id||'').trim():true;
+  return !!(nom&&prenom&&etab&&etabId&&classeOk);
 }
 
 async function getPersonalSpaceContext(){
@@ -1295,6 +1304,7 @@ async function savePersonalProfile(){
   const etabName=document.getElementById('personalEtab')?.selectedOptions?.[0]?.dataset?.name||'';
   const niveau=document.getElementById('personalNiveau')?.value.trim()||'';
   const classe=document.getElementById('personalClasse')?.value.trim()||'';
+  const classeId=document.getElementById('personalClasseId')?.value||'';
   const filiere=document.getElementById('personalFiliere')?.value.trim()||'';
   const discipline=document.getElementById('personalDiscipline')?.value.trim()||'';
   const fonction=document.getElementById('personalFonction')?.value.trim()||'';
@@ -1304,22 +1314,49 @@ async function savePersonalProfile(){
   if(msg){msg.textContent='Enregistrement de votre espace…';msg.className='personal-profile-message';}
   try{
     const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=representation'};
+    if(role==='eleve' && !classeId){
+      if(msg){msg.textContent='Choisissez une classe proposée par votre établissement.';msg.className='personal-profile-message err';}
+      if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}
+      return;
+    }
     // Le rôle et l'établissement deviennent immédiatement un espace Aurore.
     const cfg=await fetch(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({p_role:role,p_etablissement_id:etabId})});
     if(!cfg.ok){const cb=await cfg.json().catch(()=>null);throw new Error(cb?.message||cb?.hint||'Impossible d’activer votre espace établissement.');}
     // Les champs scolaires complémentaires sont stockés dans les métadonnées du compte,
     // car la table profiles de Section Instituts ne contient volontairement que l’identité.
     const client=await getClient();
-    const metaPayload={prenom,nom,full_name:`${prenom} ${nom}`,role,etablissement_id:etabId,etablissement_nom:etabName,niveau:niveau||null,classe:classe||null,filiere:filiere||null,discipline:discipline||null,fonction:fonction||null,enfant_informations:enfant||null};
+    const metaPayload={prenom,nom,full_name:`${prenom} ${nom}`,role,etablissement_id:etabId,etablissement_nom:etabName,niveau:niveau||null,classe:classe||null,classe_id:classeId||null,filiere:filiere||null,discipline:discipline||null,fonction:fonction||null,enfant_informations:enfant||null};
     const updated=await client.auth.updateUser({data:metaPayload});
     if(updated.error)throw updated.error;
     const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers,body:JSON.stringify({prenom,nom,full_name:`${prenom} ${nom}`})});
     if(!r.ok)throw new Error('Impossible d’enregistrer votre identité.');
     await loadAuroreProfile();
-    if(msg){msg.textContent='Profil enregistré. Votre espace est maintenant personnalisé.';msg.className='personal-profile-message ok';}
+    if(role==='eleve' && classeId){
+      const dr=await fetch(`${SUPABASE_URL}/rest/v1/classe_demandes?on_conflict=classe_id,profile_id`,{method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({classe_id:classeId,profile_id:id,etablissement_id:etabId,statut:'en_attente'})});
+      if(!dr.ok && dr.status!==409){const db=await dr.json().catch(()=>null);throw new Error(db?.message||'Impossible d’envoyer la demande d’inscription dans la classe.');}
+      if(msg){msg.textContent='Profil enregistré. Votre demande d’inscription dans la classe est en attente de validation.';msg.className='personal-profile-message ok';}
+    }else if(msg){msg.textContent='Profil enregistré. Votre espace est maintenant personnalisé.';msg.className='personal-profile-message ok';}
     await renderPersonalSpace();
   }catch(e){if(msg){msg.textContent=e.message||'Impossible d’enregistrer votre profil.';msg.className='personal-profile-message err';}}
   finally{if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}}
+}
+
+function hasSavedPersonalRole(){
+  const p=currentAuroreProfile||{};
+  const role=String(p.role||'').toLowerCase();
+  return ['eleve','parent','professeur','administration','proviseur'].includes(role);
+}
+function renderRoleChoice(){
+  authViewVersion++;
+  const root=$('authRoot');if(!root||!currentAuroreSession)return;
+  const roles=[['eleve','♙','Élève','Ma scolarité, ma classe et mes résultats.'],['parent','♙','Parent','Suivi de la scolarité de votre enfant.'],['professeur','◉','Professeur','Enseignement, classes et évaluations.'],['administration','⚙','Administration','Gestion de votre établissement.'],['proviseur','⌂','Proviseur','Pilotage et vie du lycée.']];
+  root.innerHTML=`<section class="role-choice-wrap"><div class="role-choice-head"><div><span class="auth-kicker">Première étape</span><h2>Quel est votre rôle sur Aurore ?</h2><p>Choisissez votre profil. Aurore adaptera ensuite votre espace et les informations demandées.</p></div><span class="role-choice-badge">Compte connecté</span></div><div class="role-choice-grid">${roles.map(r=>`<button type="button" class="role-choice-card" onclick="choosePersonalRole('${r[0]}')"><div class="role-choice-icon">${r[1]}</div><strong>${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></section>`;
+}
+async function choosePersonalRole(role){
+  if(!currentAuroreSession||!['eleve','parent','professeur','administration','proviseur'].includes(role))return;
+  currentAuroreProfile=currentAuroreProfile||{};currentAuroreProfile.role=role;
+  try{const c=await getClient();await c.auth.updateUser({data:{role}});}catch(_){ }
+  await renderPersonalSpace();
 }
 
 async function renderPersonalSpace(){
@@ -1335,7 +1372,7 @@ async function renderPersonalSpace(){
   const roleHelp=personalRoleHelp(role);
   let roleFields='';
   if(role==='eleve'){
-    roleFields=`<div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(p.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<input id="personalClasse" value="${esc(p.classe||'')}" placeholder="Ex. 2nde A"></label></div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(p.filiere||'')}" placeholder="Ex. Série D"></label>`;
+    roleFields=`<div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(p.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<select id="personalClasse" required><option value="">Sélectionnez d’abord votre établissement…</option></select><input type="hidden" id="personalClasseId" value="${esc(p.classe_id||'')}"></label></div><div id="personalClassStatus" class="class-choice-status">Les classes disponibles apparaîtront après le choix de l’établissement.</div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(p.filiere||'')}" placeholder="Ex. Série D"></label>`;
   }else if(role==='parent'){
     roleFields=`<label>Informations sur votre enfant (facultatif)<textarea id="personalEnfant" placeholder="Nom, classe ou toute information utile">${esc(p.enfant_informations||'')}</textarea>`;
   }else{
@@ -1358,7 +1395,26 @@ async function renderPersonalSpace(){
       const token=currentAuroreSession.access_token;
       const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
       const rows=r.ok?await r.json():[]; const sel=$('personalEtab');
-      if(sel)sel.innerHTML='<option value="">Sélectionner votre établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}" data-name="${esc(e.nom)}" ${String(ctx.etab?.id||'')===String(e.id)?'selected':''}>${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');
+      if(sel){
+        sel.innerHTML='<option value="">Sélectionner votre établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}" data-name="${esc(e.nom)}" ${String(ctx.etab?.id||'')===String(e.id)?'selected':''}>${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');
+        if(role==='eleve'){
+          const loadClasses=async()=>{
+            const cid=sel.value, csel=$('personalClasse'), status=$('personalClassStatus'); if(!csel)return;
+            csel.innerHTML='<option value="">Chargement des classes…</option>';
+            if(!cid){csel.innerHTML='<option value="">Sélectionnez d’abord votre établissement…</option>';if(status)status.textContent='Les classes disponibles apparaîtront après le choix de l’établissement.';return;}
+            try{
+              const cr=await fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(cid)}&actif=eq.true&select=id,nom,niveau,annee_scolaire&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
+              const classes=cr.ok?await cr.json():[];
+              csel.innerHTML='<option value="">Choisir votre classe…</option>'+classes.map(c=>`<option value="${esc(c.id)}" data-name="${esc(c.nom)}">${esc(c.nom)}${c.niveau?' · '+esc(c.niveau):''}${c.annee_scolaire?' · '+esc(c.annee_scolaire):''}</option>`).join('');
+              const savedId=String(p.classe_id||''); if(savedId&&classes.some(c=>String(c.id)===savedId))csel.value=savedId;
+              if(status)status.textContent=classes.length?`${classes.length} classe${classes.length>1?'s':''} disponible${classes.length>1?'s':''}. Choisissez celle qui vous correspond.`:'Aucune classe active n’a encore été créée par l’administration de cet établissement.';
+            }catch(_){csel.innerHTML='<option value="">Impossible de charger les classes</option>';if(status){status.textContent='Les classes ne sont pas disponibles pour le moment.';status.className='class-choice-status err';}}
+          };
+          sel.addEventListener('change',loadClasses);
+          if(sel.value)await loadClasses();
+          $('personalClasse')?.addEventListener('change',()=>{const o=$('personalClasse')?.selectedOptions?.[0];if($('personalClasseId'))$('personalClasseId').value=o?.value||'';});
+        }
+      }
     }catch(_){ }
   }
 }
@@ -1371,6 +1427,10 @@ function renderPersonalSpaceEdit(){
 async function afterLoginToPersonalSpace(showWelcome=true){
   if(!currentAuroreSession)return;
   const ctx=await getPersonalSpaceContext();
+  if(!hasSavedPersonalRole()){
+    if(showWelcome){accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Choisissons votre rôle…`,'ok');if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… préparation de votre espace');await new Promise(r=>requestAnimationFrame(r));}
+    $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');renderRoleChoice();if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
+  }
   if(ctx.etab){setSpaceLogo(ctx.etab.logo_url,ctx.etab.nom);setSpaceBrand(ctx.etab,ctx.role);}
   if(showWelcome){
     accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Ouverture de votre espace personnel…`,'ok');
@@ -2062,6 +2122,48 @@ async function uploadAdminDocument(){
   }finally{if(button)button.disabled=false;}
 }
 
+
+let draggedAdminClassId=null;
+async function adminElevesView(){
+  const root=$('spaceDashboard');if(!root)return;
+  const token=currentAuroreSession?.access_token||'';
+  root.innerHTML=`<section class="admin-class-shell"><div class="admin-class-top"><div><span class="space-panel-label">Élèves & classes</span><h3>Organisation des classes</h3><p>Créez vos classes, déplacez les cases pour les réorganiser et validez les demandes d’inscription des élèves.</p></div><div class="admin-class-actions"><button class="admin-btn" type="button" onclick="loadAdminClasses()">Actualiser</button></div></div><div class="class-create-card"><form class="class-create-grid" onsubmit="event.preventDefault();createInstituteClass()"><label>Nom de la classe<input id="newClassName" required placeholder="Ex. 2nde A"></label><label>Niveau<input id="newClassLevel" placeholder="Ex. Seconde"></label><label>Année scolaire<input id="newClassYear" placeholder="2026–2027"></label><button class="auth-primary" type="submit" id="newClassBtn">＋ Créer la classe</button></form><div id="classAdminMessage" class="class-select-note"></div></div><div><span class="space-panel-label">Vos classes</span><div id="adminClassBoard" class="class-board"><div class="admin-card">Chargement des classes…</div></div></div><div><span class="space-panel-label">Demandes d’inscription</span><div id="classRequestList" class="class-request-list"><div class="admin-card">Chargement des demandes…</div></div></div></section>`;
+  await loadAdminClasses();
+}
+async function getAdminInstituteIds(){
+  const token=currentAuroreSession?.access_token||'';if(!token)return[];
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}'});const rows=r.ok?await r.json():[];return rows.filter(x=>['administration','proviseur'].includes(x.role)&&x.etablissement_id).map(x=>x.etablissement_id);}catch(_){return[]}
+}
+async function loadAdminClasses(){
+  const board=$('adminClassBoard'),requests=$('classRequestList');if(!board)return;const token=currentAuroreSession?.access_token||'';const ids=await getAdminInstituteIds();if(!ids.length){board.innerHTML='<div class="admin-card">Aucun établissement administré n’a été trouvé pour ce compte.</div>';if(requests)requests.innerHTML='<div class="admin-card">Aucune demande disponible.</div>';return;}
+  try{
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+    const all=[];
+    for(const id of ids){const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(id)}&select=id,etablissement_id,nom,niveau,annee_scolaire,actif&order=nom.asc`,{headers:h,cache:'no-store'});if(r.ok)all.push(...await r.json());}
+    board.innerHTML=all.length?all.map(c=>`<article class="class-board-card" draggable="true" data-class-id="${esc(c.id)}" data-etab-id="${esc(c.etablissement_id)}"><button class="class-board-menu" type="button" onclick="renameInstituteClass('${esc(c.id)}','${esc(c.nom)}');event.stopPropagation()">⋯</button><span class="class-board-kicker">Classe</span><h4>${esc(c.nom)}</h4><div class="class-board-meta">${esc([c.niveau,c.annee_scolaire].filter(Boolean).join(' · ')||'Informations à compléter')}</div><span class="class-board-count" id="classCount-${esc(c.id)}">Effectif…</span><div class="class-student-panel" id="classStudents-${esc(c.id)}"></div></article>`).join(''):'<div class="admin-card">Aucune classe. Créez la première classe ci-dessus.</div>';
+    board.querySelectorAll('.class-board-card').forEach(card=>{card.addEventListener('dragstart',()=>{draggedAdminClassId=card.dataset.classId;card.classList.add('dragging')});card.addEventListener('dragend',()=>{draggedAdminClassId=null;card.classList.remove('dragging');board.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'))});card.addEventListener('dragover',e=>{e.preventDefault();if(draggedAdminClassId!==card.dataset.classId)card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(draggedAdminClassId&&draggedAdminClassId!==card.dataset.classId)reorderAdminClassCards(draggedAdminClassId,card.dataset.classId)});});
+    await Promise.all(all.map(c=>loadClassStudents(c.id)));
+    if(requests)await loadClassRequests(ids);
+  }catch(e){board.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les classes.')}</div>`;}
+}
+async function createInstituteClass(){
+  const name=$('newClassName')?.value.trim(),niveau=$('newClassLevel')?.value.trim()||null,annee=$('newClassYear')?.value.trim()||null,btn=$('newClassBtn'),msg=$('classAdminMessage');if(!name)return;const ids=await getAdminInstituteIds();if(!ids.length){if(msg)msg.textContent='Aucun établissement administré.';return;}if(btn)btn.disabled=true;
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/classes`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({etablissement_id:ids[0],nom:name,niveau,annee_scolaire:annee,actif:true})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Création de la classe refusée.');}if(msg)msg.textContent='Classe créée avec succès.';$('newClassName').value='';await loadAdminClasses();}catch(e){if(msg)msg.textContent=e.message||'Impossible de créer la classe.';}finally{if(btn)btn.disabled=false;}
+}
+async function renameInstituteClass(id,current){const name=prompt('Nouveau nom de la classe :',current||'');if(!name||name.trim()===current)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({nom:name.trim()})});if(!r.ok)throw new Error('Modification refusée.');await loadAdminClasses();}catch(e){alert(e.message||'Impossible de modifier la classe.');}}
+function reorderAdminClassCards(fromId,toId){const board=$('adminClassBoard');const from=board?.querySelector(`[data-class-id="${CSS.escape(fromId)}"]`),to=board?.querySelector(`[data-class-id="${CSS.escape(toId)}"]`);if(from&&to)board.insertBefore(from,to);}
+async function loadClassStudents(classId){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};try{const r=await fetch(`${SUPABASE_URL}/rest/v1/eleves?classe_id=eq.${encodeURIComponent(classId)}&select=id,nom,prenom,matricule,profile_id&order=nom.asc`,{headers:h,cache:'no-store'});const rows=r.ok?await r.json():[];const c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?rows.slice(0,5).map(x=>`<div class="class-student-row"><div><strong>${esc([x.prenom,x.nom].filter(Boolean).join(' ')||'Élève')}</strong><span>${esc(x.matricule||'Élève inscrit')}</span></div></div>`).join('')+(rows.length>5?`<div class="class-select-note">+ ${rows.length-5} autre${rows.length-5>1?'s':''} élève${rows.length-5>1?'s':''}</div>`:''):'<div class="class-select-note">Aucun élève validé dans cette classe.</div>';}catch(_){}}
+async function loadClassRequests(ids){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},all=[];for(const id of ids){const r=await fetch(`${SUPABASE_URL}/rest/v1/classe_demandes?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&select=id,classe_id,profile_id,etablissement_id,created_at,classes(nom,niveau,annee_scolaire)&order=created_at.asc`,{headers:h,cache:'no-store'});if(r.ok)all.push(...await r.json());}const box=$('classRequestList');if(!box)return;box.innerHTML=all.length?all.map(d=>`<article class="class-request-card"><div class="class-request-main"><strong>Demande d’inscription</strong><span>Classe : ${esc(d.classes?.nom||'Classe')} · ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span><span>Profil : ${esc(d.profile_id)}</span></div><div class="class-request-actions"><span class="class-request-status">En attente</span><button class="admin-btn primary" type="button" onclick="decideClassRequest('${esc(d.id)}','valide')">Valider</button><button class="admin-btn danger" type="button" onclick="decideClassRequest('${esc(d.id)}','refuse')">Refuser</button></div></article>`).join(''):'<div class="admin-card">Aucune demande d’inscription en attente.</div>';
+}
+async function decideClassRequest(id,decision){const comment=decision==='refuse'?prompt('Motif du refus (facultatif) :','Informations à compléter')||null:null;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Décision impossible.');}await loadAdminClasses();}catch(e){alert(e.message||'Impossible de traiter la demande.');}}
+
+
+async function renderStudentClassDashboard(root,common){
+  const p=currentAuroreProfile||{},classId=p.classe_id||'';root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>Ma classe et ma vie scolaire</h3><p>Retrouvez ici les informations qui concernent directement votre classe.</p></div>${common}</div><div id="studentClassContent"><div class="admin-card">Chargement de votre classe…</div></div></section>`;
+  if(!classId){$('studentClassContent').innerHTML='<div class="class-choice-status">Aucune classe n’est encore rattachée à votre compte. Choisissez une classe dans Mon espace puis attendez la validation de l’administration.</div>';return;}
+  try{const token=currentAuroreSession.access_token,h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,nom,niveau,annee_scolaire,etablissement_id`,{headers:h});const c=(r.ok?(await r.json()):[])[0];if(!c){$('studentClassContent').innerHTML='<div class="class-choice-status err">Votre classe n’est plus disponible.</div>';return;}const er=await fetch(`${SUPABASE_URL}/rest/v1/eleves?profile_id=eq.${encodeURIComponent(currentAuroreSession.user.id)}&select=matricule,nom,prenom,classe_id`,{headers:h});const me=(er.ok?(await er.json()):[])[0];const cr=await fetch(`${SUPABASE_URL}/rest/v1/eleves?classe_id=eq.${encodeURIComponent(classId)}&select=id`,{headers:h});const effectif=cr.ok?(await cr.json()).length:0;$('studentClassContent').innerHTML=`<div class="student-class-hero"><span class="class-board-kicker">${esc(c.niveau||'Classe')}</span><h3>${esc(c.nom)}</h3><p>${esc([c.annee_scolaire,effectif?effectif+' élève'+(effectif>1?'s':''):'Effectif en cours'].filter(Boolean).join(' · '))}</p><div class="student-class-grid"><div class="student-class-tile"><strong>Mon identité</strong><span>${esc([me?.prenom||p.prenom,me?.nom||p.nom].filter(Boolean).join(' ')||'Profil Aurore')}</span></div><div class="student-class-tile"><strong>Mon niveau</strong><span>${esc(c.niveau||p.niveau||'À compléter')}</span></div><div class="student-class-tile"><strong>Ma filière / série</strong><span>${esc(p.filiere||'À compléter')}</span></div><div class="student-class-tile"><strong>Effectif</strong><span>${effectif||'—'} élève${effectif>1?'s':''}</span></div><div class="student-class-tile"><strong>Mes devoirs</strong><span>Les devoirs publiés par vos enseignants apparaîtront ici.</span></div><div class="student-class-tile"><strong>Mes résultats</strong><span>Notes, tests et bulletins publiés pour votre profil.</span></div></div></div>`;}catch(e){$('studentClassContent').innerHTML=`<div class="class-choice-status err">${esc(e.message||'Impossible de charger votre classe.')}</div>`;}
+}
+
 function openSpaceTool(role,key){
   const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}`;
   if(location.hash!==route) pushRoute(route);
@@ -2072,13 +2174,12 @@ function openSpaceTool(role,key){
   window.scrollTo({top:0,left:0,behavior:'auto'});
   const root=document.getElementById('spaceDashboard'); if(!root)return;
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
+  if(role==='administration' && key==='admin-eleves'){ adminElevesView(); return; }
   const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
-  if(role==='eleve' && key==='class'){
-    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>3e A — Année scolaire 2026–2027</h3><p>Organisation de la classe et cases de démonstration.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">CLASSE</span><div class="big-number">3e A</div><p>Effectif : 42 élèves · Salle : B12 · Professeur principal : Mme Awa Traoré</p></div><div class="space-mini-grid">${['Test 01','Test 02','Test 03','Test 04','Test 05','Test 06'].map(x=>`<div class="space-mini-card"><strong>${x}</strong><span>Case de classe</span><b>test</b></div>`).join('')}</div></div></section>`;return;
-  }
+  if(role==='eleve' && key==='class'){ renderStudentClassDashboard(root,common); return; }
   if(role==='eleve' && (key==='professeurs'||key==='camarades')){
     const teacher=key==='professeurs'; const people=teacher?[['Awa Traoré','Mathématiques · Professeur principal','42 élèves'],['Moussa Kaboré','Français','38 élèves'],['Clarisse Ouédraogo','Anglais','41 élèves'],['Idrissa Sawadogo','Physique-Chimie','40 élèves'],['Fatimata Diallo','Histoire-Géographie','42 élèves']]:[['Adama Kinda','3e A · Élève','42 élèves'],['Mariam Compaoré','3e A · Élève','42 élèves'],['Salif Ouédraogo','3e A · Élève','42 élèves'],['Nadia Zongo','3e A · Élève','42 élèves'],['Issouf Kaboré','3e A · Élève','42 élèves']];
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
