@@ -239,7 +239,7 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 
 .account-email-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .account-email-row p{margin:0}
-.platform-admin-access{white-space:nowrap}
+.platform-admin-access{white-space:nowrap!important;background:#b91c1c!important;color:#fff!important;border:1px solid #b91c1c!important}.platform-admin-access:hover{background:#991b1b!important;border-color:#991b1b!important}.platform-admin-access:focus-visible{outline:3px solid rgba(185,28,28,.25);outline-offset:2px}.platform-admin-access:disabled{opacity:.7;cursor:wait}
 .request-logo-preview{width:min(260px,100%);height:260px;object-fit:contain;border:1px solid var(--line);border-radius:20px;background:var(--panel2);padding:10px;margin-top:10px}
 </style>
 </head>
@@ -525,8 +525,28 @@ async function renderAccountHome(){
   const isPlatformAdmin=roles.includes('admin_general') || accountEmail==='oualikevin9@gmail.com';
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
-  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="window.openGeneralAdmin()">Administration générale Aurore</button>':'';
+  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn" onclick="return window.openGeneralAdmin(event)">Administration générale Aurore</button>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces</button></div></div></section>`;
+  if(isPlatformAdmin){
+    const btn=$('generalAdminBtn');
+    if(btn){
+      btn.style.background='#b91c1c';
+      btn.style.color='#fff';
+      btn.style.borderColor='#b91c1c';
+      btn.style.cursor='pointer';
+      btn.addEventListener('click',async function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        btn.disabled=true;
+        try{
+          await openSpace('general');
+        }catch(err){
+          console.error('Administration générale:',err);
+          authMessage(err?.message||'Impossible d’ouvrir l’Administration générale Aurore.');
+        }finally{btn.disabled=false;}
+      });
+    }
+  }
 }
 
 function renderOnboarding(){
@@ -848,17 +868,21 @@ async function openSpace(role){
 }
 
 window.openSpace=openSpace;
-window.openGeneralAdmin=async function(){
-  if(!currentAuroreSession){
-    openAuthPage();
-    return;
-  }
+window.openGeneralAdmin=async function(event){
+  if(event){event.preventDefault();event.stopPropagation();}
+  const btn=$('generalAdminBtn');
+  if(btn)btn.disabled=true;
   try{
+    const session=currentAuroreSession;
+    if(!session?.access_token){openAuthPage();return false;}
     await openSpace('general');
   }catch(err){
-    console.error(err);
-    authMessage(err?.message||'Accès à l’Administration générale impossible.');
+    console.error('Administration générale Aurore:',err);
+    authMessage(err?.message||'Impossible d’ouvrir l’Administration générale Aurore.');
+  }finally{
+    if(btn)btn.disabled=false;
   }
+  return false;
 };
 
 function getSavedAdminSession(){
