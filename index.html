@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#0B0912">
 <meta name="description" content="Aurore — Section Instituts, la plateforme des établissements d’enseignement du Burkina Faso.">
 <title>Aurore — Section Instituts</title>
+<!-- Préconnexion : le navigateur ouvre la connexion DNS/TLS vers Supabase et le
+     Worker R2 pendant que le reste de la page se charge, au lieu d'attendre le
+     premier appel réseau (connexion, chargement des établissements) pour le
+     faire. Gain net sur mobile, surtout en 3G/4G. -->
+<link rel="preconnect" href="https://fdstrbqvkemtjyxxaxbj.supabase.co" crossorigin>
+<link rel="preconnect" href="https://aurore-instituts-r2.oualikevin9.workers.dev" crossorigin>
 
 <script>
 (function(){
@@ -1276,11 +1282,15 @@ async function loadAuroreProfile(){
 
   // Auth et profil DB sont indépendants : chargement en parallèle pour
   // raccourcir nettement la phase « Finalisation » après Google.
+  // Timeouts asymétriques (même principe que Section Archives) : l'identité
+  // Auth est critique (8s de marge), le profil DB est un simple enrichissement
+  // qui ne doit jamais retenir longtemps l'entrée sur le site (1.5s, puis on
+  // continue avec un profil vide plutôt que de bloquer l'utilisateur).
   let authUser=null, dbProfile=null;
   await Promise.all([
     (async()=>{
       try{
-        const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'});
+        const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'},8000);
         if(r.ok){
           authUser=await r.json().catch(()=>null);
           if(authUser){
@@ -1292,7 +1302,7 @@ async function loadAuroreProfile(){
     })(),
     (async()=>{
       try{
-        const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'});
+        const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'},1500);
         const rows=r.ok?await r.json().catch(()=>[]):[];
         dbProfile=rows[0]||null;
       }catch(_){}
@@ -1348,7 +1358,7 @@ async function getPersonalSpaceContext(){
   const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
   let spaces=[];
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:'{}'});
+    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:'{}'},6000);
     if(r.ok)spaces=await r.json();
   }catch(_){ }
   const preferred=['eleve','professeur','proviseur','administration','parent'];
@@ -1356,7 +1366,7 @@ async function getPersonalSpaceContext(){
   let etab=null;
   if(space?.etablissement_id){
     try{
-      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(space.etablissement_id)}&select=id,nom,type,ville,logo_url`,{headers});
+      const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(space.etablissement_id)}&select=id,nom,type,ville,logo_url`,{headers},4000);
       if(r.ok)etab=(await r.json())[0]||null;
     }catch(_){ }
   }
