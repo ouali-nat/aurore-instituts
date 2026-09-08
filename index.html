@@ -245,6 +245,27 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .request-card{border:1px solid var(--line);background:var(--panel);border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
 .request-card-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.request-brand{display:flex;gap:14px;align-items:center;min-width:0}.request-logo{width:72px;height:72px;border-radius:16px;object-fit:cover;background:var(--panel2);border:1px solid var(--line);flex:0 0 72px}.request-logo.empty{display:grid;place-items:center;font-size:.68rem;font-weight:800;color:var(--muted)}.request-kicker,.request-detail>span,.request-copy span{display:block;color:var(--muted);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.request-card h3{margin:3px 0 4px;font-size:1.05rem}.request-card-head p{margin:0;color:var(--muted);font-size:.78rem}.request-status{padding:7px 10px;border-radius:999px;font-size:.68rem;font-weight:850;white-space:nowrap}.request-status.pending{background:rgba(245,158,11,.13);color:#a16207}.request-status.approved{background:rgba(34,197,94,.13);color:#15803d}.request-status.rejected{background:rgba(239,68,68,.13);color:#b91c1c}.request-detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:17px 0}.request-detail{padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.request-detail strong{display:block;margin-top:4px;font-size:.78rem;overflow-wrap:anywhere}.request-copy{display:grid;grid-template-columns:1fr 1fr;gap:12px}.request-copy>div{padding:13px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}.request-copy p{margin:6px 0 0;font-size:.78rem;line-height:1.55}.request-refusal{margin-top:12px;padding:12px 14px;border-left:3px solid #ef4444;background:rgba(239,68,68,.06);border-radius:10px}.request-refusal b{font-size:.75rem}.request-refusal p{margin:5px 0 0;font-size:.78rem}.request-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}.request-footer small{color:var(--muted)}.request-published{font-size:.7rem;font-weight:800;color:#15803d}.request-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}.admin-btn.danger{background:#b91c1c;color:#fff;border-color:#b91c1c}.decision-modal{display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;padding:18px}.decision-modal.visible{display:flex}.decision-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px)}.decision-dialog{position:relative;width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.25)}.decision-dialog h3{margin:5px 0 7px}.decision-dialog>p{color:var(--muted);font-size:.8rem;line-height:1.5}.decision-dialog label{display:block;margin-top:16px;font-size:.72rem;font-weight:800}.decision-dialog textarea{display:block;width:100%;box-sizing:border-box;margin-top:7px;resize:vertical;min-height:120px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}.decision-close{position:absolute;right:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:1.6rem;cursor:pointer}.decision-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
 @media(max-width:760px){.request-card-head{flex-direction:column}.request-detail-grid,.request-copy{grid-template-columns:1fr}.request-actions{margin-left:0;width:100%}.request-actions .admin-btn{flex:1}}
+
+/* Navigation SPA robuste sur mobile : chaque espace devient une vue pleine page. */
+.space-panel.page-mode{min-height:calc(100dvh - 76px);overflow-x:hidden}
+.space-panel.page-mode .space-panel-head{position:relative}
+@media(max-width:560px){.space-panel.page-mode{padding-bottom:36px}.space-panel.page-mode .space-tools-grid{gap:10px}.space-panel.page-mode .space-back{position:sticky;top:8px;z-index:4;box-shadow:var(--shadow)}}
+
+/* Répertoire des établissements validés — administration générale */
+.accepted-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0 12px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--panel2)}
+.accepted-toolbar>div{display:flex;flex-direction:column;gap:3px}.accepted-toolbar strong{font-size:.88rem}
+.accepted-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.accepted-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--panel2);box-shadow:0 8px 24px rgba(0,0,0,.06);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.accepted-card:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 14px 32px rgba(0,0,0,.10)}
+.accepted-card-cover{height:145px;position:relative;display:grid;place-items:center;background:linear-gradient(135deg,var(--panel),var(--panel2));border-bottom:1px solid var(--line);overflow:hidden}.accepted-card-cover img{width:100%;height:100%;object-fit:cover}
+.accepted-logo-fallback{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-weight:900;font-size:1.2rem;letter-spacing:.04em;background:var(--panel);border:1px solid var(--line);color:var(--accent)}
+.accepted-status{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;background:rgba(20,20,20,.78);color:#fff;font-size:.66rem;font-weight:800;backdrop-filter:blur(8px)}.accepted-status i{width:6px;height:6px;border-radius:50%;background:#5ee28a}
+.accepted-card-body{padding:17px 18px 12px}.accepted-kicker{font-size:.61rem;letter-spacing:.13em;font-weight:850;color:var(--accent);margin-bottom:5px}.accepted-card-body h3{margin:0;font-size:1.12rem;line-height:1.2}.accepted-meta{margin:6px 0 0;color:var(--muted);font-size:.75rem;font-weight:700}.accepted-address{margin:7px 0 0;color:var(--text);font-size:.73rem}.accepted-description{margin:11px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.35em}
+.accepted-card-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px 16px;border-top:1px solid var(--line)}.accepted-card-footer>span{font-size:.65rem;color:var(--muted);font-weight:700}.accepted-card-footer .admin-btn{white-space:nowrap}
+.admin-loading,.admin-empty,.admin-error{padding:34px 20px;border:1px solid var(--line);border-radius:20px;background:var(--panel2);text-align:center}.admin-loading{display:flex;align-items:center;justify-content:center;gap:9px;color:var(--muted);font-size:.8rem}.admin-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:adminPulse 1s infinite alternate}@keyframes adminPulse{to{opacity:.35;transform:scale(.7)}}
+.admin-empty-icon{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;margin:0 auto 12px;border:1px solid var(--line);font-weight:900;color:var(--accent)}.admin-empty h3{margin:0 0 5px;font-size:1rem}.admin-empty p,.admin-error p{margin:0 auto 15px;color:var(--muted);font-size:.76rem;max-width:480px;line-height:1.5}.admin-error strong{display:block;margin-bottom:6px}
+@media(max-width:760px){.accepted-grid{grid-template-columns:1fr}.accepted-card-cover{height:125px}.accepted-card-footer{align-items:flex-start;flex-direction:column}.accepted-card-footer .admin-btn{width:100%}.accepted-toolbar{align-items:flex-start}}
+
 </style>
 </head>
 <body>
@@ -259,7 +280,7 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
       <a href="#etablissements" data-nav="etablissements">Établissements</a>
       <a href="#apropos" data-nav="apropos">À propos</a>
     </nav>
-    <button class="topbtn" onclick="openSpacesLanding()">Espaces</button><button class="topbtn" type="button" onclick="openAuthPage()">Mon compte</button>
+    <button class="topbtn" type="button" onclick="openAuthPage()">Mon compte</button>
     <div class="theme-control">
       <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-haspopup="true">◐ <span id="themeLabel">Thème</span></button>
       <div class="theme-menu" id="themeMenu" role="menu">
@@ -396,13 +417,14 @@ function normalize(e){
   };
 }
 
-function showHome(){
+function showHome(push=true){
+  if(push && location.hash!=='#accueil') pushRoute('#accueil');
   $('homeView').classList.remove('hide-home');
   $('profileView').classList.remove('show');
   $('authView').classList.remove('show');
   $('spacePanel')?.classList.remove('page-mode','visible');
   document.body.classList.remove('spaces-focus');
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(push) window.scrollTo({top:0,behavior:'auto'});
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   document.querySelector('nav a[data-nav="accueil"]')?.classList.add('active');
 }
@@ -412,11 +434,15 @@ let currentAuroreSession=null;
 let currentAuroreProfile=null;
 let selectedOnboardingRole='';
 
-function openAuthPage(){
+function openAuthPage(options={}){
+  const push=options.push!==false;
+  if(push && location.hash!=='#compte') pushRoute('#compte');
   $('homeView').classList.add('hide-home');
   $('profileView').classList.remove('show');
   $('authView').classList.add('show');
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.body.classList.remove('spaces-focus');
+  $('spacePanel')?.classList.remove('page-mode','visible');
+  if(push) window.scrollTo({top:0,behavior:'auto'});
   if(currentAuroreSession) renderAccountHome(); else renderAuthStart();
 }
 
@@ -436,13 +462,36 @@ function renderAuthSignup(){
   </div>`;
 }
 
+function saveAuroreSession(session){
+  try{localStorage.setItem('aurore-session',JSON.stringify(session));}catch(_){ }
+}
+function clearAuroreSession(){
+  try{localStorage.removeItem('aurore-session');}catch(_){ }
+}
+async function restoreAuroreSession(){
+  try{
+    const raw=localStorage.getItem('aurore-session'); if(!raw)return false;
+    let s=JSON.parse(raw); if(!s?.access_token)return false;
+    const expiresAt=Number(s.expires_at||0);
+    if(expiresAt && Date.now() >= expiresAt-30000){
+      if(!s.refresh_token){clearAuroreSession();return false;}
+      const rr=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});
+      const rb=await rr.json().catch(()=>({}));
+      if(!rr.ok||!rb.access_token){clearAuroreSession();return false;}
+      s={...rb,expires_at:Date.now()+((Number(rb.expires_in)||3600)*1000)};
+    }
+    currentAuroreSession=s; saveAuroreSession(s); await loadAuroreProfile(); return true;
+  }catch(_){clearAuroreSession();return false;}
+}
+
 async function auroreLogin(){
   try{
     authMessage('Connexion sécurisée…');
     const email=$('authEmail').value.trim(),password=$('authPassword').value;
     const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
     const body=await r.json().catch(()=>({})); if(!r.ok||!body.access_token)throw new Error(body.error_description||body.msg||'Connexion impossible.');
-    currentAuroreSession=body;
+    currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
+    saveAuroreSession(currentAuroreSession);
     await loadAuroreProfile();
     renderAccountHome();
   }catch(err){authMessage(err.message||'Connexion impossible.');}
@@ -454,7 +503,7 @@ async function auroreSignup(){
     const prenom=$('signupPrenom').value.trim(),nom=$('signupNom').value.trim(),email=$('signupEmail').value.trim(),password=$('signupPassword').value;
     const r=await fetch(`${SUPABASE_URL}/auth/v1/signup`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{prenom,nom,full_name:`${prenom} ${nom}`}})});
     const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-    if(body.access_token){currentAuroreSession=body;await saveOwnProfile(prenom,nom);renderOnboarding();}else{renderAuthStart();authMessage('Compte créé. Vérifiez votre e-mail si une confirmation est demandée, puis connectez-vous.');}
+    if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};saveAuroreSession(currentAuroreSession);await saveOwnProfile(prenom,nom);renderOnboarding();}else{renderAuthStart();authMessage('Compte créé. Vérifiez votre e-mail si une confirmation est demandée, puis connectez-vous.');}
   }catch(err){authMessage(err.message||'Création impossible.');}
 }
 
@@ -492,7 +541,7 @@ async function renderAccountHome(){
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Espaces déjà configurés</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>`<div class="configured-row"><div><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div>`).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
-  const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" onclick="openSpace('general')">Administration générale</button><button type="button" onclick="openSpace('administration')">Administration établissement</button><button type="button" onclick="openSpace('professeur')">Espace professeur</button><button type="button" onclick="openSpace('eleve')">Espace élève</button><button type="button" onclick="openSpace('parent')">Espace parent</button></div></div>`:'';
+  const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" onclick="openSpace('general')">Administration générale</button><button type="button" onclick="openSpace('administration')">Administration établissement</button><button type="button" onclick="openSpace('professeur')">Espace professeur</button><button type="button" onclick="openSpace('eleve')">Espace élève</button><button type="button" onclick="openSpace('parent')">Espace parent</button><button type="button" class="auth-secondary" onclick="renderOnboarding()">Reconfigurer / ajouter un espace</button></div></div>`:'';
   const configureBtn=(!roles.filter(r=>r!=='admin_general').length)?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer un espace</button></div>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
   if(isPlatformAdmin){
@@ -520,7 +569,7 @@ async function selectOnboardingRole(role){
   document.querySelectorAll('.auth-role').forEach(b=>b.classList.toggle('selected',b.textContent.includes({eleve:'Élève',professeur:'Professeur',parent:'Parent',administration:'Administration',proviseur:'Proviseur'}[role])));
   const root=$('onboardingNext');if(!root)return;
   root.innerHTML=`<div class="auth-step" style="margin-top:8px"><b>Étape 2</b><span>Choisissez votre établissement</span></div><label style="display:block;margin-top:8px;font-size:.73rem;color:var(--muted);font-weight:700">Établissement<select id="onboardingEtab" style="margin-top:6px;width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text)"><option>Chargement…</option></select></label><div class="auth-actions"><button class="auth-primary" type="button" onclick="finishOnboarding()">Activer mon espace</button></div><div id="onboardingMessage" class="auth-message"></div>`;
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:API_HEADERS});const rows=await r.json();const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Sélectionner un établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');}catch(e){const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Aucun établissement disponible</option>';}
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||SUPABASE_KEY}`},cache:'no-store'});const rows=await r.json();const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Sélectionner un établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');}catch(e){const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Aucun établissement disponible</option>';}
 }
 
 async function finishOnboarding(){
@@ -586,21 +635,22 @@ function previewRequestLogo(event){
   reader.readAsDataURL(file);
 }
 
-function auroreLogout(){currentAuroreSession=null;currentAuroreProfile=null;selectedOnboardingRole='';renderAuthStart();}
+function auroreLogout(){currentAuroreSession=null;currentAuroreProfile=null;selectedOnboardingRole='';clearAuroreSession();showHome();}
 
 function requestEstablishment(){openAuthPage();setTimeout(()=>{if(currentAuroreSession)openEstablishmentRequestPage();else renderAuthStart();},0);}
 
 async function loadInstituts(){
+  const notice=$('dataNotice');
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=*&order=nom.asc`,{headers:API_HEADERS,cache:'no-store'});
-    if(!r.ok) throw new Error('Supabase '+r.status);
-    const rows=await r.json();
-    data=rows.map(normalize);
-    $('dataNotice').innerHTML='<strong>Connecté :</strong> les établissements sont maintenant chargés depuis Supabase.';
+    const body=await r.json().catch(()=>null);
+    if(!r.ok) throw new Error(body?.message||body?.hint||`Supabase ${r.status}`);
+    data=Array.isArray(body)?body.map(normalize):[];
+    if(notice)notice.innerHTML=`<strong>Connecté :</strong> ${data.length} établissement${data.length>1?'s':''} validé${data.length>1?'s':''} chargé${data.length>1?'s':''} depuis Supabase.`;
   }catch(err){
-    data=demoData.map(normalize);
-    $('dataNotice').innerHTML='<strong>Mode démonstration :</strong> aucun établissement réel n’est encore enregistré.';
-    console.warn(err);
+    data=[];
+    if(notice)notice.innerHTML=`<strong>Erreur Supabase :</strong> ${esc(err.message||'Impossible de charger les établissements.')}`;
+    console.error('Aurore — chargement des établissements:',err);
   }
   render();
   loadSupport();
@@ -629,18 +679,18 @@ function render(){
     `<div class="notice" style="grid-column:1/-1">Aucun établissement ne correspond aux critères sélectionnés.</div>`;
 }
 
-async function openProfile(id,replace=false){
+async function openProfile(id,options={}){
   const e=data.find(x=>String(x.id)===String(id));
   if(!e) return;
   $('homeView').classList.add('hide-home');
   $('authView').classList.remove('show');
   $('profileView').classList.add('show');
   const target='#etablissement/'+encodeURIComponent(e.slug||e.id);
-  if(replace) history.replaceState({profileId:e.id},'',target); else history.pushState({profileId:e.id},'',target);
+  if(options.push!==false && location.hash!==target) pushRoute(target);
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'auto'});
 
-  $('profileRoot').innerHTML=`<button class="back-btn" onclick="showHome();history.replaceState(null,'','#accueil')">← Retour à l’annuaire</button>
+  $('profileRoot').innerHTML=`<button class="back-btn" onclick="history.back()">← Retour à l’annuaire</button>
   <div class="profile-top" style="margin-top:14px">
     <section class="profile-hero">
       <div class="profile-cover" ${e.cover_url?`style="background-image:linear-gradient(135deg,rgba(23,18,36,.35),rgba(23,18,36,.82)),url('${esc(e.cover_url)}')"`:''}></div>
@@ -748,14 +798,49 @@ async function loadSupport(){
   }catch(_){ console.warn('Service client non disponible'); }
 }
 
-function handleHash(){
-  const h=decodeURIComponent(location.hash||'');
-  if(h.startsWith('#etablissement/')){
-    const key=h.slice('#etablissement/'.length);
-    const e=data.find(x=>String(x.slug||x.id)===key);
-    if(e) openProfile(e.id,true);
-    else showHome();
-  }else showHome();
+const ROUTE_STATE_KEY='aurore-route-state';
+let applyingRoute=false;
+let lastHandledHash='';
+
+function saveRoutePosition(){
+  try{history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);}catch(_){ }
+}
+
+function pushRoute(hash){
+  saveRoutePosition();
+  history.pushState({scrollY:0},'',hash);
+}
+
+function restoreRoutePosition(state){
+  const y=Number(state?.scrollY);
+  requestAnimationFrame(()=>window.scrollTo({top:Number.isFinite(y)?y:0,left:0,behavior:'auto'}));
+}
+
+function handleHash(eventState=null){
+  const h=decodeURIComponent(location.hash||'#accueil');
+  if(h===lastHandledHash && eventState!==null)return;
+  lastHandledHash=h;
+  applyingRoute=true;
+  try{
+    if(h.startsWith('#etablissement/')){
+      const key=h.slice('#etablissement/'.length);
+      const e=data.find(x=>String(x.slug||x.id)===key);
+      if(e) openProfile(e.id,{push:false}); else showHome(false);
+    }else if(h.startsWith('#espace/')){
+      const parts=h.slice('#espace/'.length).split('/').filter(Boolean);
+      if(parts[0]) openSpace(parts[0],{push:false,tool:parts[1]||null}); else showHome(false);
+    }else if(h==='#compte'){
+      openAuthPage({push:false});
+      restoreRoutePosition(eventState);
+    }else if(['#etablissements','#services','#apropos'].includes(h)){
+      showHome(false);
+      const target=document.querySelector(h);
+      requestAnimationFrame(()=>target?.scrollIntoView({behavior:'auto',block:'start'}));
+    }else{
+      showHome(false);
+      restoreRoutePosition(eventState);
+    }
+  }finally{applyingRoute=false;}
 }
 
 ['q','type','city'].forEach(id=>$(id).addEventListener('input',render));
@@ -770,11 +855,11 @@ document.querySelectorAll('.shortcuts button').forEach(b=>b.addEventListener('cl
   else{$('city').value=v;$('q').value='';}
   render(); $('etablissements').scrollIntoView({behavior:'smooth'});
 }));
-window.addEventListener('hashchange',handleHash);
+window.addEventListener('hashchange',()=>handleHash());
 // Compatibilité avec les anciens appels : loadData était encore référencé dans l'interface admin.
 const loadData=loadInstituts;
-window.addEventListener('popstate',()=>handleHash());
-loadInstituts().then(()=>handleHash());
+window.addEventListener('popstate',e=>handleHash(e.state));
+loadInstituts().then(async()=>{await restoreAuroreSession();handleHash();});
 
 
 function appliquerCouleur(couleur){
@@ -785,10 +870,10 @@ function appliquerCouleur(couleur){
 (function(){const t=$('colorToggle'),m=$('colorMenu');if(!t||!m)return; appliquerCouleur(localStorage.getItem('aurore-instituts-color-theme')||'violet'); t.onclick=e=>{e.stopPropagation();m.classList.toggle('open')}; m.querySelectorAll('[data-color-choice]').forEach(b=>b.onclick=()=>{appliquerCouleur(b.dataset.colorChoice);m.classList.remove('open')});})();
 
 function openSpacesLanding(){
-  openAuthPage();
+  openAuthPage({keepAccount:true});
 }
 
-async function openSpace(role){
+async function openSpace(role,options={}){
   if(role==='general') {
     const session=currentAuroreSession;
     if(!session){openAuthPage();return;}
@@ -818,7 +903,12 @@ async function openSpace(role){
       return;
     }
   }
+  const push=options.push!==false;
+  const route=`#espace/${encodeURIComponent(role)}${options.tool?'/'+encodeURIComponent(options.tool):''}`;
+  if(push && location.hash!==route) pushRoute(route);
   document.body.classList.add('spaces-focus');
+  $('authView')?.classList.remove('show');
+  $('profileView')?.classList.remove('show');
   // Le panneau d'espace est contenu dans #homeView : ne pas masquer #homeView ici.
   // La classe spaces-focus masque déjà les sections d'accueil et laisse #spacePanel visible.
   $('homeView')?.classList.remove('hide-home');
@@ -854,7 +944,8 @@ async function openSpace(role){
     panel.className='space-panel';
     document.body.appendChild(panel);
   }
-  if(panel){panel.classList.add('page-mode');panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(panel){panel.classList.add('page-mode');panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour</button><span class="space-panel-label">Aurore · Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'auto',block:'start'});}
+  if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
 }
 
 window.openSpace=openSpace;
@@ -1029,6 +1120,8 @@ async function uploadAdminDocument(){
 
 function openSpaceTool(role,key){
   const root=document.getElementById('spaceDashboard'); if(!root)return;
+  const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}`;
+  if(location.hash!==route) pushRoute(route);
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
   const common=`<button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button>`;
   if(role==='eleve' && key==='notes'){
@@ -1050,7 +1143,7 @@ function openSpaceTool(role,key){
     loadAdminRequests();return;
   }
   if(role==='general' && key==='general-etablissements'){
-    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Établissements acceptés</span><h3>Tous les établissements de la plateforme</h3><p>Cette section est réservée à l’Administration générale Aurore.</p></div>${common}</div><div id="adminAcceptedList" class="admin-list"><div class="admin-card">Chargement des établissements…</div></div></section>`;
+    root.innerHTML=`<section class="space-dashboard accepted-page"><div class="space-dashboard-head"><div><span class="space-panel-label">Répertoire Aurore</span><h3>Établissements acceptés</h3><p>Tous les établissements validés et actuellement publiés sur la plateforme.</p></div>${common}</div><div id="adminAcceptedList"></div></section>`;
     loadAdminAcceptedEstablishments();return;
   }
   root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Aurore</span><h3>${key.replaceAll('-',' ')}</h3><p>Cette rubrique est prête pour son branchement aux données réelles.</p></div>${common}</div></section>`;
@@ -1129,21 +1222,34 @@ async function decideEstablishmentRequest(id,statut,commentaire=null,fromModal=f
 }
 
 async function loadAdminAcceptedEstablishments(){
-  try{
-    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`};
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?select=*&validation_statut=eq.valide&actif=eq.true&order=nom.asc`,{headers:h});
-    if(!r.ok)throw new Error('Impossible de charger les établissements.');
-    const rows=await r.json();const list=$('adminAcceptedList');
-    if(!rows.length){list.innerHTML='<div class="admin-card">Aucun établissement validé pour le moment.</div>';return;}
-    list.innerHTML=rows.map(e=>{const photo=e.logo_url?`<img class="admin-photo" src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}">`:'<div class="admin-photo empty">ETAB</div>';return `<article class="admin-row"><div>${photo}</div><div><strong>${esc(e.nom)}</strong><div class="admin-meta">${esc(e.type||'Établissement')} · ${esc(e.ville||'Ville non précisée')} · ${esc(e.adresse||'')}</div><p style="margin-top:6px">${esc(e.presentation||'Aucune présentation.')}</p></div><div class="admin-actions"><button class="admin-btn" type="button" onclick="openProfile('${e.id}')">Ouvrir</button></div></article>`}).join('');
-  }catch(e){if($('adminAcceptedList'))$('adminAcceptedList').innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les établissements.')}</div>`;}
+  const list=$('adminAcceptedList');
+  if(!list)return;
+  list.innerHTML='<div class="admin-loading"><span class="admin-loading-dot"></span>Chargement des établissements validés…</div>';
+  (async()=>{
+    try{
+      const token=currentAuroreSession?.access_token||'';
+      const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,slug,type,ville,commune,adresse,telephone,email,site_web,logo_url,presentation,created_at,validation_statut,actif&order=nom.asc`,{headers:h,cache:'no-store'});
+      const b=await r.json().catch(()=>null);
+      if(!r.ok)throw new Error(b?.message||b?.hint||`Supabase ${r.status}`);
+      const rows=Array.isArray(b)?b:[];
+      if(!rows.length){list.innerHTML='<div class="admin-empty"><div class="admin-empty-icon">ET</div><h3>Aucun établissement publié</h3><p>Les établissements validés apparaîtront ici automatiquement après leur publication.</p></div>';return;}
+      list.innerHTML=`<div class="accepted-toolbar"><div><span class="space-panel-label">Répertoire public</span><strong>${rows.length} établissement${rows.length>1?'s':''} publié${rows.length>1?'s':''}</strong></div><button class="admin-btn" type="button" onclick="loadAdminAcceptedEstablishments()">↻ Actualiser</button></div><div class="accepted-grid">${rows.map(e=>{
+        const initial=esc((e.nom||'ET').trim().slice(0,2).toUpperCase());
+        const location=[e.ville,e.commune].filter(Boolean).join(' · ');
+        const meta=[e.type||'Établissement',location].filter(Boolean).join(' · ');
+        return `<article class="accepted-card"><div class="accepted-card-cover">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom||'établissement')}" loading="lazy">`:`<div class="accepted-logo-fallback">${initial}</div>`}<span class="accepted-status"><i></i> Publié</span></div><div class="accepted-card-body"><div class="accepted-kicker">ÉTABLISSEMENT</div><h3>${esc(e.nom||'Établissement')}</h3><p class="accepted-meta">${esc(meta)}</p>${e.adresse?`<p class="accepted-address">⌖ ${esc(e.adresse)}</p>`:''}<p class="accepted-description">${esc(e.presentation||'Présentation non renseignée.')}</p></div><div class="accepted-card-footer"><span>Visible publiquement</span><button class="admin-btn primary" type="button" onclick="openProfile('${esc(e.id)}')">Ouvrir la fiche <span>→</span></button></div></article>`;
+      }).join('')}</div>`;
+    }catch(e){list.innerHTML=`<div class="admin-error"><strong>Impossible de charger les établissements.</strong><p>${esc(e.message||'Erreur Supabase.')}</p><button class="admin-btn" type="button" onclick="loadAdminAcceptedEstablishments()">Réessayer</button></div>`;}
+  })();
 }
 
 function closeSpacePanel(){
-  const panel=document.getElementById('spacePanel');
-  if(panel){panel.classList.remove('visible','page-mode');panel.innerHTML='';}
-  document.body.classList.remove('spaces-focus');
-  openAuthPage();
+  if(location.hash.startsWith('#espace/')){
+    history.back();
+    return;
+  }
+  showHome();
 }
 
 function appliquerTheme(choix){
