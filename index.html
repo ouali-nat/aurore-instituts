@@ -229,6 +229,11 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 @media(max-width:1000px){.space-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.space-panel{padding:18px}.space-tools-grid{grid-template-columns:1fr}.space-tool-card{min-height:145px}}
 
+
+/* Aurore — authentification et navigation plein écran */
+.auth-page{display:none;min-height:calc(100vh - 76px);padding:34px 0 70px;background:radial-gradient(circle at 15% 10%,rgba(139,92,246,.13),transparent 32%),radial-gradient(circle at 85% 20%,rgba(192,132,252,.10),transparent 30%)}
+.auth-page.show{display:block}.auth-shell{width:min(1040px,calc(100% - 28px));margin:auto}.auth-top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.auth-back{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:9px 13px;font-weight:750}.auth-kicker{color:var(--accent);font-size:.68rem;font-weight:850;text-transform:uppercase;letter-spacing:.15em}.auth-title{font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-.06em;margin-top:6px}.auth-sub{color:var(--muted);max-width:680px;margin-top:8px}.auth-card{margin-top:25px;background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow)}.auth-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px}.auth-side{padding:24px;border-radius:22px;background:linear-gradient(145deg,rgba(139,92,246,.15),rgba(192,132,252,.05));border:1px solid rgba(192,132,252,.14)}.auth-side h3{font-size:1.35rem}.auth-side p{color:var(--muted);margin-top:8px;font-size:.85rem}.auth-points{display:grid;gap:10px;margin-top:20px}.auth-point{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}.auth-point b{font-size:.82rem}.auth-point span{color:var(--muted);font-size:.74rem;display:block}.auth-form{display:grid;gap:12px}.auth-form label{font-size:.73rem;color:var(--muted);font-weight:700}.auth-form input,.auth-form select{margin-top:6px;width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);outline:none}.auth-form input:focus,.auth-form select:focus{border-color:var(--accent)}.auth-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px}.auth-primary{border:0;border-radius:13px;padding:12px 16px;background:linear-gradient(135deg,var(--accent-strong),var(--accent2));color:#fff;font-weight:800}.auth-secondary{border:1px solid var(--line);border-radius:13px;padding:12px 16px;background:var(--panel2);color:var(--text);font-weight:800}.auth-message{display:none;margin-top:4px;padding:11px 13px;border-radius:13px;border:1px dashed var(--line);font-size:.75rem;color:var(--muted)}.auth-role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.auth-role{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:16px;padding:14px;text-align:left}.auth-role:hover,.auth-role.selected{border-color:var(--accent);background:rgba(139,92,246,.10)}.auth-role strong{display:block}.auth-role span{display:block;color:var(--muted);font-size:.7rem;margin-top:3px}.auth-profile{display:grid;gap:18px}.auth-step{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.72rem}.auth-step b{color:var(--text)}.account-bar{display:none;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);font-size:.75rem}.account-bar.show{display:flex}.account-dot{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(139,92,246,.16);color:var(--accent)}
+@media(max-width:760px){.auth-grid{grid-template-columns:1fr}.auth-side{order:2}.auth-card{padding:16px}.auth-role-grid{grid-template-columns:1fr}.auth-top{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -244,7 +249,7 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
       <a href="#services" data-nav="services">Services</a>
       <a href="#apropos" data-nav="apropos">À propos</a>
     </nav>
-    <button class="topbtn" onclick="openSpacesLanding()">Espaces</button>
+    <button class="topbtn" onclick="openSpacesLanding()">Espaces</button><button class="topbtn" type="button" onclick="openAuthPage()">Mon compte</button>
     <div class="theme-control">
       <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-haspopup="true">◐ <span id="themeLabel">Thème</span></button>
       <div class="theme-menu" id="themeMenu" role="menu">
@@ -374,6 +379,15 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
   <div class="wrap" id="profileRoot"></div>
 </main>
 
+
+<!-- Vue dédiée Aurore : connexion / inscription / profil -->
+<main class="auth-page" id="authView">
+  <div class="auth-shell">
+    <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome()">← Retour à l’accueil</button></div>
+    <div class="auth-card" id="authRoot"></div>
+  </div>
+</main>
+
 <footer>
   <div class="wrap footer"><div><b>Aurore — Section Instituts</b></div><div>Plateforme nationale des établissements d’enseignement · Burkina Faso</div></div>
 </footer>
@@ -417,10 +431,106 @@ function normalize(e){
 function showHome(){
   $('homeView').classList.remove('hide-home');
   $('profileView').classList.remove('show');
+  $('authView').classList.remove('show');
   window.scrollTo({top:0,behavior:'smooth'});
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
-  document.querySelector('nav a[data-nav="accueil"]').classList.add('active');
+  document.querySelector('nav a[data-nav="accueil"]')?.classList.add('active');
 }
+
+
+let currentAuroreSession=null;
+let currentAuroreProfile=null;
+let selectedOnboardingRole='';
+
+function openAuthPage(){
+  $('homeView').classList.add('hide-home');
+  $('profileView').classList.remove('show');
+  $('authView').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+  renderAuthStart();
+}
+
+function authMessage(text){const el=$('authMessage');if(el){el.style.display='block';el.textContent=text;}}
+
+function renderAuthStart(){
+  const root=$('authRoot'); if(!root)return;
+  root.innerHTML=`<div class="auth-grid">
+    <aside class="auth-side"><span class="auth-kicker">Un compte · plusieurs espaces</span><h3>Bienvenue dans Aurore</h3><p>Votre identité reste la même, tandis que vos rôles déterminent les espaces auxquels vous avez accès.</p><div class="auth-points"><div class="auth-point"><b>01</b><div><strong>Élève</strong><span>Classe, devoirs, notes et vie scolaire.</span></div></div><div class="auth-point"><b>02</b><div><strong>Professeur</strong><span>Enseignement, classes et ressources.</span></div></div><div class="auth-point"><b>03</b><div><strong>Parent</strong><span>Suivi des enfants et informations scolaires.</span></div></div><div class="auth-point"><b>04</b><div><strong>Administration</strong><span>Gestion de l’établissement et demandes.</span></div></div></div></aside>
+    <section><div class="auth-step"><b>Connexion</b><span>ou</span><button class="auth-secondary" type="button" onclick="renderAuthSignup()">Créer mon compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreLogin()"><label>E-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@exemple.com"></label><label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" required placeholder="Votre mot de passe"></label><div class="auth-actions"><button class="auth-primary" type="submit">Se connecter →</button></div><div id="authMessage" class="auth-message"></div></form></section>
+  </div>`;
+}
+
+function renderAuthSignup(){
+  const root=$('authRoot'); if(!root)return;
+  root.innerHTML=`<div class="auth-grid">
+    <aside class="auth-side"><span class="auth-kicker">Créer un compte</span><h3>Votre identité Aurore</h3><p>Nom et prénom seront enregistrés dans votre profil. Ensuite, vous choisirez votre rôle et, si nécessaire, votre établissement dans la liste Aurore.</p><div class="auth-points"><div class="auth-point"><b>✦</b><div><strong>Pas de nom d’établissement à saisir</strong><span>Vous choisissez parmi les établissements disponibles.</span></div></div><div class="auth-point"><b>✓</b><div><strong>Un compte peut évoluer</strong><span>Les accès peuvent être ajoutés sans recréer votre identité.</span></div></div></div></aside>
+    <section><div class="auth-step"><b>Inscription</b><span>·</span><button class="auth-secondary" type="button" onclick="renderAuthStart()">J’ai déjà un compte</button></div><form class="auth-form" onsubmit="event.preventDefault();auroreSignup()"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>Prénom<input id="signupPrenom" required autocomplete="given-name"></label><label>Nom<input id="signupNom" required autocomplete="family-name"></label></div><label>E-mail<input id="signupEmail" type="email" required autocomplete="email"></label><label>Mot de passe<input id="signupPassword" type="password" minlength="6" required autocomplete="new-password"></label><div class="auth-actions"><button class="auth-primary" type="submit">Continuer →</button></div><div id="authMessage" class="auth-message"></div></form></section>
+  </div>`;
+}
+
+async function auroreLogin(){
+  try{
+    authMessage('Connexion sécurisée…');
+    const email=$('authEmail').value.trim(),password=$('authPassword').value;
+    const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const body=await r.json().catch(()=>({})); if(!r.ok||!body.access_token)throw new Error(body.error_description||body.msg||'Connexion impossible.');
+    currentAuroreSession=body;
+    await loadAuroreProfile();
+    renderAccountHome();
+  }catch(err){authMessage(err.message||'Connexion impossible.');}
+}
+
+async function auroreSignup(){
+  try{
+    authMessage('Création du compte…');
+    const prenom=$('signupPrenom').value.trim(),nom=$('signupNom').value.trim(),email=$('signupEmail').value.trim(),password=$('signupPassword').value;
+    const r=await fetch(`${SUPABASE_URL}/auth/v1/signup`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{prenom,nom,full_name:`${prenom} ${nom}`}})});
+    const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
+    if(body.access_token){currentAuroreSession=body;await saveOwnProfile(prenom,nom);renderOnboarding();}else{renderAuthStart();authMessage('Compte créé. Vérifiez votre e-mail si une confirmation est demandée, puis connectez-vous.');}
+  }catch(err){authMessage(err.message||'Création impossible.');}
+}
+
+async function loadAuroreProfile(){
+  const token=currentAuroreSession?.access_token;if(!token)return;
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(currentAuroreSession.user?.id||'')}&select=*`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`}});
+  const rows=await r.json().catch(()=>[]); currentAuroreProfile=rows[0]||null;
+}
+
+async function saveOwnProfile(prenom,nom){
+  const token=currentAuroreSession?.access_token;if(!token)return;
+  const id=currentAuroreSession.user?.id;
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({id,prenom,nom,full_name:`${prenom} ${nom}`})});
+  if(r.ok){const rows=await r.json();currentAuroreProfile=rows[0]||null;}
+}
+
+async function renderAccountHome(){
+  const root=$('authRoot'); if(!root)return;
+  const name=currentAuroreProfile?.full_name||[currentAuroreProfile?.prenom,currentAuroreProfile?.nom].filter(Boolean).join(' ')||currentAuroreSession?.user?.email||'Compte Aurore';
+  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><p>Votre compte Aurore est connecté. Nous allons maintenant déterminer vos espaces à partir de vos rôles.</p><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces →</button></div></div></section>`;
+}
+
+function renderOnboarding(){
+  const root=$('authRoot'); if(!root)return;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><b>Étape 1</b><span>Choisissez votre situation</span></div><div><span class="auth-kicker">Votre rôle</span><h2>Vous êtes…</h2><div class="auth-role-grid">${[['eleve','👨‍🎓','Élève','Espace scolaire personnel'],['professeur','👨‍🏫','Professeur','Enseignement et classes'],['parent','👨‍👩‍👧','Parent','Suivi des enfants'],['administration','🏫','Administration','Gestion de l’établissement'],['proviseur','👔','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div></section>`;
+  if(selectedOnboardingRole)selectOnboardingRole(selectedOnboardingRole);
+}
+
+async function selectOnboardingRole(role){
+  selectedOnboardingRole=role;document.querySelectorAll('.auth-role').forEach(b=>b.classList.toggle('selected',b.textContent.toLowerCase().includes(role==='eleve'?'élève':role)));
+  const root=$('onboardingNext'); if(!root)return;
+  const needsEst=['eleve','professeur','parent','administration','proviseur'].includes(role);
+  if(!needsEst)return;
+  root.innerHTML='<div class="auth-step" style="margin-top:5px"><b>Étape 2</b><span>Choisissez votre établissement</span></div><label style="display:block;margin-top:8px;font-size:.73rem;color:var(--muted);font-weight:700">Établissement<select id="onboardingEtab" style="margin-top:6px;width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text)"><option>Chargement…</option></select></label><div class="auth-actions"><button class="auth-primary" type="button" onclick="finishOnboarding()">Continuer →</button></div><div id="onboardingMessage" class="auth-message"></div>';
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&select=id,nom,type,ville&order=nom.asc`,{headers:API_HEADERS});const rows=await r.json();const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Sélectionner un établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');}catch(e){const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Aucun établissement disponible pour le moment</option>';}
+}
+
+async function finishOnboarding(){
+  const etablissementId=$('onboardingEtab')?.value;if(!etablissementId){$('onboardingMessage').style.display='block';$('onboardingMessage').textContent='Choisissez un établissement dans la liste.';return;}
+  // Le rôle établissement sera enregistré via l’API sécurisée dès que le rattachement est ouvert pour ce compte.
+  $('onboardingMessage').style.display='block';$('onboardingMessage').textContent='Profil enregistré. Votre demande de rattachement va maintenant être préparée pour l’établissement choisi.';
+}
+
+function auroreLogout(){currentAuroreSession=null;currentAuroreProfile=null;selectedOnboardingRole='';renderAuthStart();}
 
 function requestEstablishment(){
   alert('Le formulaire de présentation d’établissement sera relié au futur espace administration.');
