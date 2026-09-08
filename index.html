@@ -382,6 +382,8 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 const SUPABASE_URL='https://fdstrbqvkemtjyxxaxbj.supabase.co';
 const SUPABASE_KEY='sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
 const API_HEADERS={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`};
+const WORKER_URL='https://aurore-instituts-r2.oualikevin9.workers.dev';
+let currentAdminSession=null;
 
 const demoData=[
   {id:'demo-1',nom:'Lycée exemple de Ouagadougou',type:'Lycée',ville:'Ouagadougou',province:'Kadiogo',formation:'Enseignement secondaire général',slug:'lycee-exemple-ouagadougou',code:'LO'},
@@ -639,7 +641,8 @@ function openSpace(role){
       ['Élèves','Gestion des élèves, classes et effectifs.','♙','admin-eleves'],
       ['Inscriptions','Suivi des inscriptions et des dossiers.','＋','inscriptions'],
       ['Bulletins et notes','Suivi et publication des résultats scolaires.','▤','admin-notes'],
-      ['Cahiers de test','Organisation des cahiers et évaluations.','✎','tests']
+      ['Cahiers de test','Organisation des cahiers et évaluations.','✎','tests'],
+      ['Documents et fichiers','Importer les documents de l’établissement dans le stockage sécurisé Aurore.','⇧','admin-documents']
     ]},
     parent:{title:'Espace parent',subtitle:'Un espace pour suivre la scolarité de votre enfant.',items:[['Suivi scolaire','Suivi de la scolarité et informations transmises.','♙','parent-suivi'],['Bulletins','Consulter les bulletins disponibles.','▤','parent-bulletins']]},
     general:{title:'Espace général',subtitle:'Administration générale Aurore.',items:[['Vue générale','Pilotage global de la plateforme.','✦','general-vue'],['Établissements','Suivi des établissements présents sur Aurore.','⌂','general-etablissements']]}
@@ -650,8 +653,161 @@ function openSpace(role){
   if(panel){panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
+function getSavedAdminSession(){
+  try{
+    const raw=localStorage.getItem('aurore-admin-session');
+    if(!raw)return null;
+    const s=JSON.parse(raw);
+    if(!s?.access_token)return null;
+    if(s.expires_at && Date.now() >= Number(s.expires_at)-30000)return null;
+    return s;
+  }catch(_){return null;}
+}
+
+function saveAdminSession(session){
+  currentAdminSession=session;
+  try{localStorage.setItem('aurore-admin-session',JSON.stringify(session));}catch(_){ }
+}
+
+function clearAdminSession(){
+  currentAdminSession=null;
+  try{localStorage.removeItem('aurore-admin-session');}catch(_){ }
+}
+
+async function supabasePasswordLogin(email,password){
+  const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+    method:'POST',
+    headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({email,password})
+  });
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(body.error_description||body.msg||body.message||'Connexion impossible.');
+  if(!body.access_token)throw new Error('Jeton de connexion absent.');
+  const expiresAt=Date.now()+((Number(body.expires_in)||3600)*1000);
+  const session={access_token:body.access_token,refresh_token:body.refresh_token||null,expires_at:expiresAt,user:body.user||null};
+  saveAdminSession(session);
+  return session;
+}
+
+async function getWorkerMe(token){
+  const r=await fetch(`${WORKER_URL}/api/me`,{headers:{Authorization:`Bearer ${token}`}});
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(body.error?.message||body.message||`Worker ${r.status}`);
+  return body.data;
+}
+
+function adminDocumentsView(){
+  const root=document.getElementById('spaceDashboard'); if(!root)return;
+  currentAdminSession=getSavedAdminSession();
+  root.innerHTML=`<section class="space-dashboard">
+    <div class="space-dashboard-head"><div><span class="space-panel-label">Stockage sécurisé</span><h3>Documents et fichiers</h3><p>Les fichiers sont envoyés dans Cloudflare R2 via le Worker Aurore. Aucun secret serveur n'est exposé dans cette page.</p></div><button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button></div>
+    <div class="space-big-square">
+      <div id="adminAuthArea"></div>
+      <div id="adminUploadArea"></div>
+    </div>
+  </section>`;
+  renderAdminAuth();
+}
+
+function renderAdminAuth(){
+  const auth=$('adminAuthArea'), upload=$('adminUploadArea'); if(!auth||!upload)return;
+  currentAdminSession=currentAdminSession||getSavedAdminSession();
+  if(!currentAdminSession){
+    auth.innerHTML=`<div class="space-panel-head" style="padding:0 0 18px"><span class="space-panel-label">Connexion requise</span><h3>Accès administration</h3><p>Connectez-vous avec votre compte Supabase ayant un rôle autorisé sur l'établissement.</p></div>
+      <form onsubmit="event.preventDefault();adminLogin()" style="display:grid;gap:12px;max-width:520px">
+        <input id="adminEmail" type="email" autocomplete="username" placeholder="Adresse e-mail" required style="padding:13px;border-radius:12px;border:1px solid rgba(127,127,127,.25);background:transparent;color:inherit">
+        <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Mot de passe" required style="padding:13px;border-radius:12px;border:1px solid rgba(127,127,127,.25);background:transparent;color:inherit">
+        <button type="submit">Se connecter</button>
+        <div id="adminAuthMessage" class="notice" style="display:none"></div>
+      </form>`;
+    upload.innerHTML='';
+    return;
+  }
+  auth.innerHTML=`<div class="space-panel-head" style="padding:0 0 18px"><span class="space-panel-label">Session active</span><h3>Administration connectée</h3><p id="adminIdentity">Vérification des autorisations…</p><button type="button" onclick="adminLogout()">Se déconnecter</button></div>`;
+  upload.innerHTML=`<form id="r2UploadForm" onsubmit="event.preventDefault();uploadAdminDocument()" style="display:grid;gap:12px">
+    <label>Établissement<select id="uploadEtablissement" required style="width:100%;padding:13px;border-radius:12px"><option value="">Sélectionner…</option>${data.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}</option>`).join('')}</select></label>
+    <label>Fichier<input id="uploadFile" type="file" required></label>
+    <label>Titre du document<input id="uploadTitle" type="text" maxlength="200" placeholder="Ex. Emploi du temps 2026-2027" required></label>
+    <label>Description<textarea id="uploadDescription" maxlength="2000" rows="3" placeholder="Description facultative"></textarea></label>
+    <label>Type média<select id="uploadTypeMedia"><option value="document">Document</option><option value="image">Image</option><option value="video">Vidéo</option><option value="audio">Audio</option></select></label>
+    <label style="display:flex;gap:8px;align-items:center"><input id="uploadPublished" type="checkbox"> Publier immédiatement</label>
+    <button id="uploadSubmit" type="submit">↑ Envoyer le fichier</button>
+    <div id="uploadProgress" class="notice" style="display:none"></div>
+  </form>`;
+  verifyAdminSession();
+}
+
+async function verifyAdminSession(){
+  const el=$('adminIdentity'); if(!el||!currentAdminSession)return;
+  try{
+    const me=await getWorkerMe(currentAdminSession.access_token);
+    const memberships=(me.memberships||[]).map(m=>`${m.role}${m.etablissement_id?' · '+m.etablissement_id:''}`).join(', ');
+    el.textContent=`${me.email||'Compte connecté'} · ${me.is_admin_general?'Administrateur général':(memberships||'Aucun rôle établissement détecté')}`;
+  }catch(err){
+    clearAdminSession();
+    renderAdminAuth();
+    const msg=$('adminAuthMessage'); if(msg){msg.style.display='block';msg.textContent='Session expirée ou invalide. Reconnectez-vous.';}
+  }
+}
+
+async function adminLogin(){
+  const msg=$('adminAuthMessage');
+  if(msg){msg.style.display='block';msg.textContent='Connexion…';}
+  try{
+    const email=$('adminEmail').value.trim(), password=$('adminPassword').value;
+    const session=await supabasePasswordLogin(email,password);
+    const me=await getWorkerMe(session.access_token);
+    if(!me.is_admin_general && !(me.memberships||[]).some(m=>['professeur','administration','proviseur'].includes(m.role))){
+      clearAdminSession();
+      throw new Error('Ce compte n’a pas de rôle d’administration autorisé.');
+    }
+    renderAdminAuth();
+  }catch(err){
+    clearAdminSession();
+    if(msg){msg.style.display='block';msg.textContent=err.message||'Connexion impossible.';}
+  }
+}
+
+function adminLogout(){clearAdminSession();renderAdminAuth();}
+
+async function uploadAdminDocument(){
+  const session=currentAdminSession||getSavedAdminSession();
+  const file=$('uploadFile')?.files?.[0], etablissementId=$('uploadEtablissement')?.value;
+  const progress=$('uploadProgress'), button=$('uploadSubmit');
+  if(!session||!file||!etablissementId)return;
+  const title=$('uploadTitle').value.trim();
+  const description=$('uploadDescription').value.trim();
+  const typeMedia=$('uploadTypeMedia').value;
+  const publie=$('uploadPublished').checked;
+  const mime=file.type||'application/octet-stream';
+  if(progress){progress.style.display='block';progress.textContent='Envoi du fichier vers R2…';}
+  if(button)button.disabled=true;
+  let objectKey=null;
+  try{
+    const uploadUrl=`${WORKER_URL}/api/upload?etablissement_id=${encodeURIComponent(etablissementId)}&filename=${encodeURIComponent(file.name)}`;
+    const up=await fetch(uploadUrl,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':mime},body:file});
+    const upBody=await up.json().catch(()=>({}));
+    if(!up.ok)throw new Error(upBody.error?.message||upBody.message||`Échec de l’upload (${up.status}).`);
+    objectKey=upBody.data?.object_key;
+    if(!objectKey)throw new Error('Le Worker n’a pas retourné la clé R2.');
+    if(progress)progress.textContent='Fichier reçu. Enregistrement des métadonnées…';
+    const docPayload={etablissement_id:etablissementId,titre:title,description:description||null,type_media:typeMedia,mime_type:mime,fichier_url:objectKey,miniature_url:null,taille_octets:file.size,duree_secondes:null,publie};
+    const dr=await fetch(`${WORKER_URL}/api/documents`,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(docPayload)});
+    const drBody=await dr.json().catch(()=>({}));
+    if(!dr.ok){
+      try{await fetch(`${WORKER_URL}/api/files/${encodeURIComponent(objectKey)}`,{method:'DELETE',headers:{Authorization:`Bearer ${session.access_token}`}});}catch(_){ }
+      throw new Error(drBody.error?.message||drBody.message||`Enregistrement impossible (${dr.status}).`);
+    }
+    if(progress){progress.textContent=publie?'✓ Document envoyé et publié avec succès.':'✓ Document envoyé avec succès.';}
+    $('r2UploadForm')?.reset();
+  }catch(err){
+    if(progress){progress.textContent=`✕ ${err.message||'Une erreur est survenue.'}`;}
+  }finally{if(button)button.disabled=false;}
+}
+
 function openSpaceTool(role,key){
   const root=document.getElementById('spaceDashboard'); if(!root)return;
+  if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
   const common=`<button class="space-back" type="button" onclick="document.getElementById('spaceDashboard').innerHTML=''">← Fermer</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
