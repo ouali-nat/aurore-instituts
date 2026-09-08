@@ -876,6 +876,20 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
   </div>
 </div>
 
+<!-- ===== ÉCRAN D’ATTENTE AUTHENTIFICATION — même séquence que Section Archives ===== -->
+<div class="aurore-auth-wait" id="auroreAuthWait" aria-hidden="true">
+  <div class="aurore-auth-wait-card" role="status" aria-live="polite">
+    <div class="aurore-auth-wait-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="8" opacity=".28"></circle>
+        <path d="M20 12a8 8 0 0 1-8 8"></path>
+      </svg>
+    </div>
+    <strong>Veuillez patienter</strong>
+    <span id="auroreAuthWaitText">Aurore prépare votre espace…</span>
+  </div>
+</div>
+
 <!-- ===== INSCRIPTION ===== -->
 <div id="signupModal" class="signup-modal" style="display:none;" aria-hidden="true">
   <div class="signup-card" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
@@ -1116,9 +1130,51 @@ async function auroreSignup(){
 }
 
 async function loadAuroreProfile(){
-  const token=currentAuroreSession?.access_token;if(!token)return;
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(currentAuroreSession.user?.id||'')}&select=*`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`}});
-  const rows=await r.json().catch(()=>[]); currentAuroreProfile=rows[0]||null;
+  const token=currentAuroreSession?.access_token;if(!token)return null;
+  const id=currentAuroreSession?.user?.id||currentAuroreSession?.id||'';
+  if(!id)return null;
+  const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+
+  // 1) Auth est la source de secours la plus fiable pour l'identité Google/e-mail
+  //    et ses métadonnées (nom, prénom, avatar, etc.).
+  let authUser=null;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'});
+    if(r.ok){
+      authUser=await r.json().catch(()=>null);
+      if(authUser){
+        currentAuroreSession.user=authUser;
+        currentAuroreSession.id=authUser.id||id;
+      }
+    }
+  }catch(_){ }
+
+  // 2) Le profil établissement complète les informations enregistrées côté DB.
+  let dbProfile=null;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'});
+    const rows=r.ok?await r.json().catch(()=>[]):[];
+    dbProfile=rows[0]||null;
+  }catch(_){ }
+
+  const meta=authUser?.user_metadata||currentAuroreSession?.user?.user_metadata||{};
+  currentAuroreProfile={
+    ...(dbProfile||{}),
+    id:dbProfile?.id||authUser?.id||id,
+    email:dbProfile?.email||authUser?.email||currentAuroreSession?.user?.email||'',
+    nom:dbProfile?.nom||meta.nom||'',
+    prenom:dbProfile?.prenom||meta.prenom||'',
+    full_name:dbProfile?.full_name||meta.full_name||meta.name||[dbProfile?.prenom||meta.prenom,dbProfile?.nom||meta.nom].filter(Boolean).join(' '),
+    avatar_url:dbProfile?.avatar_url||meta.avatar_url||meta.picture||'',
+    ...dbProfile
+  };
+  // Le spread DB reste prioritaire, mais les champs essentiels vides récupèrent
+  // explicitement les métadonnées Auth.
+  if(!currentAuroreProfile.full_name) currentAuroreProfile.full_name=meta.full_name||meta.name||currentAuroreProfile.email.split('@')[0]||'Compte Aurore';
+  if(!currentAuroreProfile.nom) currentAuroreProfile.nom=meta.nom||'';
+  if(!currentAuroreProfile.prenom) currentAuroreProfile.prenom=meta.prenom||'';
+  saveAuroreSession(currentAuroreSession);
+  return currentAuroreProfile;
 }
 
 async function saveOwnProfile(prenom,nom){
@@ -2138,6 +2194,18 @@ function appliquerTheme(choix){
   const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
   let client=null, googleBusy=false;
 
+  const authWait=document.getElementById('auroreAuthWait');
+  const authWaitText=document.getElementById('auroreAuthWaitText');
+  function afficherVeuillezPatienter(texte='Aurore prépare votre espace…'){
+    if(authWaitText)authWaitText.textContent=texte;
+    if(authWait){authWait.classList.add('show');authWait.setAttribute('aria-hidden','false');}
+  }
+  function cacherVeuillezPatienter(){
+    if(authWait){authWait.classList.remove('show');authWait.setAttribute('aria-hidden','true');}
+  }
+  window.auroreAfficherVeuillezPatienter=afficherVeuillezPatienter;
+  window.auroreCacherVeuillezPatienter=cacherVeuillezPatienter;
+
   function accessMessage(text,type='ok'){
     const el=document.getElementById('accessMessage'); if(!el)return;
     el.textContent=text; el.className='access-message '+type; el.style.display='block';
@@ -2155,7 +2223,7 @@ function appliquerTheme(choix){
   async function getClient(){
     if(client)return client;
     if(window.supabase?.createClient){
-      client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+      client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.localStorage}});
       return client;
     }
     if(!document.querySelector('script[data-aurore-supabase-fallback]')){
@@ -2164,7 +2232,7 @@ function appliquerTheme(choix){
     const started=Date.now();
     while(!window.supabase?.createClient && Date.now()-started<3500) await new Promise(r=>setTimeout(r,40));
     if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
-    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.localStorage}});
     return client;
   }
 
@@ -2177,20 +2245,19 @@ function appliquerTheme(choix){
   async function startGoogle(){
     if(googleBusy)return;
     setGoogleLoading(true);
-    accessMessage('Ouverture de Google…','ok');
+    afficherVeuillezPatienter('Connexion sécurisée avec Google…');
+    accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
     try{
       const c=await getClient();
-      // Utilise le flux OAuth officiel de Supabase : le SDK crée et conserve
-      // automatiquement le verifier PKCE nécessaire au retour depuis Google.
+      // Nettoie uniquement un ancien verifier PKCE périmé avant de lancer
+      // une NOUVELLE tentative. La session et les autres données restent intactes.
+      try{window.localStorage.removeItem('sb-fdstrbqvkemtjyxxaxbj-auth-token-code-verifier');}catch(_){}
       const redirectTo='https://auroresectioninstituts.vercel.app/';
-      const {error}=await c.auth.signInWithOAuth({
-        provider:'google',
-        options:{redirectTo}
-      });
+      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo}});
       if(error)throw error;
     }catch(err){
       console.error('[Google OAuth] démarrage impossible',err);
-      setGoogleLoading(false);
+      setGoogleLoading(false); cacherVeuillezPatienter();
       const raw=String(err?.message||'');
       if(/provider.*not enabled/i.test(raw)){
         accessMessage('La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.','err');
@@ -2203,10 +2270,10 @@ function appliquerTheme(choix){
 
   async function handleGoogleReturn(){
     const params=new URLSearchParams(location.search),code=params.get('code'),oauthError=params.get('error');
-    if(oauthError){showPortal();accessMessage('La connexion Google n’a pas abouti. Réessayez.','err');return true;}
+    if(oauthError){showPortal();cacherVeuillezPatienter();accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');return true;}
     if(!code)return false;
     try{
-      showPortal(); accessMessage('Finalisation de votre connexion…','ok');
+      showPortal(); afficherVeuillezPatienter('Finalisation de votre connexion Google…'); accessMessage('Finalisation de votre connexion…','ok');
       const c=await getClient();
       let {data,error}=await c.auth.exchangeCodeForSession(code);
       // Si le SDK a déjà consommé le code pendant le retour, relire la session.
@@ -2219,9 +2286,9 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess(); setGoogleLoading(false); history.replaceState({},document.title,location.pathname+location.hash); return true;
-    }catch(err){setGoogleLoading(false);accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
+      if(typeof renderAccountHome==='function')await renderAccountHome();
+      unlockAccess(); setGoogleLoading(false); cacherVeuillezPatienter(); history.replaceState({},document.title,location.pathname+location.hash); return true;
+    }catch(err){setGoogleLoading(false);cacherVeuillezPatienter();accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
   }
 
   async function restoreGoogleSession(){
@@ -2232,8 +2299,8 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess(); return true;
+      if(typeof renderAccountHome==='function')await renderAccountHome();
+      unlockAccess(); cacherVeuillezPatienter(); return true;
     }catch(_){return false;}
   }
 
@@ -2277,8 +2344,14 @@ function appliquerTheme(choix){
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
     showPortal();
-    // Ne bloque jamais l'affichage de la page pendant la restauration de session.
-    handleGoogleReturn().then(handled=>{if(!handled)restoreGoogleSession();});
+    afficherVeuillezPatienter('Aurore prépare votre accès…');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      handleGoogleReturn().then(async handled=>{
+        if(!handled) await restoreGoogleSession();
+        // Si aucun retour OAuth n'est en cours, l'entrée initiale est terminée.
+        if(!new URLSearchParams(location.search).get('code')) cacherVeuillezPatienter();
+      });
+    }));
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
