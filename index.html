@@ -2497,10 +2497,34 @@ function appliquerTheme(choix){
       const session=data?.session; if(!session)throw new Error('Session Google introuvable.');
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
-      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);
-      unlockAccess(); setGoogleLoading(false); cacherVeuillezPatienter(); history.replaceState({},document.title,location.pathname+location.hash); return true;
-    }catch(err){setGoogleLoading(false);cacherVeuillezPatienter();accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
+
+      // IMPORTANT : dès que la session Google est obtenue, l'écran d'inscription
+      // ne doit plus pouvoir bloquer l'accès. Le chargement du profil et de
+      // « Mon espace » se poursuit ensuite, sans être confondu avec l'OAuth.
+      unlockAccess();
+      closeSignup();
+      setGoogleLoading(false);
+      history.replaceState({},document.title,location.pathname+location.hash);
+
+      try{
+        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);
+      }catch(postLoginErr){
+        console.warn('[Google OAuth] session valide, finalisation de l’espace différée',postLoginErr);
+        // La connexion est déjà réussie : ne jamais remettre le portail
+        // d'inscription par-dessus la plateforme à cause d'un chargement secondaire.
+        unlockAccess();
+        cacherVeuillezPatienter();
+      }
+      cacherVeuillezPatienter();
+      return true;
+    }catch(err){
+      setGoogleLoading(false);
+      cacherVeuillezPatienter();
+      showPortal();
+      accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');
+      return true;
+    }
   }
 
   async function restoreGoogleSession(){
