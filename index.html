@@ -525,7 +525,7 @@ async function renderAccountHome(){
   const isPlatformAdmin=roles.includes('admin_general') || accountEmail==='oualikevin9@gmail.com';
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
-  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="window.openSpace(\'general\')">Administration générale Aurore</button>':'';
+  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="window.openGeneralAdmin()">Administration générale Aurore</button>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces</button></div></div></section>`;
 }
 
@@ -848,6 +848,18 @@ async function openSpace(role){
 }
 
 window.openSpace=openSpace;
+window.openGeneralAdmin=async function(){
+  if(!currentAuroreSession){
+    openAuthPage();
+    return;
+  }
+  try{
+    await openSpace('general');
+  }catch(err){
+    console.error(err);
+    authMessage(err?.message||'Accès à l’Administration générale impossible.');
+  }
+};
 
 function getSavedAdminSession(){
   try{
