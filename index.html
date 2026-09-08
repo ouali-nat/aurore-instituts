@@ -295,32 +295,7 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
       </div>
     </section>
 
-    <section class="spaces-section" id="espaces">
-      <div class="section-head"><div><div class="kicker">Accès Aurore</div><h2>Espaces</h2><p>Chaque espace est réservé au rôle correspondant sur votre compte.</p></div></div>
-      <div class="spaces-grid">
-        <article class="space-card" onclick="openSpace('eleve')" tabindex="0" role="button"><div class="space-icon">♙</div><div><span class="space-kicker">Espace 01 · Élève</span><h3>Espace élèves</h3><p>Classe, devoirs, notes, camarades et suivi scolaire.</p></div><span class="space-arrow">→</span></article>
-        <article class="space-card" onclick="openSpace('professeur')" tabindex="0" role="button"><div class="space-icon">◉</div><div><span class="space-kicker">Espace 02 · Professeur</span><h3>Espace professeurs</h3><p>Enseignement, classes, ressources et suivi pédagogique.</p></div><span class="space-arrow">→</span></article>
-        <article class="space-card" onclick="openSpace('parent')" tabindex="0" role="button"><div class="space-icon">♙</div><div><span class="space-kicker">Espace 03 · Parent</span><h3>Espace parents</h3><p>Suivi de vos enfants, bulletins et informations scolaires.</p></div><span class="space-arrow">→</span></article>
-        <article class="space-card" onclick="openSpace('administration')" tabindex="0" role="button"><div class="space-icon">▤</div><div><span class="space-kicker">Espace 04 · Administration</span><h3>Administration établissement</h3><p>Gestion des informations, classes, élèves et ressources.</p></div><span class="space-arrow">→</span></article>
-        <article class="space-card" onclick="openSpace('general')" tabindex="0" role="button"><div class="space-icon">✦</div><div><span class="space-kicker">Espace 05 · Plateforme</span><h3>Administration générale Aurore</h3><p>Pilotage global, demandes et établissements de la plateforme.</p></div><span class="space-arrow">→</span></article>
-      </div>
-    </section>
 
-    <section class="space-panel" id="spacePanel" aria-live="polite"></section>
-
-    <!-- Les trois blocs de présentation sont fusionnés en un seul bloc. -->
-    <section class="fused-promise">
-      <div class="fused-intro">
-        <div class="ico">✦</div>
-        <h3>Aurore, un point d’accès unique</h3>
-        <p>Une présentation commune pour découvrir les établissements et accéder progressivement à leurs informations et ressources.</p>
-      </div>
-      <div class="fused-items">
-        <article class="fused-item"><div class="ico">⌂</div><h4>Annuaire national</h4><p>Retrouvez les établissements et leurs informations essentielles.</p></article>
-        <article class="fused-item"><div class="ico">◈</div><h4>Identité standardisée</h4><p>Une fiche claire, structurée et cohérente avec Aurore.</p></article>
-        <article class="fused-item"><div class="ico">▤</div><h4>Bibliothèque par classe</h4><p>Les ressources pourront être organisées par établissement, niveau, classe et matière.</p></article>
-      </div>
-    </section>
 
     <section id="etablissements">
       <div class="section-head">
@@ -442,7 +417,7 @@ function openAuthPage(){
   $('profileView').classList.remove('show');
   $('authView').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
-  renderAuthStart();
+  if(currentAuroreSession) renderAccountHome(); else renderAuthStart();
 }
 
 function authMessage(text){const el=$('authMessage');if(el){el.style.display='block';el.textContent=text;}}
@@ -617,7 +592,7 @@ function requestEstablishment(){openAuthPage();setTimeout(()=>{if(currentAuroreS
 
 async function loadInstituts(){
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&select=*&order=nom.asc`,{headers:API_HEADERS});
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=*&order=nom.asc`,{headers:API_HEADERS,cache:'no-store'});
     if(!r.ok) throw new Error('Supabase '+r.status);
     const rows=await r.json();
     data=rows.map(normalize);
@@ -654,12 +629,14 @@ function render(){
     `<div class="notice" style="grid-column:1/-1">Aucun établissement ne correspond aux critères sélectionnés.</div>`;
 }
 
-async function openProfile(id){
+async function openProfile(id,replace=false){
   const e=data.find(x=>String(x.id)===String(id));
   if(!e) return;
   $('homeView').classList.add('hide-home');
+  $('authView').classList.remove('show');
   $('profileView').classList.add('show');
-  window.location.hash='etablissement/'+encodeURIComponent(e.slug||e.id);
+  const target='#etablissement/'+encodeURIComponent(e.slug||e.id);
+  if(replace) history.replaceState({profileId:e.id},'',target); else history.pushState({profileId:e.id},'',target);
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -776,7 +753,7 @@ function handleHash(){
   if(h.startsWith('#etablissement/')){
     const key=h.slice('#etablissement/'.length);
     const e=data.find(x=>String(x.slug||x.id)===key);
-    if(e) openProfile(e.id);
+    if(e) openProfile(e.id,true);
     else showHome();
   }else showHome();
 }
@@ -794,6 +771,9 @@ document.querySelectorAll('.shortcuts button').forEach(b=>b.addEventListener('cl
   render(); $('etablissements').scrollIntoView({behavior:'smooth'});
 }));
 window.addEventListener('hashchange',handleHash);
+// Compatibilité avec les anciens appels : loadData était encore référencé dans l'interface admin.
+const loadData=loadInstituts;
+window.addEventListener('popstate',()=>handleHash());
 loadInstituts().then(()=>handleHash());
 
 
@@ -805,10 +785,7 @@ function appliquerCouleur(couleur){
 (function(){const t=$('colorToggle'),m=$('colorMenu');if(!t||!m)return; appliquerCouleur(localStorage.getItem('aurore-instituts-color-theme')||'violet'); t.onclick=e=>{e.stopPropagation();m.classList.toggle('open')}; m.querySelectorAll('[data-color-choice]').forEach(b=>b.onclick=()=>{appliquerCouleur(b.dataset.colorChoice);m.classList.remove('open')});})();
 
 function openSpacesLanding(){
-  document.body.classList.add('spaces-focus');
-  const panel=document.getElementById('spacePanel');
-  if(panel) panel.classList.remove('visible');
-  document.getElementById('espaces')?.scrollIntoView({behavior:'smooth',block:'start'});
+  openAuthPage();
 }
 
 async function openSpace(role){
@@ -870,7 +847,13 @@ async function openSpace(role){
   };
   const cfg=configs[role]; if(!cfg)return;
   const cards=cfg.items.map((item,i)=>`<article class="space-tool-card ${item[3]==='notes'||item[3]==='class'||item[3]==='professeurs'||item[3]==='camarades'?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow">→</span></article>`).join('');
-  const panel=document.getElementById('spacePanel');
+  let panel=document.getElementById('spacePanel');
+  if(!panel){
+    panel=document.createElement('section');
+    panel.id='spacePanel';
+    panel.className='space-panel';
+    document.body.appendChild(panel);
+  }
   if(panel){panel.classList.add('page-mode');panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="closeSpacePanel()">← Retour aux espaces</button><span class="space-panel-label">Aurore — Section Instituts</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div><div class="space-tools-grid">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');panel.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
@@ -1138,7 +1121,7 @@ async function decideEstablishmentRequest(id,statut,commentaire=null,fromModal=f
     const b=await r.json().catch(()=>null);
     if(!r.ok)throw new Error(b?.message||b?.hint||b?.details||'Opération impossible.');
     if(statut==='refusee')closeDecisionModal();
-    await Promise.all([loadAdminRequests(),loadAdminOverview(),loadData()]);
+    await Promise.all([loadAdminRequests(),loadAdminOverview(),loadInstituts()]);
   }catch(e){
     if(statut==='refusee'&&fromModal){if($('decisionMessage'))$('decisionMessage').textContent=e.message||'Impossible d’enregistrer le refus.';}
     else alert(e.message||'Opération impossible.');
@@ -1157,9 +1140,10 @@ async function loadAdminAcceptedEstablishments(){
 }
 
 function closeSpacePanel(){
-  const panel=document.getElementById('spacePanel'); if(panel)panel.classList.remove('visible');
+  const panel=document.getElementById('spacePanel');
+  if(panel){panel.classList.remove('visible','page-mode');panel.innerHTML='';}
   document.body.classList.remove('spaces-focus');
-  document.getElementById('espaces')?.scrollIntoView({behavior:'smooth'});
+  openAuthPage();
 }
 
 function appliquerTheme(choix){
