@@ -781,8 +781,33 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 .member-request-main strong{display:block;font-size:.9rem}.member-request-main span{display:block;color:var(--muted);font-size:.72rem;margin-top:3px}.member-request-details{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.member-request-details i{font-style:normal;padding:4px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:.64rem;color:var(--muted)}
 .member-request-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.member-request-actions .approve{border:0;background:#16a34a;color:#fff}.member-request-actions .reject{border:1px solid rgba(220,38,38,.3);background:transparent;color:#dc2626}.member-request-actions button{border-radius:11px;padding:9px 12px;font-weight:800;font-size:.7rem}
 @media(max-width:650px){.member-request-card{grid-template-columns:auto 1fr}.member-request-actions{grid-column:1/-1;justify-content:stretch}.member-request-actions button{flex:1}.personal-avatar-editor{align-items:flex-start;flex-direction:column}}
-</style></head>
-<body class="auth-initializing">
+</style>
+<style id="aurore-auth-flow-final">
+  /* L'application ne peint jamais la page publique avant que l'authentification soit décidée. */
+  body.site-locked{overflow:hidden!important}
+  body.auth-initializing > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important}
+  body.auth-initializing #accessLock{visibility:visible!important;opacity:1!important}
+  body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important}
+  body.aurore-oauth-callback-pending #accessLock{visibility:hidden!important}
+  body.aurore-oauth-callback-pending #auroreAuthWait{visibility:visible!important}
+  .access-lock{transition:opacity .16s ease}
+  .role-choice-wrap{min-height:calc(100dvh - 150px);display:flex;flex-direction:column;justify-content:center;padding:22px 0 50px}
+  .role-choice-welcome{box-shadow:0 14px 45px rgba(34,197,94,.08);animation:auroreWelcomeIn .45s cubic-bezier(.16,1,.3,1)}
+  @keyframes auroreWelcomeIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+  .personal-space-view{min-height:calc(100dvh - 150px);display:flex;align-items:flex-start;justify-content:center;padding:18px 0 60px}
+  .personal-space-card{width:min(1040px,100%);padding:30px;border-radius:28px;background:var(--panel);border:1px solid var(--line);box-shadow:0 24px 80px rgba(0,0,0,.18)}
+  .personal-profile-form{width:100%}
+  @media(max-width:700px){.personal-space-card{padding:20px;border-radius:22px}.role-choice-wrap{padding-top:12px}}
+</style>
+
+<style id="aurore-submit-success">
+.profile-submit-success{display:flex;align-items:flex-start;gap:12px;margin:0 0 16px;padding:15px 16px;border-radius:18px;border:1px solid rgba(34,197,94,.32);background:linear-gradient(135deg,rgba(34,197,94,.10),rgba(34,197,94,.035));box-shadow:0 12px 34px rgba(34,197,94,.07);animation:auroreSuccessIn .42s cubic-bezier(.16,1,.3,1)}
+.profile-submit-success-icon{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;background:rgba(34,197,94,.18);color:#16a34a;font-weight:900}
+.profile-submit-success strong{display:block;font-size:.86rem}.profile-submit-success p{margin:3px 0 0;color:var(--muted);font-size:.72rem;line-height:1.5}
+@keyframes auroreSuccessIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body class="auth-initializing site-locked">
 <header>
   <div class="wrap head">
     <a class="brand" href="#accueil" onclick="showHome()">
@@ -884,7 +909,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 
 
 <!-- ===== PORTAIL D’ACCÈS Aurore — même architecture que Section Archives ===== -->
-<div id="accessLock" class="access-lock">
+<div id="accessLock" class="access-lock" style="display:flex;">
   <div class="access-card access-card-redesign">
     <div class="access-card-body">
       <div class="access-institution">
@@ -1027,6 +1052,14 @@ function normalize(e){
 }
 
 function showHome(push=true){
+  // Sécurité centrale : un compte authentifié mais non finalisé ne peut jamais
+  // retomber sur l’accueil public, même via un clic de menu ou une ancre.
+  if(window.__auroreAuthenticated && !hasSavedPersonalRole()){
+    if(location.hash!=='#mon-espace') pushRoute('#mon-espace');
+    openAuthPage({push:false});
+    renderPersonalSpace().catch(()=>{});
+    return;
+  }
   restoreSiteLogo();
   if(push && location.hash!=='#accueil') pushRoute('#accueil');
   $('homeView').classList.remove('hide-home','directory-mode');
@@ -1043,6 +1076,7 @@ function showHome(push=true){
 let currentAuroreSession=null;
 let currentAuroreProfile=null;
 let selectedOnboardingRole='';
+let personalSubmissionNotice='';
 let currentSpaceEstablishment=null;
 let siteLogoOriginal=null;
 function applyDominantColorToBox(box,img){
@@ -1416,12 +1450,14 @@ async function renderPersonalSpace(){
     parent:[['♙','Suivi de mon enfant','Scolarité et informations transmises par l’établissement.']]
   }[role]||[['✦','Mon espace','Vos outils personnels.']];
   const dashboard=tiles.map(x=>`<article class="personal-dashboard-tile"><div class="ico">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('');
-  const body=complete
+  const submissionNotice=personalSubmissionNotice?`<div class="profile-submit-success" role="status"><div class="profile-submit-success-icon">✓</div><div><strong>Inscription enregistrée</strong><p>${esc(personalSubmissionNotice)}</p></div></div>`:'';
+   const body=complete
     ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
     : pending
-      ? `<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
+      ? `${submissionNotice}<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
       : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><div class="profile-page-role"><span class="auth-kicker">Profil sélectionné</span><strong>${esc(roleLabels[role]||role)}</strong><small>Cette page est dédiée à votre profil.</small></div><input type="hidden" id="personalRole" value="${esc(role)}"><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
   root.innerHTML=`<section class="personal-space-view"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
+  personalSubmissionNotice='';
   document.getElementById('personalAvatarFile')?.addEventListener('change',e=>{const f=e.target.files?.[0],img=document.getElementById('personalAvatarPreview');if(!f||!img)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>3*1024*1024){e.target.value='';return;}const r=new FileReader();r.onload=()=>{if(img.tagName==='IMG')img.src=r.result;else{img.innerHTML='';img.style.backgroundImage=`url(${r.result})`;img.style.backgroundSize='cover';img.style.backgroundPosition='center';}};r.readAsDataURL(f);});
   if(!complete){
     try{
@@ -1476,6 +1512,9 @@ function renderPersonalSpaceEdit(){
 async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   if(!currentAuroreSession)return;
   const ctx=await getPersonalSpaceContext();
+  // isNewAccount est optionnel : le profil DB reste la source de vérité.
+  const actuallyNew=!hasChosenRoleEver();
+  if(actuallyNew)isNewAccount=true;
   if(!hasChosenRoleEver()){
     // Compte réellement nouveau : jamais aucun rôle choisi -> écran d'accueil + choix de rôle.
     restoreSiteLogo();
@@ -1837,6 +1876,17 @@ function restoreRoutePosition(state){
 
 function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
+  // Un utilisateur connecté sans profil validé reste dans Mon espace.
+  // Cela protège aussi les URLs saisies manuellement (#accueil, #apropos, etc.).
+  if(window.__auroreAuthenticated && !hasSavedPersonalRole() && h!=='#mon-espace' && !h.startsWith('#compte')){
+    applyingRoute=true;
+    try{
+      if(location.hash!=='#mon-espace') history.replaceState({scrollY:0},document.title,'#mon-espace');
+      openAuthPage({push:false});
+      renderPersonalSpace().catch(()=>{});
+    }finally{applyingRoute=false;}
+    return;
+  }
   if(h===lastHandledHash && eventState!==null)return;
   lastHandledHash=h;
   applyingRoute=true;
@@ -2761,22 +2811,23 @@ function appliquerTheme(choix){
 
       try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
       let isNewAccount=false;
+      let destinationReady=false;
       try{
-        if(typeof loadAuroreProfile==='function'){
-          await loadAuroreProfile();
-          // Compte tout juste créé par Supabase si l'écart création/dernière connexion est minime.
-          const u=currentAuroreSession?.user||{};
-          isNewAccount=!!(u.created_at&&u.last_sign_in_at&&(new Date(u.last_sign_in_at)-new Date(u.created_at))<10000)&&!hasChosenRoleEver();
-        }
+        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+        // La base de données est la source de vérité : nouveau compte = aucun rôle
+        // et aucun établissement encore choisis. Aucun timestamp fragile.
+        isNewAccount=!hasChosenRoleEver();
         if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,isNewAccount);
+        destinationReady=true;
       }catch(postLoginErr){
-        console.warn('[Google OAuth] profil/espace différé',postLoginErr);
+        console.warn('[Google OAuth] profil/espace impossible à préparer',postLoginErr);
+        openAuthPage({push:false});
+        renderAuthStart?.();
       }finally{
-        // La destination est maintenant prête à l'écran : on peut lever le verrou et
-        // faire disparaître l'animation de finalisation.
         document.body.classList.remove('aurore-oauth-callback-pending');
-        unlockAccess();
-        cacherVeuillezPatienter();
+        // Jamais de déverrouillage si la destination n'est pas réellement prête.
+        if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
+        else{showPortal();afficherVeuillezPatienter('Impossible de préparer votre espace. Réessayez.');}
       }
       return true;
     }catch(err){
@@ -2802,12 +2853,14 @@ function appliquerTheme(choix){
       closeSignup();
       // Même principe qu'au retour Google : on attend que la destination soit prête
       // avant de lever le verrou, pour ne jamais laisser entrevoir la page principale.
+      let destinationReady=false;
       try{
         if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
         if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(false);
-      }catch(e){console.warn('[Aurore Auth] profil/espace différé',e);}
-      unlockAccess();
-      cacherVeuillezPatienter();
+        destinationReady=true;
+      }catch(e){console.warn('[Aurore Auth] profil/espace impossible à préparer',e);}
+      if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
+      else{showPortal();afficherVeuillezPatienter('Impossible de préparer votre espace. Réessayez.');}
       return true;
     }catch(err){
       console.warn('[Aurore Auth]',err);
