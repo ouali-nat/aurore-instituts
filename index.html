@@ -292,6 +292,8 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .space-tool-card.admin-general-card .space-tool-icon{width:34px;height:34px;font-size:.72rem}.space-tool-card.admin-general-card h3{font-size:.82rem}.space-tool-card.admin-general-card p{font-size:.68rem;line-height:1.35}.space-tool-card.admin-general-card .space-tool-kicker{font-size:.58rem}.space-tool-card.admin-general-card .space-tool-arrow{font-size:.9rem}
 .profile-logo.adaptive-logo,.establishment-logo-adaptive,.cover.adaptive-logo{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 22%,var(--panel2))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line))}
 #decisionReasonCode{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}
+
+.member-valid-badge{align-self:start;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.12);color:#15803d;font-size:.68rem;font-weight:900;border:1px solid rgba(22,163,74,.2);white-space:nowrap}.validated-member-card{align-items:start}.validated-member-card .member-request-main span{color:#15803d;font-weight:800}
 </style><style>body.auth-initializing > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.auth-initializing #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important} body.site-locked > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important;background:#F7F4FB!important} body.aurore-oauth-callback-pending #auroreAuthWait{visibility:visible!important}</style></head>
 <style id="aurore-visual-fixes-v2">
 /* Centre de contrôle : contraste renforcé en mode sombre. */
@@ -1627,7 +1629,7 @@ async function renderAccountHome(){
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
-  const configureBtn=(!roles.filter(r=>r!=='admin_general').length)?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer un espace</button></div>':'';
+  const configureBtn=isPlatformAdmin?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace</button></div>':'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
   if(isPlatformAdmin){
     const btn=$('generalAdminBtn'); if(btn)btn.addEventListener('click',async function(e){e.preventDefault();e.stopPropagation();btn.disabled=true;try{await openSpace('general')}catch(err){authMessage(err?.message||'Impossible d’ouvrir l’Administration générale Aurore.')}finally{btn.disabled=false;}});
@@ -1643,14 +1645,34 @@ async function removeConfiguredSpace(etablissementId,role){
   }catch(e){alert(e.message||'Impossible de supprimer cet espace.');}
 }
 
-function renderOnboarding(){
+function isAurorePlatformAdmin(){
+  const email=String(currentAuroreSession?.user?.email||'').trim().toLowerCase();
+  return email==='oualikevin9@gmail.com' || !!window.__aurorePlatformAdmin;
+}
+
+async function verifyAurorePlatformAdmin(){
+  if(isAurorePlatformAdmin())return true;
+  const token=currentAuroreSession?.access_token||'';
+  const profileId=currentAuroreProfile?.id||currentAuroreSession?.user?.id||'';
+  if(!token||!profileId)return false;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/profil_roles?profile_id=eq.${encodeURIComponent(profileId)}&role=eq.admin_general&select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
+    const ok=r.ok&&(await r.json()).length>0;
+    if(ok)window.__aurorePlatformAdmin=true;
+    return ok;
+  }catch(_){return false;}
+}
+
+async function renderOnboarding(){
+  if(!(await verifyAurorePlatformAdmin())){showHome();accessMessage('La configuration des espaces est réservée à l’Administration générale Aurore.','err');return;}
   authViewVersion++;
   const root=$('authRoot'); if(!root)return;
-  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="showHome()">Retour à l’accueil</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
   if(selectedOnboardingRole)selectOnboardingRole(selectedOnboardingRole);
 }
 
 async function selectOnboardingRole(role){
+  if(!(await verifyAurorePlatformAdmin())){showHome();accessMessage('Accès refusé : seule l’Administration générale Aurore peut configurer un espace.','err');return;}
   const onboardingVersion=++authViewVersion;
   selectedOnboardingRole=role;
   document.querySelectorAll('.auth-role').forEach(b=>b.classList.toggle('selected',b.textContent.includes({eleve:'Élève',professeur:'Professeur',parent:'Parent',administration:'Administration',proviseur:'Proviseur'}[role])));
@@ -1660,6 +1682,7 @@ async function selectOnboardingRole(role){
 }
 
 async function finishOnboarding(){
+  if(!(await verifyAurorePlatformAdmin())){showHome();accessMessage('Accès refusé : seule l’Administration générale Aurore peut configurer un espace.','err');return;}
   const etablissementId=$('onboardingEtab')?.value,role=selectedOnboardingRole;
   const msg=$('onboardingMessage');if(!role){msg.style.display='block';msg.textContent='Choisissez un rôle.';return;}if(!etablissementId){msg.style.display='block';msg.textContent='Choisissez un établissement dans la liste.';return;}
   msg.style.display='block';msg.textContent='Activation de votre espace…';
@@ -1671,7 +1694,7 @@ async function openEstablishmentRequestPage(options={}){
   const fromRoleChoice=options.fromRoleChoice===true;
   const backBtn=fromRoleChoice
     ? `<button class="auth-secondary" type="button" onclick="renderRoleChoice()">Retour au choix du profil</button>`
-    : `<button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button>`;
+    : `<button class="auth-secondary" type="button" onclick="showHome()">Retour à l’accueil</button>`;
   // Cas « nouveau compte Administration » : le rôle est déjà connu (Administration),
   // pas besoin de le refaire choisir dans un menu déroulant — un champ fixe suffit.
   const roleField=fromRoleChoice
@@ -2373,6 +2396,22 @@ async function createInstituteDiscipline(){
 }
 async function deleteInstituteDiscipline(id){if(!confirm('Supprimer cette discipline de la liste proposée aux professeurs ?'))return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/supprimer_discipline_etablissement`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'},body:JSON.stringify({p_id:id})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Suppression impossible.');await loadAdminDisciplines((await getAdminInstituteIds())[0]||'');}catch(e){alert(e.message||'Impossible de supprimer la discipline.');}}
 
+async function adminProfesseursView(){
+  const root=$('spaceDashboard');if(!root)return;
+  const ids=await getAdminInstituteIds(),token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Professeurs</span><h3>Profils des professeurs</h3><p>Les dossiers validés sont automatiquement associés à ce bloc avec les informations transmises par chaque professeur.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div id="validatedTeachers" class="space-list"><div class="admin-card">Chargement des profils validés…</div></div></section>`;
+  const box=$('validatedTeachers');if(!box||!ids.length)return;
+  try{
+    const all=[];
+    for(const id of ids){
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.valide&role=eq.professeur&select=id,created_at,informations,avatar_url,profiles(prenom,nom,full_name,avatar_url,role)&order=created_at.desc`,{headers:h,cache:'no-store'});
+      if(r.ok)all.push(...await r.json());
+    }
+    const cards=all.map(d=>{const p=d.profiles||{},i=d.informations||{},name=p.full_name||[p.prenom,p.nom].filter(Boolean).join(' ')||'Professeur',avatar=p.avatar_url||d.avatar_url;const details=[i.discipline,i.fonction,i.telephone,i.adresse,i.filiere].filter(Boolean);return `<article class="member-request-card validated-member-card"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>Professeur · Profil validé</span><div class="member-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')||'<i>Dossier validé</i>'}</div></div><span class="member-valid-badge">✓ Validé</span></article>`;}).join('');
+    box.innerHTML=cards||'<div class="personal-profile-success-card"><div class="success-icon">✓</div><div><h3>Aucun professeur validé</h3><p>Les profils apparaîtront ici automatiquement après validation de leur dossier.</p></div></div>';
+  }catch(e){box.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les profils.')}</div>`;}
+}
+
 async function adminInscriptionsView(){
   const root=$('spaceDashboard');if(!root)return;
   root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Inscriptions</span><h3>Demandes de profils</h3><p>Examinez chaque dossier, consultez les informations et acceptez ou refusez l’accès à l’établissement.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des dossiers…</div></div></section>`;
@@ -2432,6 +2471,7 @@ function openSpaceTool(role,key){
   const root=document.getElementById('spaceDashboard'); if(!root)return;
   if(role==='administration' && key==='admin-documents'){ adminDocumentsView(); return; }
   if(role==='administration' && key==='admin-eleves'){ adminElevesView(); return; }
+  if(role==='administration' && key==='admin-professeurs'){ adminProfesseursView(); return; }
   if(role==='administration' && key==='admin-disciplines'){ adminDisciplinesView(); return; }
   if(role==='administration' && key==='inscriptions'){ adminInscriptionsView(); return; }
   const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
