@@ -1281,34 +1281,16 @@ async function loadAuroreProfile(){
   if(!id)return null;
   const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
 
-  // Auth et profil DB sont indépendants : chargement en parallèle pour
-  // raccourcir nettement la phase « Finalisation » après Google.
-  // Timeouts asymétriques (même principe que Section Archives) : l'identité
-  // Auth est critique (8s de marge), le profil DB est un simple enrichissement
-  // qui ne doit jamais retenir longtemps l'entrée sur le site (1.5s, puis on
-  // continue avec un profil vide plutôt que de bloquer l'utilisateur).
-  let authUser=null, dbProfile=null;
-  await Promise.all([
-    (async()=>{
-      try{
-        const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/auth/v1/user`,{headers,cache:'no-store'},8000);
-        if(r.ok){
-          authUser=await r.json().catch(()=>null);
-          if(authUser){
-            currentAuroreSession.user=authUser;
-            currentAuroreSession.id=authUser.id||id;
-          }
-        }
-      }catch(_){}
-    })(),
-    (async()=>{
-      try{
-        const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'},1500);
-        const rows=r.ok?await r.json().catch(()=>[]):[];
-        dbProfile=rows[0]||null;
-      }catch(_){}
-    })()
-  ]);
+  // Optimisation : la session Supabase contient déjà l'utilisateur après
+  // connexion/refresh. Inutile de refaire /auth/v1/user avant de charger le profil.
+  // On supprime ainsi un aller-retour réseau à chaque ouverture de session.
+  const authUser=currentAuroreSession?.user||null;
+  let dbProfile=null;
+  try{
+    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`,{headers,cache:'no-store'},1500);
+    const rows=r.ok?await r.json().catch(()=>[]):[];
+    dbProfile=rows[0]||null;
+  }catch(_){}
 
   const meta=authUser?.user_metadata||currentAuroreSession?.user?.user_metadata||{};
   currentAuroreProfile={
@@ -1364,13 +1346,15 @@ async function getPersonalSpaceContext(){
   }catch(_){ }
   const preferred=['eleve','professeur','proviseur','administration','parent'];
   const space=preferred.map(role=>spaces.find(x=>x.role===role&&x.etablissement_id)).find(Boolean)||spaces.find(x=>x.etablissement_id);
-  let etab=null;
-  if(space?.etablissement_id){
-    try{
-      const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(space.etablissement_id)}&select=id,nom,type,ville,logo_url`,{headers},4000);
-      if(r.ok)etab=(await r.json())[0]||null;
-    }catch(_){ }
-  }
+  // Le RPC renvoie maintenant le logo de l'établissement : plus besoin d'un
+  // second appel REST /etablissements pendant l'ouverture de l'espace.
+  const etab=space?.etablissement_id?{
+    id:space.etablissement_id,
+    nom:space.etablissement_nom||'',
+    type:space.etablissement_type||'',
+    ville:space.etablissement_ville||'',
+    logo_url:space.etablissement_logo_url||null
+  }:null;
   return {role:space?.role||currentAuroreProfile?.role||'eleve',etab:etab||((currentAuroreProfile?.etablissement_id)?{id:currentAuroreProfile.etablissement_id,nom:currentAuroreProfile.etablissement_nom,logo_url:currentAuroreProfile.etablissement_logo_url||null}:null),spaces};
 }
 
