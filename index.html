@@ -236,6 +236,11 @@ html[data-color-theme]{--accent:var(--theme-primary);--accent2:var(--theme-secon
 .space-panel.page-mode{display:block;position:relative;min-height:calc(100vh - 76px);padding:34px 0 80px;background:var(--bg);border:0;border-radius:0;margin:0;width:100%;box-shadow:none}.space-panel.page-mode .space-panel-head,.space-panel.page-mode .space-tools-grid,.space-panel.page-mode #spaceDashboard{width:min(1100px,calc(100% - 28px));margin-left:auto;margin-right:auto}.space-panel.page-mode .space-panel-head{padding-top:10px}.admin-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:20px}.admin-card{border:1px solid var(--line);background:var(--panel);border-radius:20px;padding:18px}.admin-card h3{margin-bottom:6px}.admin-card p,.admin-meta{color:var(--muted);font-size:.76rem}.admin-list{display:grid;gap:10px;margin-top:14px}.admin-row{border:1px solid var(--line);background:var(--panel2);border-radius:15px;padding:14px;display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center}.admin-photo{width:110px;height:90px;border-radius:12px;object-fit:cover;background:var(--panel);border:1px solid var(--line)}.admin-photo.empty{display:grid;place-items:center;font-weight:800;color:var(--muted);font-size:.72rem}.admin-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.admin-btn{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--panel);color:var(--text);font-weight:750}.admin-btn.primary{background:var(--accent-strong);color:#fff;border-color:var(--accent-strong)}.request-logo-upload{display:grid;gap:8px;padding:14px;border:1px dashed var(--line);border-radius:14px;background:var(--panel2)}.request-logo-preview{width:100%;max-width:260px;height:150px;border-radius:14px;object-fit:cover;border:1px solid var(--line);display:none;background:var(--panel)}.request-form{display:grid;gap:12px}.request-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.request-form label{font-size:.72rem;color:var(--muted);font-weight:700}.request-form input,.request-form select,.request-form textarea{margin-top:6px;width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);outline:none}.request-form textarea{min-height:110px;resize:vertical}.request-form input:focus,.request-form select:focus,.request-form textarea:focus{border-color:var(--accent)}.platform-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.platform-kpi{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}.platform-kpi b{display:block;font-size:1.4rem}.platform-kpi span{color:var(--muted);font-size:.7rem}@media(max-width:760px){.admin-grid,.request-grid{grid-template-columns:1fr}.admin-row{grid-template-columns:48px 1fr}.admin-actions{grid-column:2;justify-content:flex-start}.platform-kpis{grid-template-columns:1fr 1fr}}
 .account-bar.show{display:flex}.account-dot{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(139,92,246,.16);color:var(--accent)}
 @media(max-width:760px){.auth-grid{grid-template-columns:1fr}.auth-side{order:2}.auth-card{padding:16px}.auth-role-grid{grid-template-columns:1fr}.auth-top{align-items:flex-start;flex-direction:column}}
+
+.account-email-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.account-email-row p{margin:0}
+.platform-admin-access{white-space:nowrap}
+.request-logo-preview{width:min(260px,100%);height:260px;object-fit:contain;border:1px solid var(--line);border-radius:20px;background:var(--panel2);padding:10px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -516,9 +521,12 @@ async function renderAccountHome(){
     if(r.ok){const rows=await r.json();rows.forEach(x=>{if(x.role&&!roles.includes(x.role))roles.push(x.role);});}
   }catch(_){ }
   const roleNames={eleve:'Élève',professeur:'Professeur',parent:'Parent',administration:'Administration',proviseur:'Proviseur',admin_general:'Administration générale Aurore'};
-  const isAdminGeneral=roles.includes('admin_general');
+  const accountEmail=(currentAuroreSession?.user?.email||'').trim().toLowerCase();
+  const isPlatformAdmin=roles.includes('admin_general') || accountEmail==='oualikevin9@gmail.com';
+  if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
-  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><p>${esc(currentAuroreSession?.user?.email||'')}</p><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces</button>${isAdminGeneral?'<button class="auth-secondary" type="button" onclick="openSpace(\'general\')">Administration générale Aurore</button>':''}</div></div></section>`;
+  const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" onclick="openSpace(\'general\')">Administration générale Aurore</button>':'';
+  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div><div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">Configurer mes espaces</button></div></div></section>`;
 }
 
 function renderOnboarding(){
@@ -800,10 +808,12 @@ async function openSpace(role){
     const session=currentAuroreSession;
     if(!session){openAuthPage();return;}
     let isAdminGeneral=false;
+    const accountEmail=(session.user?.email||'').trim().toLowerCase();
     try{
       const r=await fetch(`${SUPABASE_URL}/rest/v1/profil_roles?profile_id=eq.${encodeURIComponent(currentAuroreProfile?.id||session.user?.id||'')}&role=eq.admin_general&select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${session.access_token}`}});
       isAdminGeneral=r.ok&&(await r.json()).length>0;
     }catch(_){ }
+    if(accountEmail==='oualikevin9@gmail.com') isAdminGeneral=true;
     if(!isAdminGeneral){openAuthPage();authMessage('Accès réservé à l’Administration générale Aurore.');return;}
   }
   document.body.classList.add('spaces-focus');
