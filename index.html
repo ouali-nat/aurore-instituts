@@ -1341,8 +1341,8 @@ async function savePersonalProfile(){
     if(role==='eleve' && classeId){
       const dr=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/classe_demandes?on_conflict=classe_id,profile_id`,{method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({classe_id:classeId,profile_id:id,etablissement_id:etabId,statut:'en_attente'})});
       if(!dr.ok && dr.status!==409){const db=await dr.json().catch(()=>null);throw new Error(db?.message||'Impossible d’envoyer la demande d’inscription dans la classe.');}
-      if(msg){msg.textContent='Profil enregistré. Votre demande d’inscription dans la classe est en attente de validation.';msg.className='personal-profile-message ok';}
-    }else if(msg){msg.textContent='Profil enregistré. Votre espace est maintenant personnalisé.';msg.className='personal-profile-message ok';}
+      if(msg){msg.textContent='Votre profil a bien été enregistré. Merci ! Votre demande d’inscription dans la classe a été transmise à l’administration du lycée et sera examinée prochainement.';msg.className='personal-profile-message ok';}
+    }else if(msg){msg.textContent='Votre profil a bien été enregistré. Merci ! Votre espace personnel est maintenant configuré.';msg.className='personal-profile-message ok';}
     await renderPersonalSpace();
   }catch(e){if(msg){msg.textContent=e.message||'Impossible d’enregistrer votre profil.';msg.className='personal-profile-message err';}}
   finally{if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}}
