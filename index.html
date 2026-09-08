@@ -799,6 +799,17 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
   .personal-profile-form{width:100%}
   @media(max-width:700px){.personal-space-card{padding:20px;border-radius:22px}.role-choice-wrap{padding-top:12px}}
 </style>
+<style id="aurore-page-transition">
+.aurore-page-transition{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(7,6,11,.46);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
+.aurore-page-transition.show{opacity:1;visibility:visible;pointer-events:all}
+.aurore-page-transition-card{width:min(350px,calc(100vw - 36px));padding:25px 22px;border:1px solid var(--line);border-radius:23px;background:var(--panel);box-shadow:0 25px 80px rgba(0,0,0,.28);text-align:center;transform:translateY(10px) scale(.985);transition:transform .28s cubic-bezier(.16,1,.3,1)}
+.aurore-page-transition.show .aurore-page-transition-card{transform:none}
+.aurore-page-transition-icon{width:54px;height:54px;margin:0 auto 13px;border-radius:17px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 13%,transparent);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line))}
+.aurore-page-transition-icon svg{width:26px;height:26px;animation:aurorePageSpin 1s linear infinite}
+.aurore-page-transition-card strong{display:block;font-size:1rem}.aurore-page-transition-card span{display:block;margin-top:6px;color:var(--muted);font-size:.76rem;line-height:1.5}
+@keyframes aurorePageSpin{to{transform:rotate(360deg)}}
+body.aurore-transitioning{overflow:hidden!important}
+</style>
 
 <style id="aurore-submit-success">
 .profile-submit-success{display:flex;align-items:flex-start;gap:12px;margin:0 0 16px;padding:15px 16px;border-radius:18px;border:1px solid rgba(34,197,94,.32);background:linear-gradient(135deg,rgba(34,197,94,.10),rgba(34,197,94,.035));box-shadow:0 12px 34px rgba(34,197,94,.07);animation:auroreSuccessIn .42s cubic-bezier(.16,1,.3,1)}
@@ -949,6 +960,14 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
       <div class="access-note">Connexion sécurisée · Aurore — Section Instituts</div>
     </div>
     <div class="access-footer">© 2026 Aurore — Section Instituts</div>
+  </div>
+</div>
+
+<!-- ===== TRANSITION GLOBALE ENTRE LES PAGES ===== -->
+<div class="aurore-page-transition" id="aurorePageTransition" aria-hidden="true">
+  <div class="aurore-page-transition-card" role="status" aria-live="polite">
+    <div class="aurore-page-transition-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8" opacity=".25"></circle><path d="M20 12a8 8 0 0 1-8 8"></path></svg></div>
+    <strong>Chargement en cours</strong><span id="aurorePageTransitionText">Aurore prépare la page suivante…</span>
   </div>
 </div>
 
@@ -1864,7 +1883,23 @@ function saveRoutePosition(){
   try{history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);}catch(_){ }
 }
 
+let pageTransitionTimer=null;
+function startPageTransition(text='Aurore prépare la page suivante…'){
+  const el=$('aurorePageTransition'); if(!el)return;
+  if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
+  const t=$('aurorePageTransitionText'); if(t)t.textContent=text;
+  el.classList.add('show'); el.setAttribute('aria-hidden','false');
+  document.body.classList.add('aurore-transitioning');
+  pageTransitionTimer=setTimeout(endPageTransition,560);
+}
+function endPageTransition(){
+  const el=$('aurorePageTransition'); if(!el)return;
+  if(pageTransitionTimer)clearTimeout(pageTransitionTimer); pageTransitionTimer=null;
+  el.classList.remove('show'); el.setAttribute('aria-hidden','true');
+  document.body.classList.remove('aurore-transitioning');
+}
 function pushRoute(hash){
+  startPageTransition();
   saveRoutePosition();
   history.pushState({scrollY:0},'',hash);
 }
@@ -1876,6 +1911,7 @@ function restoreRoutePosition(state){
 
 function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
+  if(lastHandledHash && h!==lastHandledHash) startPageTransition();
   // Un utilisateur connecté sans profil validé reste dans Mon espace.
   // Cela protège aussi les URLs saisies manuellement (#accueil, #apropos, etc.).
   if(window.__auroreAuthenticated && !hasSavedPersonalRole() && h!=='#mon-espace' && !h.startsWith('#compte')){
@@ -1934,7 +1970,13 @@ function handleHash(eventState=null){
       showHome(false);
       restoreRoutePosition(eventState);
     }
-  }finally{applyingRoute=false;}
+  }finally{
+    applyingRoute=false;
+    if(pageTransitionTimer) {
+      clearTimeout(pageTransitionTimer);
+      pageTransitionTimer=setTimeout(endPageTransition,260);
+    }
+  }
 }
 
 ['q','type','city'].forEach(id=>$(id).addEventListener('input',render));
