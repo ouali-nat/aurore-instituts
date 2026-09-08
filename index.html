@@ -341,6 +341,31 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 .edit-logo-copy{display:grid;gap:5px}
 @media(max-width:680px){.establishment-edit-grid{grid-template-columns:1fr;}.edit-logo-upload{grid-template-columns:82px 1fr}.edit-logo-preview{width:82px;height:82px}}
 </style>
+<style id="aurore-personal-space">
+.personal-space-view{display:grid;gap:16px;max-width:980px;margin:0 auto;padding-bottom:30px}
+.personal-space-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.personal-space-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
+.personal-space-head h2{font-size:clamp(1.35rem,3vw,2rem);margin-top:5px}
+.personal-space-head p{color:var(--muted);font-size:.78rem;margin-top:6px;line-height:1.55}
+.personal-space-badge{padding:7px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 12%,var(--panel2));color:var(--accent);font-size:.65rem;font-weight:850;white-space:nowrap}
+.personal-profile-form{display:grid;gap:13px;margin-top:18px}
+.personal-profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.personal-profile-form label{display:grid;gap:5px;font-size:.7rem;color:var(--muted);font-weight:750}
+.personal-profile-form input,.personal-profile-form select,.personal-profile-form textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);outline:none;font:inherit;font-size:.78rem}
+.personal-profile-form textarea{min-height:88px;resize:vertical}
+.personal-profile-form input:focus,.personal-profile-form select:focus,.personal-profile-form textarea:focus{border-color:var(--accent)}
+.personal-role-context{padding:12px 13px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--accent) 7%,var(--panel));color:var(--muted);font-size:.7rem;line-height:1.5}
+.personal-role-context strong{display:block;color:var(--text);margin-bottom:3px}
+.personal-profile-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:3px}
+.personal-profile-message{font-size:.72rem;font-weight:750;color:var(--muted)}
+.personal-profile-message.ok{color:#15803d}.personal-profile-message.err{color:#b91c1c}
+.personal-dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:16px}
+.personal-dashboard-tile{padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--panel2)}
+.personal-dashboard-tile .ico{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent-strong),var(--accent2));color:#fff}
+.personal-dashboard-tile h3{font-size:.86rem;margin-top:10px}.personal-dashboard-tile p{font-size:.68rem;color:var(--muted);line-height:1.45;margin-top:4px}
+.personal-space-home-btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:9px 12px;font-size:.7rem;font-weight:800}
+@media(max-width:620px){.personal-profile-grid,.personal-dashboard-grid{grid-template-columns:1fr}.personal-space-head{flex-direction:column}.personal-space-badge{white-space:normal}}
+</style>
 <style id="aurore-cards-v2">
 /* ===== Blocs de l'accueil et des espaces : petits, presque carrés, 2 par ligne, colorés selon le thème violet/lilas du site ===== */
 .promise,.accepted-grid,.grid,.space-tools-grid,.config-test-grid,.admin-grid,.configured-list{
@@ -994,16 +1019,25 @@ function applyDominantColorToBox(box,img){
   }catch(_){/* image distante sans CORS : le fond par défaut reste utilisé */}};
   if(img.complete)apply();else img.addEventListener('load',apply,{once:true});
 }
+function shortEstablishmentName(name){
+  const value=String(name||'Établissement').trim();
+  if(value.length<=24)return value;
+  const words=value.split(/\s+/).filter(Boolean);
+  const letters=words.map(w=>w.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ0-9]/g,'')[0]).filter(Boolean).join('').toUpperCase();
+  return letters.length>=2?letters.slice(0,7):value.slice(0,21).trim()+'…';
+}
 function setSpaceBrand(etab,role){
   const title=document.getElementById('brandTitle'),subtitle=document.getElementById('brandSubtitle'),brand=document.querySelector('.brand');
   if(!title||!subtitle||!brand)return;
   if(etab){
-    title.textContent=etab.nom||'Établissement';
+    title.textContent=shortEstablishmentName(etab.nom||'Établissement');
+    title.title=etab.nom||'Établissement';
     const roleLabels={administration:'Administration lycée',proviseur:'Espace proviseur',professeur:'Espace professeur',eleve:'Espace élève',parent:'Espace parent'};
     subtitle.textContent=roleLabels[role]||'Section Instituts';
     brand.classList.add('brand-space-active');
   }else{
     title.textContent='Aurore';
+    title.removeAttribute('title');
     subtitle.textContent='Section Instituts';
     brand.classList.remove('brand-space-active');
   }
@@ -1102,7 +1136,7 @@ async function restoreAuroreSession(){
       if(!rr.ok||!rb.access_token){clearAuroreSession();return false;}
       s={...rb,expires_at:Date.now()+((Number(rb.expires_in)||3600)*1000)};
     }
-    currentAuroreSession=s; saveAuroreSession(s); await loadAuroreProfile(); return true;
+    currentAuroreSession=s; saveAuroreSession(s); await loadAuroreProfile(); await afterLoginToPersonalSpace(false); return true;
   }catch(_){clearAuroreSession();return false;}
 }
 
@@ -1115,7 +1149,7 @@ async function auroreLogin(){
     currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
     saveAuroreSession(currentAuroreSession);
     await loadAuroreProfile();
-    renderAccountHome();
+    await afterLoginToPersonalSpace(true);
   }catch(err){authMessage(err.message||'Connexion impossible.');}
 }
 
@@ -1168,6 +1202,8 @@ async function loadAuroreProfile(){
     avatar_url:dbProfile?.avatar_url||meta.avatar_url||meta.picture||'',
     ...dbProfile
   };
+  const profileFields=['role','etablissement_id','etablissement_nom','etablissement_logo_url','niveau','classe','filiere','discipline','fonction','enfant_informations'];
+  profileFields.forEach(k=>{if(currentAuroreProfile[k]===undefined||currentAuroreProfile[k]===null||currentAuroreProfile[k]==='') currentAuroreProfile[k]=meta[k]??'';});
   // Le spread DB reste prioritaire, mais les champs essentiels vides récupèrent
   // explicitement les métadonnées Auth.
   if(!currentAuroreProfile.full_name) currentAuroreProfile.full_name=meta.full_name||meta.name||currentAuroreProfile.email.split('@')[0]||'Compte Aurore';
@@ -1186,6 +1222,152 @@ async function saveOwnProfile(prenom,nom){
   if(r.ok){const rows=await r.json();currentAuroreProfile=rows[0]||currentAuroreProfile;return;}
   // Le trigger Auth crée déjà le profil : si aucune ligne n'est encore visible, on retente une lecture.
   await loadAuroreProfile();
+}
+
+function profilPersonnelEstComplet(){
+  const p=currentAuroreProfile||{};
+  const role=String(p.role||p.profil_role||'').toLowerCase();
+  const nom=String(p.nom||'').trim(), prenom=String(p.prenom||'').trim();
+  const etab=String(p.etablissement_nom||'').trim();
+  const etabId=String(p.etablissement_id||'').trim();
+  return !!(nom&&prenom&&etab&&etabId);
+}
+
+async function getPersonalSpaceContext(){
+  const token=currentAuroreSession?.access_token||'';
+  if(!token)return {role:'eleve',etab:null};
+  const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+  let spaces=[];
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:'{}'});
+    if(r.ok)spaces=await r.json();
+  }catch(_){ }
+  const preferred=['eleve','professeur','proviseur','administration','parent'];
+  const space=preferred.map(role=>spaces.find(x=>x.role===role&&x.etablissement_id)).find(Boolean)||spaces.find(x=>x.etablissement_id);
+  let etab=null;
+  if(space?.etablissement_id){
+    try{
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(space.etablissement_id)}&select=id,nom,type,ville,logo_url`,{headers});
+      if(r.ok)etab=(await r.json())[0]||null;
+    }catch(_){ }
+  }
+  return {role:space?.role||currentAuroreProfile?.role||'eleve',etab:etab||((currentAuroreProfile?.etablissement_id)?{id:currentAuroreProfile.etablissement_id,nom:currentAuroreProfile.etablissement_nom,logo_url:currentAuroreProfile.etablissement_logo_url||null}:null),spaces};
+}
+
+function personalRoleText(role){
+  return ({eleve:'Élève',professeur:'Professeur',proviseur:'Proviseur',administration:'Administration',parent:'Parent'})[role]||'Membre de l’établissement';
+}
+function personalRoleHelp(role){
+  return ({
+    eleve:'Élève : renseignez votre établissement, niveau et classe. La filière ou série est facultative.',
+    professeur:'Professeur : renseignez votre établissement et votre discipline. La fonction peut préciser votre rôle dans le lycée.',
+    proviseur:'Proviseur : renseignez votre établissement et votre fonction. Votre espace sera orienté vers le pilotage du lycée.',
+    administration:'Administration : renseignez votre établissement et votre fonction pour adapter les outils de gestion.',
+    parent:'Parent : renseignez votre établissement et, si utile, les informations de votre enfant.'
+  })[role]||'Renseignez les informations utiles à votre espace personnel.';
+}
+
+async function savePersonalProfile(){
+  const token=currentAuroreSession?.access_token||'',id=currentAuroreSession?.user?.id||'';
+  const msg=document.getElementById('personalProfileMessage'),btn=document.getElementById('personalProfileSave');
+  if(!token||!id)return;
+  const role=document.getElementById('personalRole')?.value||'eleve';
+  const nom=document.getElementById('personalNom')?.value.trim()||'';
+  const prenom=document.getElementById('personalPrenom')?.value.trim()||'';
+  const etabId=document.getElementById('personalEtab')?.value||'';
+  const etabName=document.getElementById('personalEtab')?.selectedOptions?.[0]?.dataset?.name||'';
+  const niveau=document.getElementById('personalNiveau')?.value.trim()||'';
+  const classe=document.getElementById('personalClasse')?.value.trim()||'';
+  const filiere=document.getElementById('personalFiliere')?.value.trim()||'';
+  const discipline=document.getElementById('personalDiscipline')?.value.trim()||'';
+  const fonction=document.getElementById('personalFonction')?.value.trim()||'';
+  const enfant=document.getElementById('personalEnfant')?.value.trim()||'';
+  if(!nom||!prenom||!etabId){if(msg){msg.textContent='Veuillez renseigner au minimum votre nom, prénom et établissement.';msg.className='personal-profile-message err';}return;}
+  if(btn){btn.disabled=true;btn.textContent='Enregistrement…';}
+  if(msg){msg.textContent='Enregistrement de votre espace…';msg.className='personal-profile-message';}
+  try{
+    const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=representation'};
+    // Le rôle et l'établissement deviennent immédiatement un espace Aurore.
+    const cfg=await fetch(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{...headers,'Prefer':'return=minimal'},body:JSON.stringify({p_role:role,p_etablissement_id:etabId})});
+    if(!cfg.ok){const cb=await cfg.json().catch(()=>null);throw new Error(cb?.message||cb?.hint||'Impossible d’activer votre espace établissement.');}
+    // Les champs scolaires complémentaires sont stockés dans les métadonnées du compte,
+    // car la table profiles de Section Instituts ne contient volontairement que l’identité.
+    const client=await getClient();
+    const metaPayload={prenom,nom,full_name:`${prenom} ${nom}`,role,etablissement_id:etabId,etablissement_nom:etabName,niveau:niveau||null,classe:classe||null,filiere:filiere||null,discipline:discipline||null,fonction:fonction||null,enfant_informations:enfant||null};
+    const updated=await client.auth.updateUser({data:metaPayload});
+    if(updated.error)throw updated.error;
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers,body:JSON.stringify({prenom,nom,full_name:`${prenom} ${nom}`})});
+    if(!r.ok)throw new Error('Impossible d’enregistrer votre identité.');
+    await loadAuroreProfile();
+    if(msg){msg.textContent='Profil enregistré. Votre espace est maintenant personnalisé.';msg.className='personal-profile-message ok';}
+    await renderPersonalSpace();
+  }catch(e){if(msg){msg.textContent=e.message||'Impossible d’enregistrer votre profil.';msg.className='personal-profile-message err';}}
+  finally{if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}}
+}
+
+async function renderPersonalSpace(){
+  const root=$('authRoot'); if(!root||!currentAuroreSession)return;
+  authViewVersion++;
+  const ctx=await getPersonalSpaceContext();
+  const role=ctx.role||'eleve', etab=ctx.etab;
+  if(etab){setSpaceLogo(etab.logo_url,etab.nom);setSpaceBrand(etab,role);}
+  const p=currentAuroreProfile||{};
+  const roleLabels={eleve:'Élève',professeur:'Professeur',proviseur:'Proviseur',administration:'Administration',parent:'Parent'};
+  const complete=profilPersonnelEstComplet()&&!!etab;
+  const name=(p.prenom&&p.nom)?`${p.prenom} ${p.nom}`:(p.full_name||currentAuroreSession.user?.email||'Votre espace');
+  const roleHelp=personalRoleHelp(role);
+  let roleFields='';
+  if(role==='eleve'){
+    roleFields=`<div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(p.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<input id="personalClasse" value="${esc(p.classe||'')}" placeholder="Ex. 2nde A"></label></div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(p.filiere||'')}" placeholder="Ex. Série D"></label>`;
+  }else if(role==='parent'){
+    roleFields=`<label>Informations sur votre enfant (facultatif)<textarea id="personalEnfant" placeholder="Nom, classe ou toute information utile">${esc(p.enfant_informations||'')}</textarea>`;
+  }else{
+    roleFields=`<div class="personal-profile-grid"><label>Discipline${role==='professeur'?'':' (facultatif)'}<input id="personalDiscipline" value="${esc(p.discipline||'')}" placeholder="Ex. Mathématiques"></label><label>Fonction${role==='proviseur'||role==='administration'?'':' (facultatif)'}<input id="personalFonction" value="${esc(p.fonction||'')}" placeholder="Ex. Proviseur, censeur…"></label></div>`;
+  }
+  const tiles={
+    eleve:[['📚','Ma scolarité','Classe, devoirs, notes et bulletins.']],
+    professeur:[['◉','Mon enseignement','Classes, matières, évaluations et suivi.']],
+    proviseur:[['⌂','Mon établissement','Pilotage et informations du lycée.']],
+    administration:[['⚙','Gestion du lycée','Informations, élèves, professeurs et documents.']],
+    parent:[['♙','Suivi de mon enfant','Scolarité et informations transmises par l’établissement.']]
+  }[role]||[['✦','Mon espace','Vos outils personnels.']];
+  const dashboard=tiles.map(x=>`<article class="personal-dashboard-tile"><div class="ico">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('');
+  const body=complete
+    ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
+    : `<div class="personal-role-context"><strong>Informations adaptées à votre profil : ${esc(roleLabels[role]||role)}</strong>${esc(roleHelp)}</div><form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><label>Votre profil<select id="personalRole"><option value="eleve" ${role==='eleve'?'selected':''}>Élève</option><option value="professeur" ${role==='professeur'?'selected':''}>Professeur</option><option value="proviseur" ${role==='proviseur'?'selected':''}>Proviseur</option><option value="administration" ${role==='administration'?'selected':''}>Administration</option><option value="parent" ${role==='parent'?'selected':''}>Parent</option></select></label><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Enregistrer mon profil</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></form>`;
+  root.innerHTML=`<section class="personal-space-view"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
+  if(!complete){
+    try{
+      const token=currentAuroreSession.access_token;
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
+      const rows=r.ok?await r.json():[]; const sel=$('personalEtab');
+      if(sel)sel.innerHTML='<option value="">Sélectionner votre établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}" data-name="${esc(e.nom)}" ${String(ctx.etab?.id||'')===String(e.id)?'selected':''}>${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');
+    }catch(_){ }
+  }
+}
+
+function renderPersonalSpaceEdit(){
+  const oldRole=currentAuroreProfile?.role||'eleve';
+  renderPersonalSpace().catch(()=>{});
+}
+
+async function afterLoginToPersonalSpace(showWelcome=true){
+  if(!currentAuroreSession)return;
+  const ctx=await getPersonalSpaceContext();
+  if(ctx.etab){setSpaceLogo(ctx.etab.logo_url,ctx.etab.nom);setSpaceBrand(ctx.etab,ctx.role);}
+  if(showWelcome){
+    accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Ouverture de votre espace personnel…`,'ok');
+    if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… ouverture de votre espace personnel');
+    await new Promise(r=>setTimeout(r,650));
+  }
+  $('homeView')?.classList.add('hide-home');
+  $('profileView')?.classList.remove('show');
+  $('authView')?.classList.add('show');
+  document.body.classList.remove('spaces-focus');
+  $('spacePanel')?.classList.remove('page-mode','visible');
+  if(location.hash!=='#mon-espace')pushRoute('#mon-espace');
+  await renderPersonalSpace();
+  if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();
 }
 
 async function renderAccountHome(){
@@ -1547,6 +1729,14 @@ function handleHash(eventState=null){
     }else if(h.startsWith('#espace/')){
       const parts=h.slice('#espace/'.length).split('/').filter(Boolean);
       if(parts[0]) openSpace(parts[0],{push:false,tool:parts[1]||null}); else showHome(false);
+    }else if(h==='#mon-espace'){
+      if(currentAuroreSession){
+        openAuthPage({push:false});
+        renderPersonalSpace();
+      }else{
+        openAuthPage({push:false});
+      }
+      restoreRoutePosition(eventState);
     }else if(h==='#compte'){
       openAuthPage({push:false});
       restoreRoutePosition(eventState);
@@ -2286,7 +2476,7 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')await renderAccountHome();
+      if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);
       unlockAccess(); setGoogleLoading(false); cacherVeuillezPatienter(); history.replaceState({},document.title,location.pathname+location.hash); return true;
     }catch(err){setGoogleLoading(false);cacherVeuillezPatienter();accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
   }
@@ -2299,7 +2489,7 @@ function appliquerTheme(choix){
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
       if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')await renderAccountHome();
+      if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(false);
       unlockAccess(); cacherVeuillezPatienter(); return true;
     }catch(_){return false;}
   }
@@ -2330,7 +2520,7 @@ function appliquerTheme(choix){
     try{
       const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
       const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof renderAccountHome==='function')renderAccountHome();}
+      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true);}
       else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
