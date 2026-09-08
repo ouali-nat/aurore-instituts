@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0B0912">
 <meta name="description" content="Aurore — Section Instituts, la plateforme des établissements d’enseignement du Burkina Faso.">
@@ -1451,7 +1452,14 @@ function renderRoleChoice(isNewAccount=false){
 }
 async function choosePersonalRole(role){
   if(!currentAuroreSession||!['eleve','parent','professeur','administration','proviseur'].includes(role))return;
-  selectedOnboardingRole=role;await renderPersonalSpace();
+  selectedOnboardingRole=role;
+  // Un nouveau compte « Administration » ne doit jamais pouvoir rattacher son
+  // dossier à un établissement déjà présent dans la liste — ce choix (rejoindre
+  // un établissement existant) reste réservé aux élèves, parents, professeurs
+  // et proviseurs. Une administration ne peut que proposer un nouvel
+  // établissement, examiné ensuite par l'Administration générale Aurore.
+  if(role==='administration'){await openEstablishmentRequestPage({fromRoleChoice:true});return;}
+  await renderPersonalSpace();
 }
 
 async function renderPersonalSpace(preloadedCtx=null){
@@ -1651,9 +1659,18 @@ async function finishOnboarding(){
   try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/configurer_espace`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'},body:JSON.stringify({p_role:role,p_etablissement_id:etablissementId})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Impossible de configurer cet espace.');selectedOnboardingRole='';await renderAccountHome();}catch(e){msg.textContent=e.message||'Impossible de configurer cet espace.';}
 }
 
-async function openEstablishmentRequestPage(){
+async function openEstablishmentRequestPage(options={}){
   const root=$('authRoot');if(!root)return;
-  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button><span>Nouvelle demande</span></div><div><span class="auth-kicker">Création d’un établissement</span><h2>Présenter un établissement à Aurore</h2><p class="auth-sub">Toute personne peut proposer un établissement. La demande reste privée jusqu’à sa validation par l’Administration générale Aurore.</p></div><div class="request-form-card"><form class="request-form" id="establishmentRequestForm" onsubmit="submitEstablishmentRequest(event)"><div class="request-grid"><label>Nom de l’établissement<input id="reqNom" required placeholder="Nom officiel"></label><label>Type<select id="reqType"><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option><option>Centre de formation</option></select></label><label>Ville<input id="reqVille" placeholder="Ville"></label><label>Commune<input id="reqCommune" placeholder="Commune"></label><label>Adresse<input id="reqAdresse" placeholder="Adresse ou secteur"></label><label>Téléphone<input id="reqTelephone" placeholder="Numéro de contact"></label><label>E-mail de l’établissement<input id="reqEmail" type="email" placeholder="contact@etablissement.bf"></label><label>Site web<input id="reqSite" type="url" placeholder="https://…"></label><div class="request-logo-upload"><label>Photo / logo de l’établissement<input id="reqPhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="previewRequestLogo(event)"></label><img id="reqPhotoPreview" class="request-logo-preview" alt="Aperçu du logo"></div><label>Votre rôle dans cet établissement<select id="reqRole"><option value="administration">Administration</option><option value="proviseur">Proviseur</option><option value="professeur">Professeur</option><option value="eleve">Élève</option><option value="parent">Parent</option></select></label></div><label>Description<textarea id="reqDescription" placeholder="Présentez l’établissement, ses formations, son fonctionnement et les informations utiles."></textarea></label><label>Motif de la demande<textarea id="reqJustification" placeholder="Expliquez pourquoi cet établissement doit rejoindre Aurore."></textarea></label><div class="auth-actions"><button class="auth-primary" type="submit">Envoyer la demande</button></div><div id="requestMessage" class="auth-message"></div></form></div></section>`;
+  const fromRoleChoice=options.fromRoleChoice===true;
+  const backBtn=fromRoleChoice
+    ? `<button class="auth-secondary" type="button" onclick="renderRoleChoice()">Retour au choix du profil</button>`
+    : `<button class="auth-secondary" type="button" onclick="renderAccountHome()">Retour au compte</button>`;
+  // Cas « nouveau compte Administration » : le rôle est déjà connu (Administration),
+  // pas besoin de le refaire choisir dans un menu déroulant — un champ fixe suffit.
+  const roleField=fromRoleChoice
+    ? `<label>Votre rôle dans cet établissement<input value="Administration" disabled><input type="hidden" id="reqRole" value="administration"></label>`
+    : `<label>Votre rôle dans cet établissement<select id="reqRole"><option value="administration">Administration</option><option value="proviseur">Proviseur</option><option value="professeur">Professeur</option><option value="eleve">Élève</option><option value="parent">Parent</option></select></label>`;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step">${backBtn}<span>Nouvelle demande</span></div><div><span class="auth-kicker">Création d’un établissement</span><h2>Présenter un établissement à Aurore</h2><p class="auth-sub">${fromRoleChoice?'Un compte Administration ne peut pas rejoindre un établissement déjà présent sur Aurore : proposez votre établissement, il sera examiné par l’Administration générale Aurore avant publication.':'Toute personne peut proposer un établissement. La demande reste privée jusqu’à sa validation par l’Administration générale Aurore.'}</p></div><div class="request-form-card"><form class="request-form" id="establishmentRequestForm" onsubmit="submitEstablishmentRequest(event)"><div class="request-grid"><label>Nom de l’établissement<input id="reqNom" required placeholder="Nom officiel"></label><label>Type<select id="reqType"><option>Lycée</option><option>Collège</option><option>Université</option><option>Institut</option><option>Centre de formation</option></select></label><label>Ville<input id="reqVille" placeholder="Ville"></label><label>Commune<input id="reqCommune" placeholder="Commune"></label><label>Adresse<input id="reqAdresse" placeholder="Adresse ou secteur"></label><label>Téléphone<input id="reqTelephone" placeholder="Numéro de contact"></label><label>E-mail de l’établissement<input id="reqEmail" type="email" placeholder="contact@etablissement.bf"></label><label>Site web<input id="reqSite" type="url" placeholder="https://…"></label><div class="request-logo-upload"><label>Photo / logo de l’établissement<input id="reqPhotoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="previewRequestLogo(event)"></label><img id="reqPhotoPreview" class="request-logo-preview" alt="Aperçu du logo"></div>${roleField}</div><label>Description<textarea id="reqDescription" placeholder="Présentez l’établissement, ses formations, son fonctionnement et les informations utiles."></textarea></label><label>Motif de la demande<textarea id="reqJustification" placeholder="Expliquez pourquoi cet établissement doit rejoindre Aurore."></textarea></label><div class="auth-actions"><button class="auth-primary" type="submit">Envoyer la demande</button></div><div id="requestMessage" class="auth-message"></div></form></div></section>`;
 }
 
 async function submitEstablishmentRequest(event){
@@ -2845,6 +2862,11 @@ function appliquerTheme(choix){
   async function startGoogle(){
     if(googleBusy)return;
     googleBusy=true;
+    // Filet de sécurité posé en tout premier, avant tout await : si pour une
+    // raison quelconque le site n'était plus verrouillé au moment du clic, on
+    // le reverrouille immédiatement pour qu'aucune page du site ne puisse
+    // jamais apparaître pendant l'attente du SDK / de la redirection Google.
+    document.body.classList.add('site-locked','auth-initializing');
     try{sessionStorage.setItem('aurore-google-oauth-pending','1');}catch(_){}
     setGoogleLoading(true);
     afficherVeuillezPatienter('Connexion sécurisée avec Google…');
@@ -3034,6 +3056,19 @@ function appliquerTheme(choix){
     auroreInitAuth();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+
+  // Protection contre le cache de navigation (bfcache) : sur mobile, quand
+  // l'aller-retour vers Google est très rapide, certains navigateurs peuvent
+  // restaurer une version figée de CETTE page (telle qu'elle était juste avant
+  // le clic sur « Continuer avec Google ») au lieu de charger la vraie réponse
+  // du serveur — l'utilisateur voit alors un instant la page du site avant que
+  // l'écran de finalisation ne prenne le relais. `pageshow` avec
+  // `event.persisted` détecte précisément ce cas ; on force un rechargement
+  // propre pour repartir sur l'état verrouillé initial plutôt que sur un DOM
+  // obsolète (jeton PKCE potentiellement déjà consommé, variables JS périmées).
+  window.addEventListener('pageshow',function(e){
+    if(e.persisted){window.location.reload();}
+  });
 })();
 </script>
 </body>
