@@ -2096,8 +2096,11 @@ const loadData=loadInstituts;
 window.addEventListener('popstate',e=>handleHash(e.state));
 // Démarrage non bloquant : l’interface est peinte immédiatement, puis les données et la session arrivent en parallèle.
 try{ if(!data.length){ data=demoData.map(normalize); render(); } }catch(_){ }
-Promise.allSettled([loadInstituts()]).then(()=>handleHash());
 handleHash();
+// Le premier écran de connexion doit être affiché avant les requêtes publiques.
+// Les données des établissements sont chargées juste après le premier rendu.
+const deferPublicData=window.requestIdleCallback||((cb)=>setTimeout(cb,120));
+deferPublicData(()=>{loadInstituts().catch(()=>{});});
 
 
 function appliquerCouleur(couleur){
@@ -2888,7 +2891,7 @@ function appliquerTheme(choix){
   // également les attentes infinies sur certains réseaux mobiles.
   function creerClientAuthGoogle(){
     const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:false,detectSessionInUrl:false,storage:window.localStorage}
+      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,storage:window.localStorage,experimental:{appendPkceFlowIdToRedirects:true}}
     });
     brancherEvenementsAuth(client);
     return client;
@@ -3000,8 +3003,6 @@ function appliquerTheme(choix){
     afficherVeuillezPatienter('Connexion sécurisée avec Google…');
     accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
     try{
-      // Nettoyage ciblé du verifier précédent, exactement avant une NOUVELLE tentative.
-      try{localStorage.removeItem('sb-fdstrbqvkemtjyxxaxbj-auth-token-code-verifier');}catch(_){}
       const c=await assurerClientAuthGoogle();
       const redirectTo=window.location.origin+window.location.pathname;
       const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
@@ -3034,13 +3035,17 @@ function appliquerTheme(choix){
     try{
       afficherVeuillezPatienter('Finalisation de votre connexion Google…');
       const c=await assurerClientAuthGoogle();
-      const {data,error}=await c.auth.exchangeCodeForSession(code);
+      const flowId=params.get('sb_flow_id');
+      const {data,error}=await c.auth.exchangeCodeForSession(code,flowId?{flowId}:undefined);
       if(error)throw error;
       const session=data?.session;
       if(!session?.access_token)throw new Error('Session Google introuvable après authentification.');
 
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+      // Le client Supabase persiste désormais aussi la session OAuth. Cela évite
+      // qu'un appel ultérieur à getSession() ou un rafraîchissement perde le compte.
+      await synchroniserSessionSupabase(session);
 
       // Important : on NE révèle PAS le site tout de suite. Tant que le profil et la
       // destination (choix de rôle / espace personnel) ne sont pas prêts, l'écran reste
@@ -3078,7 +3083,11 @@ function appliquerTheme(choix){
       try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
       console.error('[Google OAuth PKCE] callback impossible',err);
       setGoogleLoading(false);
-      recoverAuthScreen('La connexion Google n’a pas pu être finalisée. Réessayez.');
+      const msg=String(err?.message||'');
+      const friendly=/verifier|pkce|code.*(invalid|expired)|invalid.*code/i.test(msg)
+        ? 'La connexion Google a expiré ou a perdu sa vérification sécurisée. Relancez la connexion depuis Aurore.'
+        : 'La connexion Google n’a pas pu être finalisée. Réessayez.';
+      recoverAuthScreen(friendly);
       return true;
     }
   }
