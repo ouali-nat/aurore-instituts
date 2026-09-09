@@ -44,6 +44,11 @@ main{padding:18px 0 70px}.hero{position:relative;overflow:hidden;border-radius:3
 .profile-site{display:grid;gap:16px;max-width:980px;margin:0 auto}.profile-site>.profile-hero{border-radius:24px}.profile-hero{display:grid;grid-template-columns:230px 1fr;min-height:270px}.profile-cover{grid-column:1;height:100%;min-height:270px;background:var(--panel2);background-size:cover;background-position:center}.profile-logo-wrap{grid-column:1;grid-row:1;align-self:center;justify-self:center;padding:0;z-index:2}.profile-logo{width:170px;height:170px;margin:0;border-radius:30px;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line);box-shadow:0 16px 35px rgba(0,0,0,.18);overflow:hidden;font-family:Georgia,serif;font-size:2rem;font-weight:850;color:var(--accent2)}.profile-content{grid-column:2;grid-row:1;padding:38px 36px;align-self:center}.profile-content h1{font-size:clamp(1.8rem,4vw,3rem);margin-top:8px}.profile-description{color:var(--muted);margin-top:12px;font-size:.88rem;line-height:1.7}.profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}.profile-actions button,.back-btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:9px 12px;font-size:.74rem;font-weight:750}.profile-library{display:grid;grid-template-columns:1fr 170px;align-items:center;gap:24px;padding:26px 28px;border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:var(--shadow)}.profile-library-main{max-width:650px}.profile-section-kicker{display:inline-block;color:var(--accent2);font-size:.62rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.profile-library h2,.profile-description-card h3,.profile-contact-block h3{margin-top:7px}.profile-library p,.profile-description-card p,.profile-contact-block p{color:var(--muted);font-size:.8rem;line-height:1.7;margin-top:7px}.profile-library button,.profile-contact-actions button{margin-top:15px;border:1px solid var(--line);border-radius:11px;padding:10px 14px;background:var(--panel2);color:var(--text);font-weight:750;font-size:.73rem}.profile-library-mark{min-width:150px;height:150px;border-radius:26px;display:grid;place-items:center;text-align:center;background:var(--panel2);border:1px solid var(--line);font-family:Georgia,serif;font-size:2rem;font-weight:900;color:var(--accent2);line-height:.85}.profile-library-mark span{font-family:inherit;font-size:.52rem;letter-spacing:.18em}.profile-info-grid{display:grid;grid-template-columns:.9fr 1.35fr;gap:16px}.profile-description-card{padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow)}.profile-description-card p{font-size:.88rem;margin-top:14px}.profile-list{display:grid;gap:0;margin-top:14px}.info-row{display:flex;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.75rem}.info-row:last-child{border-bottom:0}.info-row span{color:var(--muted)}.info-row b{font-weight:750;text-align:right}.profile-location{padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow)}.profile-location h3{margin-top:6px}.location-map{margin-top:14px;min-height:105px;border:1px dashed var(--line);border-radius:15px;display:grid;place-items:center;text-align:center;background:var(--panel2);color:var(--muted);font-size:.74rem}.profile-contact-block{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow)}.profile-contact-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.profile-contact-actions button{margin-top:0}.profile-contact-empty{color:var(--muted);font-size:.75rem}.profile-news,.profile-gallery,.profile-panel{padding:22px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow)}.profile-news h3,.profile-gallery h3,.profile-panel h3{margin-top:6px}.profile-news p,.profile-gallery p,.profile-panel p{color:var(--muted);font-size:.78rem;line-height:1.65;margin-top:6px}@media(max-width:760px){.profile-hero{grid-template-columns:1fr;min-height:0}.profile-cover{grid-column:1;grid-row:1;height:190px;min-height:190px}.profile-logo-wrap{grid-column:1;grid-row:1;align-self:end;margin-bottom:-58px}.profile-logo{width:116px;height:116px;border-radius:22px}.profile-content{grid-column:1;grid-row:2;padding:78px 22px 24px}.profile-library{grid-template-columns:1fr;padding:22px}.profile-library-mark{min-width:100%;height:92px;border-radius:18px}.profile-info-grid{grid-template-columns:1fr}.profile-contact-block{align-items:flex-start;flex-direction:column}.profile-contact-actions{justify-content:flex-start;width:100%}.profile-contact-actions button{width:100%}}.profile-library-mark{min-width:100%;height:100px;border-radius:20px}.profile-info-grid{grid-template-columns:1fr}.profile-contact-block{align-items:flex-start;flex-direction:column}.profile-contact-actions{justify-content:flex-start;width:100%}.profile-contact-actions button{width:100%}}
 
 @media(max-width:900px){.profile-top{grid-template-columns:1fr}.class-grid{grid-template-columns:repeat(2,1fr)}.support-card{grid-template-columns:1fr 1fr}.support-main{grid-column:1/-1}.fused-promise{grid-template-columns:1fr}.fused-items{grid-template-columns:1fr 1fr}}
+/* Retour accueil : contrôle toujours visible et clairement actionnable. */
+.personal-space-home-btn{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.personal-space-home-btn:hover{transform:translateY(-1px);border-color:var(--accent)!important;box-shadow:0 8px 20px rgba(0,0,0,.10)}
+.personal-space-home-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
 @media(max-width:700px){.profile-cover{height:170px}.profile-content,.profile-logo-wrap{padding-left:18px;padding-right:18px}.profile-logo{width:92px;height:92px;margin-top:-46px;border-radius:23px}.class-grid,.gallery-grid,.support-card{grid-template-columns:1fr}.support-main{grid-column:auto}.student-box{align-items:flex-start;flex-direction:column}.student-box button{width:100%}.fused-items{grid-template-columns:1fr}}
 
 /* ===== Aurore Instituts — thème inspiré d'Aurore Archives ===== */
@@ -1221,14 +1226,29 @@ let authViewVersion=0;
 function openAuthPage(options={}){
   restoreSiteLogo();
   const push=options.push!==false;
+  const transition=options.transition!==false;
+
+  // Si le lien est cliqué alors que l'on est déjà sur #compte, pushRoute() ne
+  // déclenche normalement aucune transition. On la force donc dans ce cas.
+  if(transition && location.hash==='#compte'){
+    startPageTransition('Ouverture de votre espace de connexion…',300);
+  }
+
   if(push && location.hash!=='#compte') pushRoute('#compte');
+
+  // Peindre immédiatement la bonne vue derrière l'animation : l'utilisateur
+  // ne revoit plus l'écran d'inscription pendant le chargement.
   $('homeView').classList.add('hide-home');
   $('profileView').classList.remove('show');
   $('authView').classList.add('show');
   document.body.classList.remove('spaces-focus');
   $('spacePanel')?.classList.remove('page-mode','visible');
   if(push) window.scrollTo({top:0,behavior:'auto'});
-  if(currentAuroreSession) renderAccountHome(); else renderAuthStart();
+
+  requestAnimationFrame(()=>{
+    if(currentAuroreSession) renderAccountHome();
+    else renderAuthStart();
+  });
 }
 
 function authMessage(text){const el=$('authMessage');if(el){el.style.display='block';el.textContent=text;}}
@@ -1517,9 +1537,9 @@ async function renderPersonalSpace(preloadedCtx=null){
   const dashboard=tiles.map(x=>`<article class="personal-dashboard-tile"><div class="ico">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('');
   const submissionNotice=personalSubmissionNotice?`<div class="profile-submit-success" role="status"><div class="profile-submit-success-icon">✓</div><div><strong>Inscription enregistrée</strong><p>${esc(personalSubmissionNotice)}</p></div></div>`:'';
    const body=complete
-    ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
+    ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome(true)" aria-label="Retour à l’accueil du site">← Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
     : pending
-      ? `${submissionNotice}<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
+      ? `${submissionNotice}<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome(true)" aria-label="Retour à l’accueil du site">← Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
       : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><button type="button" class="registration-back" onclick="personalRegistrationBack()" aria-label="Retour au choix du profil">← Retour au choix du profil</button><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><div class="profile-page-role"><span class="auth-kicker">Profil sélectionné</span><strong>${esc(roleLabels[role]||role)}</strong><small>Cette page est dédiée à votre profil.</small></div><input type="hidden" id="personalRole" value="${esc(role)}"><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
   root.innerHTML=`<section class="personal-space-view ${(!complete&&!pending)?'registration-modal-mode':''}"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
   personalSubmissionNotice='';
@@ -1966,13 +1986,13 @@ function saveRoutePosition(){
 }
 
 let pageTransitionTimer=null;
-function startPageTransition(text='Aurore prépare la page suivante…'){
+function startPageTransition(text='Aurore prépare la page suivante…',duration=340){
   const el=$('aurorePageTransition'); if(!el)return;
   if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
   const t=$('aurorePageTransitionText'); if(t)t.textContent=text;
   el.classList.add('show'); el.setAttribute('aria-hidden','false');
   document.body.classList.add('aurore-transitioning');
-  pageTransitionTimer=setTimeout(endPageTransition,560);
+  pageTransitionTimer=setTimeout(endPageTransition,duration);
 }
 function endPageTransition(){
   const el=$('aurorePageTransition'); if(!el)return;
@@ -3111,7 +3131,7 @@ function appliquerTheme(choix){
         // Aucun compte actif : l’animation d’introduction doit TOUJOURS précéder
         // l’ouverture de l’écran de choix Google. Le contenu public reste invisible.
         if(authWaitText)authWaitText.textContent='Ouverture de l’accès sécurisé…';
-        await new Promise(resolve=>setTimeout(resolve,520));
+        await new Promise(resolve=>setTimeout(resolve,220));
         cacherVeuillezPatienter();
         showPortal();
         document.body.classList.remove('auth-initializing');
