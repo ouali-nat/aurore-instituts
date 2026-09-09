@@ -1588,6 +1588,26 @@ function renderPersonalSpaceEdit(){
 
 async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   if(!currentAuroreSession)return;
+  // Le propriétaire Aurore est reconnu par son adresse et arrive directement
+  // dans son espace personnel de compte, sans passer par le choix de rôle.
+  const ownerEmail=String(currentAuroreSession.user?.email||'').trim().toLowerCase();
+  if(ownerEmail==='oualikevin9@gmail.com'){
+    window.__aurorePlatformAdmin=true;
+    if(currentAuroreProfile && currentAuroreProfile.role!=='admin_general'){
+      currentAuroreProfile={...currentAuroreProfile,role:'admin_general'};
+    }
+    restoreSiteLogo();
+    if(showWelcome){
+      accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Ouverture de votre espace personnel…`,'ok');
+      if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Ouverture de votre espace personnel…');
+      await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    }
+    $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');
+    if(location.hash!=='#mon-espace')pushRoute('#mon-espace');
+    await renderAccountHome();
+    if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();
+    return;
+  }
   // Chemin critique Google : pour un nouveau compte, aucune requête « mes espaces »
   // n'est nécessaire avant l'écran de choix du rôle.
   const actuallyNew=!hasChosenRoleEver();
@@ -1654,7 +1674,8 @@ async function renderAccountHome(){
   if(isPlatformAdmin && !roles.includes('admin_general')) roles.unshift('admin_general');
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
-  const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+  const configuredSpaces=[...spaces].sort((a,b)=>String(a.etablissement_nom||'').localeCompare(String(b.etablissement_nom||''),'fr',{sensitivity:'base'})||String(a.role||'').localeCompare(String(b.role||''),'fr',{sensitivity:'base'}));
+   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
   const configureBtn=isPlatformAdmin?`<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace${spaces.length>=10?' (limite atteinte)':''}</button></div>`:'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
@@ -2006,6 +2027,7 @@ async function loadSupport(){
 const ROUTE_STATE_KEY='aurore-route-state';
 let applyingRoute=false;
 let lastHandledHash='';
+let currentSpaceEstablishmentId='';
 
 function saveRoutePosition(){
   try{history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);}catch(_){ }
@@ -2066,12 +2088,22 @@ function handleHash(eventState=null){
       const e=data.find(x=>String(x.slug||x.id)===key);
       if(e) openProfile(e.id,{push:false}); else showHome(false);
     }else if(h.startsWith('#espace/')){
-      const parts=h.slice('#espace/'.length).split('/').filter(Boolean);
-      if(parts[0]) openSpace(parts[0],{push:false,tool:parts[1]||null}); else showHome(false);
+      const rawSpace=h.slice('#espace/'.length);
+      const [spacePath,spaceQuery='']=rawSpace.split('?');
+      const parts=spacePath.split('/').filter(Boolean);
+      const spaceParams=new URLSearchParams(spaceQuery);
+      const routeEtab=spaceParams.get('etab')||'';
+      if(parts[0]) openSpace(parts[0],{push:false,tool:parts[1]||null,etablissementId:routeEtab}); else showHome(false);
     }else if(h==='#mon-espace'){
       if(currentAuroreSession){
         openAuthPage({push:false});
-        renderPersonalSpace();
+        const ownerEmail=String(currentAuroreSession.user?.email||'').trim().toLowerCase();
+        if(ownerEmail==='oualikevin9@gmail.com'){
+          window.__aurorePlatformAdmin=true;
+          renderAccountHome();
+        }else{
+          renderPersonalSpace();
+        }
       }else{
         openAuthPage({push:false});
       }
@@ -2134,6 +2166,8 @@ function openSpacesLanding(){
 
 async function openSpace(role,options={}){
   options=options||{};
+  if(role!=='general' && options.etablissementId) currentSpaceEstablishmentId=String(options.etablissementId);
+  else if(role!=='general' && !options.etablissementId && currentSpaceEstablishmentId) options.etablissementId=currentSpaceEstablishmentId;
   if(role==='general') {
     const session=currentAuroreSession;
     if(!session){openAuthPage();return;}
@@ -2165,7 +2199,8 @@ async function openSpace(role,options={}){
     }
   }
   const push=options.push!==false;
-  const route=`#espace/${encodeURIComponent(role)}${options.tool?'/'+encodeURIComponent(options.tool):''}`;
+  const etabParam=(role!=='general'&&(options.etablissementId||currentSpaceEstablishmentId))?`?etab=${encodeURIComponent(options.etablissementId||currentSpaceEstablishmentId)}`:'';
+  const route=`#espace/${encodeURIComponent(role)}${options.tool?'/'+encodeURIComponent(options.tool):''}${etabParam}`;
   if(push && location.hash!==route) pushRoute(route);
   document.body.classList.add('spaces-focus');
   const existingSpacePanel=document.getElementById('spacePanel');
@@ -2405,7 +2440,7 @@ async function adminElevesView(){
 }
 async function getAdminInstituteIds(){
   const token=currentAuroreSession?.access_token||'';if(!token)return[];
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}'});const rows=r.ok?await r.json():[];return rows.filter(x=>['administration','proviseur'].includes(x.role)&&x.etablissement_id).map(x=>x.etablissement_id);}catch(_){return[]}
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}'});const rows=r.ok?await r.json():[];const ids=rows.filter(x=>['administration','proviseur'].includes(x.role)&&x.etablissement_id).map(x=>x.etablissement_id);if(currentSpaceEstablishmentId&&ids.includes(currentSpaceEstablishmentId))return [currentSpaceEstablishmentId];return ids;}catch(_){return[]}
 }
 async function loadAdminClasses(){
   const board=$('adminClassBoard'),requests=$('classRequestList');if(!board)return;const token=currentAuroreSession?.access_token||'';const ids=await getAdminInstituteIds();if(!ids.length){board.innerHTML='<div class="admin-card">Aucun établissement administré n’a été trouvé pour ce compte.</div>';if(requests)requests.innerHTML='<div class="admin-card">Aucune demande disponible.</div>';return;}
@@ -2432,7 +2467,7 @@ async function loadClassRequests(ids){const token=currentAuroreSession?.access_t
 async function adminDisciplinesView(){
   const root=$('spaceDashboard');if(!root)return;
   const ids=await getAdminInstituteIds();
-  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Professeurs</span><h3>Disciplines de l’établissement</h3><p>Créez les disciplines que les professeurs pourront sélectionner dans leur dossier.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div class="class-create-card"><form class="class-create-grid" onsubmit="event.preventDefault();createInstituteDiscipline()"><label>Nouvelle discipline<input id="newDisciplineName" required placeholder="Ex. Mathématiques"></label><button class="auth-primary" type="submit" id="newDisciplineBtn">＋ Ajouter la discipline</button></form><div id="disciplineAdminMessage" class="class-select-note"></div></div><div id="disciplineAdminList" class="space-list"><div class="admin-card">Chargement…</div></div></section>`;
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Professeurs</span><h3>Disciplines de l’établissement</h3><p>Créez les disciplines que les professeurs pourront sélectionner dans leur dossier.</p></div><button class="space-back" type="button" onclick="openSpace('administration',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})">Retour aux rubriques</button></div><div class="class-create-card"><form class="class-create-grid" onsubmit="event.preventDefault();createInstituteDiscipline()"><label>Nouvelle discipline<input id="newDisciplineName" required placeholder="Ex. Mathématiques"></label><button class="auth-primary" type="submit" id="newDisciplineBtn">＋ Ajouter la discipline</button></form><div id="disciplineAdminMessage" class="class-select-note"></div></div><div id="disciplineAdminList" class="space-list"><div class="admin-card">Chargement…</div></div></section>`;
   await loadAdminDisciplines(ids[0]||'');
 }
 async function loadAdminDisciplines(etabId){
@@ -2448,7 +2483,7 @@ async function deleteInstituteDiscipline(id){if(!confirm('Supprimer cette discip
 async function adminProfesseursView(){
   const root=$('spaceDashboard');if(!root)return;
   const ids=await getAdminInstituteIds(),token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
-  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Professeurs</span><h3>Profils des professeurs</h3><p>Les dossiers validés sont automatiquement associés à ce bloc avec les informations transmises par chaque professeur.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div id="validatedTeachers" class="space-list"><div class="admin-card">Chargement des profils validés…</div></div></section>`;
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Professeurs</span><h3>Profils des professeurs</h3><p>Les dossiers validés sont automatiquement associés à ce bloc avec les informations transmises par chaque professeur.</p></div><button class="space-back" type="button" onclick="openSpace('administration',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})">Retour aux rubriques</button></div><div id="validatedTeachers" class="space-list"><div class="admin-card">Chargement des profils validés…</div></div></section>`;
   const box=$('validatedTeachers');if(!box||!ids.length)return;
   try{
     const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.valide&role=eq.professeur&select=id,created_at,informations,avatar_url,profiles(prenom,nom,full_name,avatar_url,role)&order=created_at.desc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));
@@ -2460,7 +2495,7 @@ async function adminProfesseursView(){
 
 async function adminInscriptionsView(){
   const root=$('spaceDashboard');if(!root)return;
-  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Inscriptions</span><h3>Demandes de profils</h3><p>Examinez chaque dossier, consultez les informations et acceptez ou refusez l’accès à l’établissement.</p></div><button class="space-back" type="button" onclick="openSpace('administration')">Retour aux rubriques</button></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des dossiers…</div></div></section>`;
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Inscriptions</span><h3>Demandes de profils</h3><p>Examinez chaque dossier, consultez les informations et acceptez ou refusez l’accès à l’établissement.</p></div><button class="space-back" type="button" onclick="openSpace('administration',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})">Retour aux rubriques</button></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des dossiers…</div></div></section>`;
   await loadMemberRequestsAdmin();
 }
 async function loadMemberRequestsAdmin(){
@@ -2504,7 +2539,8 @@ async function renderStudentClassDashboard(root,common){
 }
 
 function openSpaceTool(role,key){
-  const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}`;
+  const etabParam=(role!=='general'&&currentSpaceEstablishmentId)?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
+  const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}${etabParam}`;
   if(location.hash!==route) pushRoute(route);
   const panel=document.getElementById('spacePanel');
   if(!panel)return;
@@ -2517,7 +2553,7 @@ function openSpaceTool(role,key){
   if(role==='administration' && key==='admin-professeurs'){ adminProfesseursView(); return; }
   if(role==='administration' && key==='admin-disciplines'){ adminDisciplinesView(); return; }
   if(role==='administration' && key==='inscriptions'){ adminInscriptionsView(); return; }
-  const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
+  const common=`<button class="space-back" type="button" onclick="openSpace('${role}',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})">Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
