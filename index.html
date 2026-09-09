@@ -1675,7 +1675,7 @@ async function renderAccountHome(){
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
   const configuredSpaces=[...spaces].sort((a,b)=>String(a.etablissement_nom||'').localeCompare(String(b.etablissement_nom||''),'fr',{sensitivity:'base'})||String(a.role||'').localeCompare(String(b.role||''),'fr',{sensitivity:'base'}));
-   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}" role="button" tabindex="0" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="event.stopPropagation();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="event.stopPropagation();removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
   const configureBtn=isPlatformAdmin?`<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace${spaces.length>=10?' (limite atteinte)':''}</button></div>`:'';
   root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
@@ -2186,10 +2186,16 @@ async function openSpace(role,options={}){
     if(!token){openAuthPage();return;}
     const profileId=currentAuroreProfile?.id||currentAuroreSession?.user?.id||'';
     let allowed=false;
+    const accountEmail=String(currentAuroreSession?.user?.email||'').trim().toLowerCase();
+    // Le propriétaire Aurore peut ouvrir directement les espaces déjà configurés
+    // depuis son compte, sans être renvoyé vers l'écran de configuration.
+    if(accountEmail==='oualikevin9@gmail.com' && options.etablissementId){
+      allowed=true;
+    }
     try{
       const etabFilter=options.etablissementId?`&etablissement_id=eq.${encodeURIComponent(options.etablissementId)}`:'';
       const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_membres?profile_id=eq.${encodeURIComponent(profileId)}&role=eq.${encodeURIComponent(role)}${etabFilter}&statut=eq.valide&select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`}});
-      allowed=r.ok&&(await r.json()).length>0;
+      if(!allowed) allowed=r.ok&&(await r.json()).length>0;
     }catch(_){}
     if(!allowed){
       selectedOnboardingRole=role;
@@ -2647,25 +2653,48 @@ async function confirmRefusal(){
   await decideEstablishmentRequest(pendingEstablishmentDecision.id,'refusee',reason,true,code);
 }
 async function decideEstablishmentRequest(id,statut,commentaire=null,fromModal=false,motifCode=null){
-  if(statut==='refusee'&&!commentaire){
+  if(!id||!['validee','refusee'].includes(statut))return;
+  // Pour un refus, le motif codifié suffit : les motifs prédéfinis
+  // n'ont volontairement pas de texte libre. Seul « Autre » exige
+  // une précision dans le champ commentaire.
+  if(statut==='refusee'&&!motifCode){
     const row=document.querySelector(`[onclick*="decideEstablishmentRequest('${id}','refusee')"]`);
     const article=row?.closest('.request-card');
     openRefusalModal(id,article?.querySelector('h3')?.textContent||'cet établissement');
     return;
   }
   if(!fromModal && statut==='validee'&&!confirm('Valider cette demande et publier l’établissement dans l’annuaire Aurore ?'))return;
+
+  // Récupère toujours le jeton le plus récent : un ancien access_token peut
+  // laisser le bouton visuellement cliquable alors que Supabase refuse l'appel RPC.
+  let busyButton=null;
+  if(statut==='validee'){
+    busyButton=document.querySelector(`[onclick*="decideEstablishmentRequest('${id}','validee')"]`);
+    if(busyButton){busyButton.disabled=true;busyButton.dataset.oldText=busyButton.textContent;busyButton.textContent='Validation…';}
+  }
   try{
-    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'};
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_etablissement`,{method:'POST',headers:h,body:JSON.stringify({p_demande_id:id,p_decision:statut,p_motif:commentaire||null,p_motif_code:motifCode||null})});
+    const freshToken=await getFreshAccessToken();
+    if(!freshToken)throw new Error('Session expirée. Veuillez vous reconnecter.');
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${freshToken}`,'Content-Type':'application/json','Prefer':'return=representation'};
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_etablissement`,{
+      method:'POST',headers:h,
+      body:JSON.stringify({p_demande_id:id,p_decision:statut,p_motif:commentaire||null,p_motif_code:motifCode||null})
+    });
     const b=await r.json().catch(()=>null);
-    if(!r.ok)throw new Error(b?.message||b?.hint||b?.details||'Opération impossible.');
+    if(!r.ok)throw new Error(b?.message||b?.hint||b?.details||`Impossible d’enregistrer la décision (${r.status}).`);
+    if(!b)throw new Error('Supabase n’a pas confirmé la décision.');
     if(statut==='refusee')closeDecisionModal();
     await Promise.all([loadAdminRequests(),loadAdminOverview(),loadInstituts()]);
+    if(statut==='validee')alert('Demande validée avec succès. L’établissement est maintenant publié dans l’annuaire Aurore.');
   }catch(e){
+    console.error('Aurore — décision demande établissement:',e);
     if(statut==='refusee'&&fromModal){if($('decisionMessage'))$('decisionMessage').textContent=e.message||'Impossible d’enregistrer le refus.';}
     else alert(e.message||'Opération impossible.');
+  }finally{
+    if(busyButton){busyButton.disabled=false;busyButton.textContent=busyButton.dataset.oldText||'Valider et publier';}
   }
 }
+window.decideEstablishmentRequest=decideEstablishmentRequest;
 
 let lastAdminStatusKind=null;
 async function refreshAdminStatusView(){
