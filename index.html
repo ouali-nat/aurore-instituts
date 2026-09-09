@@ -14,4 +14,16 @@
 <link rel="preconnect" href="https://fdstrbqvkemtjyxxaxbj.supabase.co" crossorigin>
 <link rel="preconnect" href="https://aurore-instituts-r2.oualikevin9.workers.dev" crossorigin>
 
-PLACEHOLDER_WILL_NOT_USE
+<script>
+(function(){
+  try{
+    const saved=localStorage.getItem('aurore-instituts-theme')||'systeme';
+    const actual=saved==='systeme'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')
+      : (saved==='clair'?'light':'dark');
+    document.documentElement.setAttribute('data-theme',actual);
+    document.documentElement.setAttribute('data-theme-choice',saved);
+    var c=localStorage.getItem('aurore-instituts-color-theme')||'violet'; document.documentElement.setAttribute('data-color-theme',c);
+  }catch(e){}
+})();
+</script>
