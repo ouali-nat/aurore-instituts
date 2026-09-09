@@ -818,7 +818,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
   @media(max-width:700px){.personal-space-card{padding:20px;border-radius:22px}.role-choice-wrap{padding-top:12px}}
 </style>
 <style id="aurore-page-transition">
-.aurore-page-transition{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,13,18,.50);backdrop-filter:blur(18px) saturate(1.18);-webkit-backdrop-filter:blur(18px) saturate(1.18);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,visibility .28s ease}
+.aurore-page-transition{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,13,18,.50);backdrop-filter:blur(18px) saturate(1.18);-webkit-backdrop-filter:blur(18px) saturate(1.18);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .20s ease,visibility .20s ease}
 .aurore-page-transition::before,.aurore-page-transition::after{content:"";position:absolute;width:34vmax;height:34vmax;border-radius:50%;filter:blur(50px);opacity:.16;pointer-events:none;background:var(--accent)}
 .aurore-page-transition::before{top:-14vmax;left:-10vmax;animation:auroreFloatA 5s ease-in-out infinite}.aurore-page-transition::after{right:-12vmax;bottom:-16vmax;animation:auroreFloatB 6s ease-in-out infinite}
 .aurore-page-transition.show{opacity:1;visibility:visible;pointer-events:all}
@@ -831,7 +831,7 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
 .aurore-page-transition-card strong{position:relative;display:block;font-size:1.08rem;letter-spacing:-.01em}.aurore-page-transition-card span{position:relative;display:block;margin-top:7px;color:var(--muted);font-size:.78rem;line-height:1.55}
 .aurore-page-transition-progress{position:relative;height:4px;margin:20px auto 0;width:min(250px,78%);overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--accent) 10%,var(--line))}.aurore-page-transition-progress::after{content:"";position:absolute;inset:0;width:42%;border-radius:inherit;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:auroreProgress 1.15s ease-in-out infinite}
 @keyframes aurorePageSpin{to{transform:rotate(360deg)}}@keyframes aurorePulse{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.18);opacity:0}}@keyframes auroreProgress{0%{transform:translateX(-145%)}100%{transform:translateX(340%)}}@keyframes auroreFloatA{50%{transform:translate(7vw,5vh) scale(1.12)}}@keyframes auroreFloatB{50%{transform:translate(-6vw,-4vh) scale(.9)}}
-body.aurore-transitioning{overflow:hidden!important}@media(max-width:430px){.aurore-page-transition-card{padding:26px 19px 22px;border-radius:24px}.aurore-page-transition-icon{width:64px;height:64px;border-radius:20px}.aurore-page-transition-icon svg{width:29px;height:29px}}@media(prefers-reduced-motion:reduce){.aurore-page-transition-icon::before,.aurore-page-transition-icon svg,.aurore-page-transition-progress::after,.aurore-page-transition::before,.aurore-page-transition::after{animation:none}.aurore-page-transition-card{transition:none}}
+body.aurore-transitioning{overflow-x:hidden!important}@media(max-width:430px){.aurore-page-transition-card{padding:26px 19px 22px;border-radius:24px}.aurore-page-transition-icon{width:64px;height:64px;border-radius:20px}.aurore-page-transition-icon svg{width:29px;height:29px}}@media(prefers-reduced-motion:reduce){.aurore-page-transition-icon::before,.aurore-page-transition-icon svg,.aurore-page-transition-progress::after,.aurore-page-transition::before,.aurore-page-transition::after{animation:none}.aurore-page-transition-card{transition:none}}
 </style>
 
 <style id="aurore-personal-registration-modal">
@@ -960,6 +960,48 @@ button,input,select,textarea{max-width:100%}
 }
 @media (prefers-reduced-motion:reduce){
   .school-student-card,.admin-request-card-modern{transition:none!important}
+}
+</style>
+
+<style id="aurore-browser-fit">
+/* Ajustement automatique au viewport — principe « Ajuster à la largeur » */
+html{width:100%;min-width:0;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{max-width:100%}
+img,svg,video,canvas,iframe{max-width:100%;height:auto}
+.wrap{width:min(1160px,calc(100% - 32px));max-width:1160px}
+main{width:100%;min-width:0}
+button,input,select,textarea{max-width:100%;min-width:0}
+.grid,.modules,.promise,.spaces-grid,.space-tools-grid,.admin-grid,.request-grid,.class-grid,.gallery-grid,.support-card,.personal-profile-grid,.personal-dashboard-grid,.accepted-grid,.config-test-grid,.configured-list,.role-choice-grid,.student-class-grid,.member-request-card{min-width:0}
+.card,.module,.stat,.space-panel,.space-dashboard,.auth-card,.auth-side,.profile-content,.profile-hero,.hero,.section-head{min-width:0}
+.table-wrap,.table-scroll,.overflow-auto{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{max-width:none;width:100%;border-collapse:collapse}
+pre{max-width:100%;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.long-text,.email-text,.account-email,.request-copy,.request-detail-grid,.profile-fields-grid{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:760px){
+  .wrap{width:calc(100% - 24px)}
+  main{padding-top:10px}
+  .hero{width:100%;padding-left:clamp(16px,5vw,24px);padding-right:clamp(16px,5vw,24px)}
+  .section-head{gap:10px;flex-wrap:wrap}
+  .section-head>*{min-width:0}
+  .toolbar,.toolbar-grid{grid-template-columns:1fr!important}
+  .toolbar .control:first-child{grid-column:auto!important}
+}
+@media(max-width:480px){
+  .wrap{width:calc(100% - 18px)}
+  h1{font-size:clamp(2rem,11vw,3rem);line-height:1.04}
+  .copy{font-size:.92rem}
+  .hero{border-radius:22px}
+  .card,.module,.stat{border-radius:18px}
+  .head{min-height:62px}
+}
+@media(min-width:1400px){
+  .wrap{width:min(1240px,calc(100% - 64px));max-width:1240px}
+}
+@media(orientation:landscape) and (max-height:560px){
+  header{position:relative}
+  main{padding-bottom:32px}
+  .hero{padding-top:32px;padding-bottom:28px}
 }
 </style>
 </head>
@@ -2199,11 +2241,12 @@ function saveRoutePosition(){
 }
 
 let pageTransitionTimer=null;
+let pendingRouteTransition='';
 const auroreRouteTransitionNames={accueil:'Aurore revient à l’accueil…',annuaire:'Aurore ouvre l’annuaire…',archives:'Aurore ouvre les archives…',instituts:'Aurore ouvre les instituts…',espace:'Aurore prépare votre espace…',administration:'Aurore ouvre l’administration…',inscriptions:'Aurore charge les demandes d’inscription…','admin-eleves':'Aurore charge la gestion des élèves…','admin-classe':'Aurore ouvre la classe…','admin-etablissements':'Aurore charge les établissements…'};
 function auroreTransitionMessage(hash){const raw=String(hash||'').toLowerCase();for(const [key,msg] of Object.entries(auroreRouteTransitionNames)){if(raw.includes(key))return msg}return 'Aurore prépare la page suivante…'}
-function startPageTransition(text='Aurore prépare la page suivante…',duration=700){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);const t=$('aurorePageTransitionText');if(t)t.textContent=text;el.classList.add('show');el.setAttribute('aria-hidden','false');document.body.classList.add('aurore-transitioning');pageTransitionTimer=setTimeout(endPageTransition,duration)}
-function endPageTransition(){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);pageTransitionTimer=null;el.classList.remove('show');el.setAttribute('aria-hidden','true');document.body.classList.remove('aurore-transitioning')}
-function pushRoute(hash){startPageTransition(auroreTransitionMessage(hash),700);saveRoutePosition();history.pushState({scrollY:0},'',hash)}
+function startPageTransition(text='Aurore prépare la page suivante…',duration=280){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);const t=$('aurorePageTransitionText');if(t)t.textContent=text;el.classList.add('show');el.setAttribute('aria-hidden','false');pageTransitionTimer=setTimeout(endPageTransition,duration)}
+function endPageTransition(){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);pageTransitionTimer=null;el.classList.remove('show');el.setAttribute('aria-hidden','true')}
+function pushRoute(hash){pendingRouteTransition=String(hash||'');saveRoutePosition();history.pushState({scrollY:0},'',hash);startPageTransition(auroreTransitionMessage(hash),280)}
 
 function restoreRoutePosition(state){
   const y=Number(state?.scrollY);
@@ -2212,8 +2255,9 @@ function restoreRoutePosition(state){
 
 function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
-  if(lastHandledHash && h!==lastHandledHash) startPageTransition(auroreTransitionMessage(h),700);
+  if(lastHandledHash && h!==lastHandledHash && pendingRouteTransition!==h) startPageTransition(auroreTransitionMessage(h),280);
   if(h===lastHandledHash && eventState!==null)return;
+  if(pendingRouteTransition===h) pendingRouteTransition='';
   lastHandledHash=h;
   applyingRoute=true;
   try{
@@ -2274,7 +2318,7 @@ function handleHash(eventState=null){
     applyingRoute=false;
     if(pageTransitionTimer) {
       clearTimeout(pageTransitionTimer);
-      pageTransitionTimer=setTimeout(endPageTransition,260);
+      pageTransitionTimer=setTimeout(endPageTransition,120);
     }
   }
 }
@@ -2437,25 +2481,30 @@ async function openSpace(role,options={}){
 
 async function switchGoogleAccount(){
   const btn=document.getElementById('switchGoogleAccountBtn');
-  if(btn?.disabled)return;
+  if(btn?.disabled)return false;
   if(btn){btn.disabled=true;btn.textContent='Ouverture de Google…';}
   try{
-    sessionStorage.setItem('aurore-google-oauth-pending','1');
-    sessionStorage.setItem('aurore-google-switch-admin','1');
+    document.body.classList.add('site-locked','auth-initializing');
+    try{sessionStorage.setItem('aurore-google-oauth-pending','1');sessionStorage.setItem('aurore-google-switch-admin','1');}catch(_){}
     const c=await assurerClientAuthGoogle();
-    await c.auth.signOut({scope:'local'}).catch(()=>{});
-    currentAuroreSession=null;currentAuroreProfile=null;window.__auroreAuthenticated=false;
-    try{localStorage.removeItem('aurore-session');}catch(_){ }
+    // Ne pas fermer la session Supabase avant OAuth : cela peut interrompre
+    // le flux dans certains navigateurs. Google impose le choix du compte.
     const redirectTo=window.location.origin+window.location.pathname+'#compte';
-    const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
+    const {error}=await c.auth.signInWithOAuth({
+      provider:'google',
+      options:{redirectTo,queryParams:{prompt:'select_account'}}
+    });
     if(error)throw error;
   }catch(err){
-    try{sessionStorage.removeItem('aurore-google-switch-admin');sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){ }
+    try{sessionStorage.removeItem('aurore-google-switch-admin');sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
+    document.body.classList.remove('auth-initializing');
     console.error('[Google] changement de compte impossible',err);
-    authMessage(err?.message||'Impossible de changer de compte Google.');
+    authMessage(err?.message||'Impossible d’ouvrir Google pour changer de compte.');
     if(btn){btn.disabled=false;btn.textContent='Changer de compte Google';}
   }
+  return false;
 }
+
 window.switchGoogleAccount=switchGoogleAccount;
 
 window.openSpace=openSpace;
@@ -3668,9 +3717,6 @@ function appliquerTheme(choix){
     if(e.persisted){window.location.reload();}
   });
 })();
-</script>
-<script id="aurore-global-navigation-loader">
-(function(){if(window.__auroreGlobalNavigationLoader)return;window.__auroreGlobalNavigationLoader=true;document.addEventListener('click',function(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target.closest?.('a[href]');if(!a)return;const href=a.getAttribute('href')||'';if(!href.startsWith('#'))return;const target=new URL(href,location.href).hash;if(!target||target===location.hash)return;const label=(a.textContent||'').replace(/\s+/g,' ').trim();startPageTransition(label?'Aurore ouvre « '+label.slice(0,52)+' »…':auroreTransitionMessage(target),700)},true);window.addEventListener('popstate',function(){startPageTransition(auroreTransitionMessage(location.hash),650)})})();
 </script>
 </body>
 </html>
