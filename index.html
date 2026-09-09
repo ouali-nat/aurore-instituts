@@ -12,6 +12,7 @@
      premier appel réseau (connexion, chargement des établissements) pour le
      faire. Gain net sur mobile, surtout en 3G/4G. -->
 <link rel="preconnect" href="https://fdstrbqvkemtjyxxaxbj.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://aurore-instituts.oualikevin9.workers.dev" crossorigin>
 
 <script>
@@ -294,7 +295,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
 #decisionReasonCode{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit}
 
 .member-valid-badge{align-self:start;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.12);color:#15803d;font-size:.68rem;font-weight:900;border:1px solid rgba(22,163,74,.2);white-space:nowrap}.validated-member-card{align-items:start}.validated-member-card .member-request-main span{color:#15803d;font-weight:800}
-.class-board-card.is-open .class-student-panel{display:block}.class-board-card .class-student-panel{display:none}.class-student-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--bordure)}.class-student-avatar{width:30px;height:30px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--fond);font-size:.65rem;font-weight:800}.class-student-avatar img{width:100%;height:100%;object-fit:cover}.class-student-grid-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px;margin-top:10px}.class-student-card-admin{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}.class-student-card-admin strong{display:block;font-size:.7rem}.class-student-card-admin span{display:block;color:var(--muted);font-size:.61rem;margin-top:3px}.class-student-card-admin small{display:block;color:#15803d;font-size:.57rem;font-weight:800;margin-top:4px}.member-request-card{cursor:pointer;transition:border-color .18s,box-shadow .18s}.member-request-card:hover{border-color:var(--accent)}.member-request-card.is-open{box-shadow:0 12px 32px rgba(0,0,0,.08)}.member-request-expanded{display:none;grid-column:1/-1;margin-top:12px;padding:14px;border-top:1px solid var(--line);background:var(--panel2);border-radius:13px}.member-request-card.is-open .member-request-expanded{display:block}.member-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}.member-detail-item{padding:9px;border:1px solid var(--line);border-radius:11px}.member-detail-item b{display:block;font-size:.59rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.member-detail-item span{display:block;margin-top:4px;font-size:.68rem;line-height:1.4}.member-open-hint{display:block;color:var(--accent);font-size:.61rem;font-weight:800;margin-top:8px}.member-request-card.is-open .member-open-hint{display:none}</style><style>body.auth-initializing > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.auth-initializing #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important} body.site-locked > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important;background:#F7F4FB!important} body.aurore-oauth-callback-pending #auroreAuthWait{visibility:visible!important}</style></head>
+</style><style>body.auth-initializing > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.auth-initializing #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important} body.site-locked > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending > *:not(#accessLock):not(#auroreAuthWait){visibility:hidden!important} body.aurore-oauth-callback-pending #accessLock{visibility:hidden!important;opacity:0!important;pointer-events:none!important;background:#F7F4FB!important} body.aurore-oauth-callback-pending #auroreAuthWait{visibility:visible!important}</style></head>
 <style id="aurore-visual-fixes-v2">
 /* Centre de contrôle : contraste renforcé en mode sombre. */
 .config-test{background:var(--panel)!important;border-color:color-mix(in srgb,var(--accent) 28%,var(--line))!important}
@@ -730,7 +731,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
   @media(max-width:520px){.access-lock{padding:14px}.access-card-body{padding:24px 20px 20px}.access-tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.access-logo{width:52px;height:52px;flex-basis:52px;border-radius:14px}.signup-card{padding:23px 19px}}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<!-- Supabase est chargé à la demande uniquement lors d’une connexion. -->
 <style id="aurore-adaptive-theme-v3">
 /* Thème réellement adaptatif : aucune couleur fixe ne doit empêcher Clair/Sombre + les 25 palettes. */
 html[data-theme="light"]{--fond:#f7f7f9;--papier:#fff;--bordure:#ded9e6;--encre:#17131f;--gris:#625d69;--violet:var(--accent-strong);--bleu:var(--accent2)}
@@ -1051,7 +1052,7 @@ body.aurore-transitioning{overflow:hidden!important}
 <!-- Vue dédiée au compte : conservée pour l’espace personnel après connexion -->
 <main class="auth-page" id="authView">
   <div class="auth-shell">
-    <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome()">Retour à l’accueil</button></div>
+    <div class="auth-top"><div><div class="auth-kicker">Aurore · Compte</div><h1 class="auth-title">Votre espace, <span class="accent">à votre mesure.</span></h1><p class="auth-sub">Un seul compte pour retrouver vos espaces Aurore, votre identité et votre établissement.</p></div><button class="auth-back" type="button" onclick="showHome(true)">← Retour à l’accueil</button></div>
     <div class="auth-card" id="authRoot"></div>
   </div>
 </main>
@@ -1109,14 +1110,6 @@ function normalize(e){
 }
 
 function showHome(push=true){
-  // Sécurité centrale : un compte authentifié mais non finalisé ne peut jamais
-  // retomber sur l’accueil public, même via un clic de menu ou une ancre.
-  if(window.__auroreAuthenticated && !hasSavedPersonalRole()){
-    if(location.hash!=='#mon-espace') pushRoute('#mon-espace');
-    openAuthPage({push:false});
-    renderPersonalSpace().catch(()=>{});
-    return;
-  }
   restoreSiteLogo();
   if(push && location.hash!=='#accueil') pushRoute('#accueil');
   $('homeView').classList.remove('hide-home','directory-mode');
@@ -1127,6 +1120,9 @@ function showHome(push=true){
   if(push) window.scrollTo({top:0,behavior:'auto'});
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   document.querySelector('nav a[data-nav="accueil"]')?.classList.add('active');
+  // La transition doit toujours se terminer, y compris si le bouton a été
+  // déclenché depuis « Mon espace ».
+  requestAnimationFrame(()=>endPageTransition());
 }
 
 
@@ -1221,6 +1217,8 @@ let authViewVersion=0;
 function openAuthPage(options={}){
   restoreSiteLogo();
   const push=options.push!==false;
+  const transition=options.transition!==false;
+  if(transition && location.hash==='#compte') startPageTransition('Ouverture de votre espace de connexion…',300);
   if(push && location.hash!=='#compte') pushRoute('#compte');
   $('homeView').classList.add('hide-home');
   $('profileView').classList.remove('show');
@@ -1228,7 +1226,9 @@ function openAuthPage(options={}){
   document.body.classList.remove('spaces-focus');
   $('spacePanel')?.classList.remove('page-mode','visible');
   if(push) window.scrollTo({top:0,behavior:'auto'});
-  if(currentAuroreSession) renderAccountHome(); else renderAuthStart();
+  requestAnimationFrame(()=>{
+    if(currentAuroreSession) renderAccountHome(); else renderAuthStart();
+  });
 }
 
 function authMessage(text){const el=$('authMessage');if(el){el.style.display='block';el.textContent=text;}}
@@ -1267,21 +1267,27 @@ async function restoreAuroreSession(){
       if(!rr.ok||!rb.access_token){clearAuroreSession();return false;}
       s={...rb,expires_at:Date.now()+((Number(rb.expires_in)||3600)*1000)};
     }
-    currentAuroreSession=s; saveAuroreSession(s); await loadAuroreProfile(); await afterLoginToPersonalSpace(false); return true;
+    currentAuroreSession=s; window.__auroreAuthenticated=true; saveAuroreSession(s);
+    await synchroniserSessionSupabase(s);
+    await loadAuroreProfile(); await afterLoginToPersonalSpace(false); return true;
   }catch(_){clearAuroreSession();return false;}
 }
 
 async function auroreLogin(){
+  window.__auroreAuthActionInProgress=true;
   try{
     authMessage('Connexion sécurisée…');
     const email=$('authEmail').value.trim(),password=$('authPassword').value;
     const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
     const body=await r.json().catch(()=>({})); if(!r.ok||!body.access_token)throw new Error(body.error_description||body.msg||'Connexion impossible.');
     currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
+    window.__auroreAuthenticated=true;
     saveAuroreSession(currentAuroreSession);
+    await synchroniserSessionSupabase(currentAuroreSession);
     await loadAuroreProfile();
     await afterLoginToPersonalSpace(true);
   }catch(err){authMessage(err.message||'Connexion impossible.');}
+  finally{window.__auroreAuthActionInProgress=false;}
 }
 
 async function auroreSignup(){
@@ -1517,9 +1523,9 @@ async function renderPersonalSpace(preloadedCtx=null){
   const dashboard=tiles.map(x=>`<article class="personal-dashboard-tile"><div class="ico">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('');
   const submissionNotice=personalSubmissionNotice?`<div class="profile-submit-success" role="status"><div class="profile-submit-success-icon">✓</div><div><strong>Inscription enregistrée</strong><p>${esc(personalSubmissionNotice)}</p></div></div>`:'';
    const body=complete
-    ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
+    ? `<div class="personal-dashboard-grid">${dashboard}</div><div class="personal-profile-actions" style="margin-top:16px"><button class="personal-space-home-btn" type="button" onclick="showHome(true)">← Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpaceEdit()">Modifier mes informations</button></div>`
     : pending
-      ? `${submissionNotice}<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome()">Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
+      ? `${submissionNotice}<div class="personal-profile-pending"><div class="pending-icon">⏳</div><div><h3>Dossier en cours d’examen</h3><p>Votre dossier pour <strong>${esc(p.etablissement_nom||'votre établissement')}</strong> a bien été transmis à l’administration. L’accès à votre espace d’établissement sera ouvert après validation.</p><div class="personal-profile-actions" style="margin-top:14px"><button class="personal-space-home-btn" type="button" onclick="showHome(true)">← Retour à l’accueil</button><button class="personal-space-home-btn" type="button" onclick="renderPersonalSpace()">Actualiser le statut</button></div></div></div>`
       : `<form class="personal-profile-form" onsubmit="event.preventDefault();savePersonalProfile()"><button type="button" class="registration-back" onclick="personalRegistrationBack()" aria-label="Retour au choix du profil">← Retour au choix du profil</button><div class="profile-form-top"><div><span class="auth-kicker">Configuration de votre espace</span><h3>Votre dossier d’établissement</h3><p>Les informations seront transmises à l’administration pour validation.</p></div></div><div class="personal-avatar-editor"><div class="personal-avatar-frame">${p.avatar_url?`<img id="personalAvatarPreview" src="${esc(p.avatar_url)}" alt="Photo de profil">`:`<div class="fallback" id="personalAvatarPreview">PHOTO</div>`}</div><div><strong>Photo de profil</strong><p style="color:var(--muted);font-size:.72rem;margin:3px 0 8px">JPG, PNG ou WebP · 3 Mo maximum.</p><input id="personalAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"></div></div><div class="form-inner"><div class="profile-page-role"><span class="auth-kicker">Profil sélectionné</span><strong>${esc(roleLabels[role]||role)}</strong><small>Cette page est dédiée à votre profil.</small></div><input type="hidden" id="personalRole" value="${esc(role)}"><div class="personal-profile-grid"><label>Prénom<input id="personalPrenom" value="${esc(p.prenom||'')}" autocomplete="given-name" required></label><label>Nom<input id="personalNom" value="${esc(p.nom||'')}" autocomplete="family-name" required></label></div><label>Établissement<select id="personalEtab" required><option value="">Sélectionner votre établissement…</option></select></label>${roleFields}<div class="personal-profile-actions"><button class="auth-primary" id="personalProfileSave" type="submit">Envoyer mon dossier</button><span id="personalProfileMessage" class="personal-profile-message"></span></div></div></form>`;
   root.innerHTML=`<section class="personal-space-view ${(!complete&&!pending)?'registration-modal-mode':''}"><div class="personal-space-card"><div class="personal-space-head"><div><span class="auth-kicker">Mon espace</span><h2>${complete?'Bienvenue, '+esc(name):'Bienvenue dans votre espace personnel'}</h2><p>${complete?'Votre espace est adapté à votre profil de '+esc(roleLabels[role]||role)+'. Vous pourrez revenir à l’accueil quand vous le souhaitez.':'Pour commencer, renseignez les informations utiles à votre profil. Aurore adaptera ensuite votre espace à votre rôle.'}</p></div><span class="personal-space-badge">${esc(roleLabels[role]||'Profil')}</span></div>${body}</div></section>`;
   personalSubmissionNotice='';
@@ -1582,8 +1588,8 @@ function renderPersonalSpaceEdit(){
 
 async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   if(!currentAuroreSession)return;
-  const ctx=await getPersonalSpaceContext();
-  // isNewAccount est optionnel : le profil DB reste la source de vérité.
+  // Chemin critique Google : pour un nouveau compte, aucune requête « mes espaces »
+  // n'est nécessaire avant l'écran de choix du rôle.
   const actuallyNew=!hasChosenRoleEver();
   if(actuallyNew)isNewAccount=true;
   if(!hasChosenRoleEver()){
@@ -1592,6 +1598,7 @@ async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
     if(showWelcome){accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Choisissons votre rôle…`,'ok');if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… préparation de votre espace');await new Promise(r=>requestAnimationFrame(r));}
     $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');renderRoleChoice(isNewAccount);if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
   }
+  const ctx=await getPersonalSpaceContext();
   if(!hasSavedPersonalRole()){
     // Compte déjà engagé (rôle déjà choisi, établissement pas encore choisi ou dossier
     // en attente) : jamais de retour au choix de rôle, direction l'espace personnel.
@@ -1614,8 +1621,6 @@ async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   await renderPersonalSpace(ctx);
   if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();
 }
-
-async function switchAuroreAccount(){try{const c=await getClient();await c.auth.signOut({scope:'local'});}catch(_){ }currentAuroreSession=null;currentAuroreProfile=null;window.__aurorePlatformAdmin=false;selectedOnboardingRole='';saveAuroreSession(null);renderAuthStart();setTimeout(()=>startGoogle(),80);}
 
 async function renderAccountHome(){
   const viewVersion=++authViewVersion;
@@ -1642,7 +1647,7 @@ async function renderAccountHome(){
   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} accès</span></div><div class="configured-list">${spaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role)&&false;return `<div class="configured-row"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="openSpace('${esc(x.role)}')">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
   const configureBtn=isPlatformAdmin?'<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace</button></div>':'';
-  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="switchAuroreAccount()">Changer de compte</button><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
+  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
   if(isPlatformAdmin){
     const btn=$('generalAdminBtn'); if(btn)btn.addEventListener('click',async function(e){e.preventDefault();e.stopPropagation();btn.disabled=true;try{await openSpace('general')}catch(err){authMessage(err?.message||'Impossible d’ouvrir l’Administration générale Aurore.')}finally{btn.disabled=false;}});
   }
@@ -1679,7 +1684,7 @@ async function renderOnboarding(){
   if(!(await verifyAurorePlatformAdmin())){showHome();accessMessage('La configuration des espaces est réservée à l’Administration générale Aurore.','err');return;}
   authViewVersion++;
   const root=$('authRoot'); if(!root)return;
-  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="showHome()">Retour à l’accueil</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
+  root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="showHome(true)">← Retour à l’accueil</button><span>Configuration d’un espace</span></div><div><span class="auth-kicker">Vos rôles</span><h2>Choisissez l’espace à configurer</h2><p class="auth-sub">L’espace choisi sera rattaché à l’établissement sélectionné. Vous pourrez ensuite le supprimer depuis votre compte.</p><div class="auth-role-grid">${[['eleve','EL','Élève','Compte élève'],['professeur','PR','Professeur','Compte professeur'],['parent','PA','Parent','Compte parent'],['administration','AD','Administration','Gestion de l’établissement'],['proviseur','PV','Proviseur','Pilotage de l’établissement']].map(r=>`<button class="auth-role ${selectedOnboardingRole===r[0]?'selected':''}" type="button" onclick="selectOnboardingRole('${r[0]}')"><strong>${r[1]} · ${r[2]}</strong><span>${r[3]}</span></button>`).join('')}</div></div><div id="onboardingNext"></div><div class="auth-actions"><button class="auth-secondary" type="button" onclick="openEstablishmentRequestPage()">Proposer un nouvel établissement</button></div></section>`;
   if(selectedOnboardingRole)selectOnboardingRole(selectedOnboardingRole);
 }
 
@@ -1706,7 +1711,7 @@ async function openEstablishmentRequestPage(options={}){
   const fromRoleChoice=options.fromRoleChoice===true;
   const backBtn=fromRoleChoice
     ? `<button class="auth-secondary" type="button" onclick="renderRoleChoice()">Retour au choix du profil</button>`
-    : `<button class="auth-secondary" type="button" onclick="showHome()">Retour à l’accueil</button>`;
+    : `<button class="auth-secondary" type="button" onclick="showHome(true)">← Retour à l’accueil</button>`;
   // Cas « nouveau compte Administration » : le rôle est déjà connu (Administration),
   // pas besoin de le refaire choisir dans un menu déroulant — un champ fixe suffit.
   const roleField=fromRoleChoice
@@ -1968,13 +1973,13 @@ function saveRoutePosition(){
 }
 
 let pageTransitionTimer=null;
-function startPageTransition(text='Aurore prépare la page suivante…'){
+function startPageTransition(text='Aurore prépare la page suivante…',duration=340){
   const el=$('aurorePageTransition'); if(!el)return;
   if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
   const t=$('aurorePageTransitionText'); if(t)t.textContent=text;
   el.classList.add('show'); el.setAttribute('aria-hidden','false');
   document.body.classList.add('aurore-transitioning');
-  pageTransitionTimer=setTimeout(endPageTransition,560);
+  pageTransitionTimer=setTimeout(endPageTransition,duration);
 }
 function endPageTransition(){
   const el=$('aurorePageTransition'); if(!el)return;
@@ -1996,17 +2001,6 @@ function restoreRoutePosition(state){
 function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
   if(lastHandledHash && h!==lastHandledHash) startPageTransition();
-  // Un utilisateur connecté sans profil validé reste dans Mon espace.
-  // Cela protège aussi les URLs saisies manuellement (#accueil, #apropos, etc.).
-  if(window.__auroreAuthenticated && !hasSavedPersonalRole() && h!=='#mon-espace' && !h.startsWith('#compte')){
-    applyingRoute=true;
-    try{
-      if(location.hash!=='#mon-espace') history.replaceState({scrollY:0},document.title,'#mon-espace');
-      openAuthPage({push:false});
-      renderPersonalSpace().catch(()=>{});
-    }finally{applyingRoute=false;}
-    return;
-  }
   if(h===lastHandledHash && eventState!==null)return;
   lastHandledHash=h;
   applyingRoute=true;
@@ -2081,8 +2075,11 @@ const loadData=loadInstituts;
 window.addEventListener('popstate',e=>handleHash(e.state));
 // Démarrage non bloquant : l’interface est peinte immédiatement, puis les données et la session arrivent en parallèle.
 try{ if(!data.length){ data=demoData.map(normalize); render(); } }catch(_){ }
-Promise.allSettled([loadInstituts(),restoreAuroreSession()]).then(()=>handleHash());
 handleHash();
+// Le premier écran de connexion doit être affiché avant les requêtes publiques.
+// Les données des établissements sont chargées juste après le premier rendu.
+const deferPublicData=window.requestIdleCallback||((cb)=>setTimeout(cb,120));
+deferPublicData(()=>{loadInstituts().catch(()=>{});});
 
 
 function appliquerCouleur(couleur){
@@ -2159,7 +2156,7 @@ async function openSpace(role,options={}){
       ['Documents et fichiers','Importer les documents de l’établissement dans le stockage sécurisé Aurore.','⇧','admin-documents']
     ]},
     parent:{title:'Espace parent',subtitle:'Un espace pour suivre la scolarité de votre enfant.',items:[['Suivi scolaire','Suivi de la scolarité et informations transmises.','♙','parent-suivi'],['Bulletins','Consulter les bulletins disponibles.','▤','parent-bulletins']]},
-    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Comptes Google','Retrouver les comptes Aurore liés à Google et vérifier leur état.','G','general-google-accounts']]}
+    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned']]}
   };
   const cfg=configs[role]; if(!cfg)return;
   const cards=cfg.items.map((item,i)=>role==='general'?
@@ -2366,17 +2363,17 @@ async function adminElevesView(){
   await loadAdminClasses();
 }
 async function getAdminInstituteIds(){
-  const token=await getFreshAccessToken();if(!token)return[];
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}',cache:'no-store'});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);}const rows=await r.json();return [...new Set((Array.isArray(rows)?rows:[]).filter(x=>x.etablissement_id).map(x=>x.etablissement_id))];}catch(e){console.warn('Aurore admin_lister_espaces:',e);return[]}
+  const token=currentAuroreSession?.access_token||'';if(!token)return[];
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}'});const rows=r.ok?await r.json():[];return rows.filter(x=>['administration','proviseur'].includes(x.role)&&x.etablissement_id).map(x=>x.etablissement_id);}catch(_){return[]}
 }
 async function loadAdminClasses(){
   const board=$('adminClassBoard'),requests=$('classRequestList');if(!board)return;const token=currentAuroreSession?.access_token||'';const ids=await getAdminInstituteIds();if(!ids.length){board.innerHTML='<div class="admin-card">Aucun établissement administré n’a été trouvé pour ce compte.</div>';if(requests)requests.innerHTML='<div class="admin-card">Aucune demande disponible.</div>';return;}
   try{
     const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
-    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_classes`,{method:'POST',headers:{...h,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:id}),cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error((await r.text())||`Erreur ${r.status}`);return r.json()})));
+    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(id)}&select=id,etablissement_id,nom,niveau,annee_scolaire,actif&order=nom.asc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));
     const all=results.flat();
     board.innerHTML=all.length?all.map(c=>`<article class="class-board-card" draggable="true" data-class-id="${esc(c.id)}" data-etab-id="${esc(c.etablissement_id)}"><button class="class-board-menu" type="button" onclick="renameInstituteClass('${esc(c.id)}','${esc(c.nom)}');event.stopPropagation()">⋯</button><span class="class-board-kicker">Classe</span><h4>${esc(c.nom)}</h4><div class="class-board-meta">${esc([c.niveau,c.annee_scolaire].filter(Boolean).join(' · ')||'Informations à compléter')}</div><span class="class-board-count" id="classCount-${esc(c.id)}">Effectif…</span><div class="class-student-panel" id="classStudents-${esc(c.id)}"></div></article>`).join(''):'<div class="admin-card">Aucune classe. Créez la première classe ci-dessus.</div>';
-    board.querySelectorAll('.class-board-card').forEach(card=>{card.addEventListener('dragstart',()=>{draggedAdminClassId=card.dataset.classId;card.classList.add('dragging')});card.addEventListener('dragend',()=>{draggedAdminClassId=null;card.classList.remove('dragging');board.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'))});card.addEventListener('dragover',e=>{e.preventDefault();if(draggedAdminClassId!==card.dataset.classId)card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(draggedAdminClassId&&draggedAdminClassId!==card.dataset.classId)reorderAdminClassCards(draggedAdminClassId,card.dataset.classId)});card.addEventListener('click',e=>{if(e.target.closest('.class-board-menu'))return;if(draggedAdminClassId)return;card.classList.toggle('is-open');});});
+    board.querySelectorAll('.class-board-card').forEach(card=>{card.addEventListener('dragstart',()=>{draggedAdminClassId=card.dataset.classId;card.classList.add('dragging')});card.addEventListener('dragend',()=>{draggedAdminClassId=null;card.classList.remove('dragging');board.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'))});card.addEventListener('dragover',e=>{e.preventDefault();if(draggedAdminClassId!==card.dataset.classId)card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(draggedAdminClassId&&draggedAdminClassId!==card.dataset.classId)reorderAdminClassCards(draggedAdminClassId,card.dataset.classId)});});
     await Promise.all(all.map(c=>loadClassStudents(c.id)));
     if(requests)await loadClassRequests(ids);
   }catch(e){board.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les classes.')}</div>`;}
@@ -2387,20 +2384,9 @@ async function createInstituteClass(){
 }
 async function renameInstituteClass(id,current){const name=prompt('Nouveau nom de la classe :',current||'');if(!name||name.trim()===current)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({nom:name.trim()})});if(!r.ok)throw new Error('Modification refusée.');await loadAdminClasses();}catch(e){alert(e.message||'Impossible de modifier la classe.');}}
 function reorderAdminClassCards(fromId,toId){const board=$('adminClassBoard');const from=board?.querySelector(`[data-class-id="${CSS.escape(fromId)}"]`),to=board?.querySelector(`[data-class-id="${CSS.escape(toId)}"]`);if(from&&to)board.insertBefore(from,to);}
-async function loadClassStudents(classId){const token=await getFreshAccessToken(),h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};if(!token)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_eleves_classe`,{method:'POST',headers:h,body:JSON.stringify({p_classe_id:classId}),cache:'no-store'});const b=await r.json().catch(()=>[]);if(!r.ok)throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);const rows=Array.isArray(b)?b:[],c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?`<div class="class-student-grid-admin">${rows.map(x=>{const name=x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève';return `<div class="class-student-card-admin"><div class="class-student-avatar">${x.avatar_url?`<img src="${esc(x.avatar_url)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div><strong>${esc(name)}</strong><span>${esc(x.matricule||'Élève validé')}</span><small>✓ Profil validé</small></div></div>`}).join('')}</div>`:'<div class="class-select-note">Aucun élève validé dans cette classe.</div>';}catch(e){const box=$(`classStudents-${classId}`);if(box)box.innerHTML=`<div class="class-select-note err">${esc(e.message||'Impossible de charger les élèves.')}</div>`;}}
-
-async function loadClassRequests(ids){
-  const token=await getFreshAccessToken();if(!token)return;
-  const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
-  const box=$('classRequestList');if(!box)return;
-  try{
-    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_demandes_membres`,{method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:id}),cache:'no-store'}).then(async r=>{const b=await r.json().catch(()=>[]);if(!r.ok)throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);return Array.isArray(b)?b:[]}).catch(()=>[])));
-    const all=results.flat().filter(d=>String(d.role||'').toLowerCase()==='eleve');
-    box.innerHTML=all.length?all.map(d=>{const name=d.full_name||[d.prenom,d.nom].filter(Boolean).join(' ')||'Élève';const info=d.informations||{};const details=[info.telephone,info.date_naissance,info.adresse].filter(Boolean);return `<article class="class-request-card" data-request-id="${esc(d.id)}"><div class="class-request-main"><strong>Demande d’inscription élève</strong><span>${esc(name)}</span><span>Classe demandée : ${esc(d.classe_nom||'À préciser')} · ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):''}</span>${details.length?`<div class="class-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div>`:''}</div><span class="member-pending-badge">En attente</span></article>`}).join(''):'<div class="admin-card">Aucune demande d’inscription en attente.</div>';
-    box.querySelectorAll('.class-request-card').forEach(card=>card.addEventListener('click',()=>card.classList.toggle('is-open')));
-  }catch(e){box.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les demandes d’inscription.')}</div>`;}
+async function loadClassStudents(classId){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};try{const r=await fetch(`${SUPABASE_URL}/rest/v1/eleves?classe_id=eq.${encodeURIComponent(classId)}&statut=eq.valide&select=id,nom,prenom,matricule,profile_id&order=nom.asc`,{headers:h,cache:'no-store'});const rows=r.ok?await r.json():[];const c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?rows.slice(0,5).map(x=>`<div class="class-student-row"><div><strong>${esc([x.prenom,x.nom].filter(Boolean).join(' ')||'Élève')}</strong><span>${esc(x.matricule||'Élève inscrit')}</span></div></div>`).join('')+(rows.length>5?`<div class="class-select-note">+ ${rows.length-5} autre${rows.length-5>1?'s':''} élève${rows.length-5>1?'s':''}</div>`:''):'<div class="class-select-note">Aucun élève validé dans cette classe.</div>';}catch(_){}}
+async function loadClassRequests(ids){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&role=eq.eleve&select=id,classe_id,profile_id,etablissement_id,created_at,profiles(prenom,nom,full_name,avatar_url),classes(nom,niveau,annee_scolaire)&order=created_at.asc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));const all=results.flat();const box=$('classRequestList');if(!box)return;box.innerHTML=all.length?all.map(d=>{const p=d.profiles||{},name=p.full_name||[p.prenom,p.nom].filter(Boolean).join(' ')||'Élève';return `<article class="class-request-card"><div class="class-request-main"><strong>${esc(name)}</strong><span>Classe : ${esc(d.classes?.nom||'Classe')} · ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span></div><div class="class-request-actions"><span class="class-request-status">En attente</span><button class="admin-btn primary" type="button" data-member-decision="valide" data-member-request-id="${esc(d.id)}">Valider</button><button class="admin-btn danger" type="button" data-member-decision="refuse" data-member-request-id="${esc(d.id)}">Refuser</button></div></article>`;}).join(''):'<div class="admin-card">Aucune demande d’inscription en attente.</div>';
 }
-async function decideClassRequest(id,decision){const comment=decision==='refuse'?prompt('Motif du refus (facultatif) :','Informations à compléter')||null:null;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Décision impossible.');}await loadAdminClasses();}catch(e){alert(e.message||'Impossible de traiter la demande.');}}
 
 async function adminDisciplinesView(){
   const root=$('spaceDashboard');if(!root)return;
@@ -2410,7 +2396,7 @@ async function adminDisciplinesView(){
 }
 async function loadAdminDisciplines(etabId){
   const box=$('disciplineAdminList');if(!box||!etabId){if(box)box.innerHTML='<div class="admin-card">Aucun établissement administré n’a été trouvé.</div>';return;}
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_matieres`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:etabId}),cache:'no-store'});const rows=r.ok?await r.json():[];box.innerHTML=rows.length?rows.map(d=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">✦</div><div><strong>${esc(d.nom)}</strong><span>Discipline disponible aux professeurs</span></div></div><button class="admin-btn danger" type="button" onclick="deleteInstituteDiscipline('${esc(d.id)}')">Supprimer</button></div>`).join(''):'<div class="admin-card">Aucune discipline configurée. Ajoutez la première discipline ci-dessus.</div>';}catch(e){box.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les disciplines.')}</div>`;}
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/disciplines_etablissement?etablissement_id=eq.${encodeURIComponent(etabId)}&actif=eq.true&select=id,nom,created_at&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`},cache:'no-store'});const rows=r.ok?await r.json():[];box.innerHTML=rows.length?rows.map(d=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">✦</div><div><strong>${esc(d.nom)}</strong><span>Discipline disponible aux professeurs</span></div></div><button class="admin-btn danger" type="button" onclick="deleteInstituteDiscipline('${esc(d.id)}')">Supprimer</button></div>`).join(''):'<div class="admin-card">Aucune discipline configurée. Ajoutez la première discipline ci-dessus.</div>';}catch(e){box.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les disciplines.')}</div>`;}
 }
 async function createInstituteDiscipline(){
   const name=$('newDisciplineName')?.value.trim(),btn=$('newDisciplineBtn'),msg=$('disciplineAdminMessage'),etabId=(await getAdminInstituteIds())[0];if(!name||!etabId){if(msg)msg.textContent='Indiquez une discipline et vérifiez que vous administrez un établissement.';return;}if(btn)btn.disabled=true;
@@ -2441,22 +2427,20 @@ async function loadMemberRequestsAdmin(){
   const ids=await getAdminInstituteIds(),token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
   if(!ids.length){box.innerHTML='<div class="admin-card">Aucun établissement administré n’est associé à ce compte.</div>';return;}
   try{
-    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_demandes_membres`,{method:'POST',headers:{...h,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:id}),cache:'no-store'}).then(async r=>{if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);}return r.json();})));
+    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&select=*,profiles(prenom,nom,full_name,avatar_url,role),classes(nom,niveau,annee_scolaire)&order=created_at.asc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));
     const all=results.flat();
     const groups=[['eleve','Élèves','♙'],['parent','Parents','♧'],['professeur','Professeurs','◉'],['proviseur','Proviseurs','⌂'],['administration','Administration','⚙']];
     const roleNames={eleve:'Élève',parent:'Parent',professeur:'Professeur',administration:'Administration',proviseur:'Proviseur',personnel:'Personnel'};
     const card=d=>{
-      const i=d.informations||{},name=d.full_name||[d.prenom,d.nom].filter(Boolean).join(' ')||'Utilisateur',avatar=d.avatar_url||d.profile_avatar_url;
-      const details=[d.classe_nom,d.classe_niveau,i.filiere,i.discipline,i.fonction,i.telephone,i.adresse].filter(Boolean);
-      const entries=Object.entries(i).filter(([k,v])=>v!==null&&v!==undefined&&String(v).trim()!==''&&typeof v!=='object');
-      return `<article class="member-request-card" data-member-open="${esc(d.id)}"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>${esc(roleNames[d.role]||d.role)}${d.classe_nom?' · '+esc(d.classe_nom):''}</span><div class="member-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')||'<i>Dossier complet à consulter</i>'}</div><span style="margin-top:7px">Dossier reçu le ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):''}</span><span class="member-open-hint">Cliquer pour ouvrir le profil complet</span></div><div class="member-request-actions"><button class="approve" type="button" data-member-decision="valide" data-member-request-id="${esc(d.id)}">✓ Accepter</button><button class="reject" type="button" data-member-decision="refuse" data-member-request-id="${esc(d.id)}">Refuser</button></div><div class="member-request-expanded"><div class="member-detail-grid">${entries.map(([k,v])=>`<div class="member-detail-item"><b>${esc(k.replace(/_/g,' '))}</b><span>${esc(String(v))}</span></div>`).join('')||'<div class="class-select-note">Aucune information complémentaire.</div>'}</div></div></article>`;
+      const p=d.profiles||{},i=d.informations||{},name=p.full_name||[p.prenom,p.nom].filter(Boolean).join(' ')||'Utilisateur',avatar=p.avatar_url||d.avatar_url;
+      const details=[d.classes?.nom||i.classe,i.filiere,i.discipline,i.fonction,i.telephone,i.adresse].filter(Boolean);
+      return `<article class="member-request-card"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>${esc(roleNames[d.role]||d.role)}${d.classes?.nom?' · '+esc(d.classes.nom):''}</span><div class="member-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div><span style="margin-top:7px">Dossier reçu le ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span></div><div class="member-request-actions"><button class="approve" type="button" data-member-decision="valide" data-member-request-id="${esc(d.id)}">✓ Accepter</button><button class="reject" type="button" data-member-decision="refuse" data-member-request-id="${esc(d.id)}">Refuser</button></div></article>`;
     };
     if(!all.length){box.innerHTML='<div class="personal-profile-success-card"><div class="success-icon">✓</div><div><h3>Aucun dossier en attente</h3><p>Toutes les demandes ont été traitées. Les nouveaux dossiers apparaîtront ici automatiquement.</p></div></div>';return;}
     const summary=groups.map(g=>{const n=all.filter(x=>x.role===g[0]).length;return `<button type="button" class="config-chip" onclick="document.getElementById('member-group-${g[0]}')?.scrollIntoView({behavior:'smooth',block:'start'})"><span class="config-chip-ico">${g[2]}</span><span>${g[1]} <b style="margin-left:4px">${n}</b></span></button>`}).join('');
     box.innerHTML=`<div class="config-test-grid" style="margin-bottom:18px">${summary}</div>`+groups.map(g=>{const rows=all.filter(x=>x.role===g[0]);return rows.length?`<section id="member-group-${g[0]}" style="scroll-margin-top:90px;margin-top:16px"><div class="space-panel-head"><span class="space-panel-label">${g[2]} ${g[1]}</span><h4 style="margin-top:5px">${rows.length} dossier${rows.length>1?'s':''} à examiner</h4></div><div style="display:grid;gap:11px;margin-top:10px">${rows.map(card).join('')}</div></section>`:'';}).join('');
   }catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les dossiers.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p></div>`;}
 }
-document.addEventListener('click',e=>{const card=e.target.closest?.('[data-member-open]');if(!card||e.target.closest('[data-member-decision]'))return;card.classList.toggle('is-open');});
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-member-decision][data-member-request-id]');if(!b)return;e.preventDefault();if(b.dataset.busy==='1')return;b.dataset.busy='1';decideMemberRequest(b.dataset.memberRequestId,b.dataset.memberDecision).finally(()=>{b.dataset.busy='0';});});
 async function getFreshAccessToken(){
   try{const c=await getClient();const {data}=await c.auth.getSession();if(data?.session?.access_token){currentAuroreSession={...data.session,expires_at:(data.session.expires_at||0)*1000};return data.session.access_token;}}catch(_){}
@@ -2492,7 +2476,6 @@ function openSpaceTool(role,key){
   if(role==='administration' && key==='admin-professeurs'){ adminProfesseursView(); return; }
   if(role==='administration' && key==='admin-disciplines'){ adminDisciplinesView(); return; }
   if(role==='administration' && key==='inscriptions'){ adminInscriptionsView(); return; }
-  if(role==='general' && key==='general-google-accounts'){ generalGoogleAccountsView(); return; }
   const common=`<button class="space-back" type="button" onclick="openSpace('${role}')">Retour aux rubriques</button>`;
   if(role==='eleve' && key==='notes'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
@@ -2520,15 +2503,6 @@ function openSpaceTool(role,key){
   root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Aurore</span><h3>${key.replaceAll('-',' ')}</h3><p>Cette rubrique est prête pour son branchement aux données réelles.</p></div>${common}</div></section>`;
 }
 
-
-async function generalGoogleAccountsView(){
-  const root=$('spaceDashboard');if(!root)return;if(!(await verifyAurorePlatformAdmin())){root.innerHTML='<div class="admin-card">Accès réservé à l’Administration générale Aurore.</div>';return;}
-  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale</span><h3>Comptes Google</h3><p>Recherchez les comptes Aurore déjà liés à Google.</p></div><button class="space-back" type="button" onclick="openSpace('general')">Retour</button></div><div class="class-create-card"><form class="class-create-grid" onsubmit="event.preventDefault();searchGoogleAccounts()"><label>E-mail Google<input id="googleAccountSearch" type="email" placeholder="laisser vide pour tout afficher"></label><button class="auth-primary" type="submit">Rechercher</button></form></div><div id="googleAccountList" class="space-list"><div class="admin-card">Chargement…</div></div></section>`;await searchGoogleAccounts();
-}
-async function searchGoogleAccounts(){
-  const box=$('googleAccountList');if(!box)return;const token=await getFreshAccessToken();if(!token){box.innerHTML='<div class="admin-card">Session expirée. Reconnectez-vous.</div>';return;}
-  try{const email=$('googleAccountSearch')?.value.trim()||null;const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/rechercher_compte_google_admin`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_email:email}),cache:'no-store'});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);const rows=Array.isArray(b)?b:[];box.innerHTML=rows.length?rows.map(x=>{const name=x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Compte Google';const avatar=x.avatar_url?`<img src="${esc(x.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`:esc(initials(name));return `<div class="space-list-row"><div class="space-person"><div class="space-avatar">${avatar}</div><div><strong>${esc(name)}</strong><span>${esc(x.email||'E-mail non renseigné')} · ${esc(x.role||'Aucun rôle')} · ${esc(x.etablissement_nom||'Aucun établissement')}</span></div></div><span class="auth-role-chip">${esc(x.profil_statut||'inconnu')}</span></div>`;}).join(''):'<div class="admin-card">Aucun compte Google trouvé.</div>';}catch(e){box.innerHTML=`<div class="admin-card"><strong>Recherche impossible.</strong><p>${esc(e.message||'Erreur Supabase')}</p><button class="admin-btn" type="button" onclick="searchGoogleAccounts()">Réessayer</button></div>`;}
-}
 
 async function loadAdminOverview(){
   const ids=['general-demandes','general-accepted','general-refused','general-suspended','general-banned'];
@@ -2830,35 +2804,163 @@ function appliquerTheme(choix){
   const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
   let client=null, googleBusy=false;
 
+  // Une nouvelle ouverture de l'URL ne doit JAMAIS déduire l'identité depuis
+  // une ancienne session du navigateur. L'utilisateur doit d'abord choisir
+  // son mode/compte de connexion. La session ne devient active qu'après une
+  // connexion explicite (mot de passe ou Google). On conserve le verifier PKCE
+  // séparément pour permettre le retour OAuth.
+  try{localStorage.removeItem('aurore-session');}catch(_){ }
+
+  const authWait=document.getElementById('auroreAuthWait');
+  const authWaitText=document.getElementById('auroreAuthWaitText');
+  function afficherVeuillezPatienter(texte='Aurore prépare votre espace…'){
+    if(authWaitText)authWaitText.textContent=texte;
+    if(authWait){authWait.classList.add('show');authWait.setAttribute('aria-hidden','false');}
+  }
+  function cacherVeuillezPatienter(){
+    if(authWait){authWait.classList.remove('show');authWait.setAttribute('aria-hidden','true');}
+    document.body.classList.remove('auth-initializing');
+  }
+  window.auroreAfficherVeuillezPatienter=afficherVeuillezPatienter;
+  window.auroreCacherVeuillezPatienter=cacherVeuillezPatienter;
+
   function accessMessage(text,type='ok'){
     const el=document.getElementById('accessMessage'); if(!el)return;
     el.textContent=text; el.className='access-message '+type; el.style.display='block';
   }
   function unlockAccess(){
-    document.body.classList.remove('site-locked');
+    document.body.classList.remove('site-locked','auth-initializing');
     const lock=document.getElementById('accessLock'); if(lock)lock.style.display='none';
   }
   function showPortal(){
     document.body.classList.add('site-locked');
-    const lock=document.getElementById('accessLock'); if(lock)lock.style.display='flex';
+    document.body.classList.remove('aurore-oauth-callback-pending');
+    const lock=document.getElementById('accessLock');
+    if(lock){lock.style.display='flex';lock.style.visibility='visible';lock.style.opacity='1';}
+  }
+  function recoverAuthScreen(message='Votre connexion est prête. Vous pouvez réessayer.'){
+    try{
+      document.body.classList.remove('aurore-oauth-callback-pending','aurore-transitioning');
+      document.body.classList.add('site-locked');
+      const wait=document.getElementById('auroreAuthWait');
+      const lock=document.getElementById('accessLock');
+      // Règle absolue : le site ne devient jamais visible pendant la récupération.
+      if(lock){lock.style.display='flex';lock.style.visibility='hidden';lock.style.opacity='0';}
+      if(wait){
+        wait.classList.add('show');
+        wait.setAttribute('aria-hidden','false');
+        if(authWaitText)authWaitText.textContent='Aurore prépare l’accès sécurisé…';
+      }
+      if(typeof openAuthPage==='function')openAuthPage({push:false});
+      if(typeof renderAuthStart==='function')renderAuthStart();
+      window.setTimeout(()=>{
+        if(wait){wait.classList.remove('show');wait.setAttribute('aria-hidden','true');}
+        if(lock){lock.style.visibility='visible';lock.style.opacity='1';}
+        document.body.classList.remove('auth-initializing');
+        accessMessage(message,'err');
+      },520);
+    }catch(e){console.error('[Aurore] récupération écran connexion impossible',e);}
   }
   window.auroreUnlockAccess=unlockAccess;
 
-  async function getClient(){
-    if(client)return client;
-    if(window.supabase?.createClient){
-      client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-      return client;
-    }
-    if(!document.querySelector('script[data-aurore-supabase-fallback]')){
-      const s=document.createElement('script'); s.src='https://unpkg.com/@supabase/supabase-js@2'; s.async=true; s.dataset.auroreSupabaseFallback='1'; document.head.appendChild(s);
-    }
-    const started=Date.now();
-    while(!window.supabase?.createClient && Date.now()-started<3500) await new Promise(r=>setTimeout(r,40));
-    if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
-    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  // ===== AUTH GOOGLE — même architecture que la Section Archives =====
+  // Le SDK est chargé en asynchrone : un CDN lent ne doit jamais bloquer le parsing
+  // ni retarder le traitement du retour Google. Un CDN de secours + timeout évitent
+  // également les attentes infinies sur certains réseaux mobiles.
+  function creerClientAuthGoogle(){
+    const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,storage:window.localStorage,experimental:{appendPkceFlowIdToRedirects:true}}
+    });
+    brancherEvenementsAuth(client);
     return client;
   }
+  let AURORE_SUPABASE_AUTH = window.supabase?.createClient ? creerClientAuthGoogle() : null;
+  let supabaseLoadPromise=null;
+  let authEventsBound=false;
+
+  function brancherEvenementsAuth(c){
+    if(authEventsBound||!c?.auth)return;
+    authEventsBound=true;
+    c.auth.onAuthStateChange((event,session)=>{
+      if(session){
+        // Le site utilise aussi l'API REST pour l'e-mail/mot de passe.
+        // En navigation normale, le client Supabase peut restaurer une ancienne
+        // session persistante et l'événement INITIAL_SESSION/TOKEN_REFRESH peut
+        // alors écraser la session que l'utilisateur vient réellement d'ouvrir.
+        // On accepte la session du client uniquement si elle correspond à la
+        // session courante, ou s'il n'y en a pas encore.
+        const incomingId=session.user?.id||'';
+        const currentId=currentAuroreSession?.user?.id||'';
+        // Une session reçue sans action de connexion de cette page ne doit pas
+        // devenir une authentification automatique. Les sessions OAuth sont
+        // acceptées uniquement pendant le retour explicite Google, et les
+        // connexions mot de passe passent par auroreLogin().
+        if(!window.__auroreAuthActionInProgress && !window.__auroreOAuthCallbackActive && event!=='TOKEN_REFRESH') return;
+        if(currentId && incomingId && currentId!==incomingId) return;
+        currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+        window.__auroreAuthenticated=true;
+      }else if(event==='SIGNED_OUT'){
+        currentAuroreSession=null;
+        window.__auroreAuthenticated=false;
+        try{localStorage.removeItem('aurore-session');}catch(_){}
+      }
+    });
+  }
+
+  async function synchroniserSessionSupabase(session){
+    if(!session?.access_token||!session?.refresh_token)return;
+    try{
+      const c=await assurerClientAuthGoogle();
+      // Synchronise le stockage interne Supabase avec la session REST.
+      // Cela supprime la divergence entre navigation privée et navigation normale.
+      await c.auth.setSession({
+        access_token:session.access_token,
+        refresh_token:session.refresh_token
+      });
+    }catch(e){
+      console.warn('[Aurore Auth] synchronisation de session différée',e);
+    }
+  }
+
+  function chargerScriptSupabase(url,delaiMs=8000){
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      let fini=false;
+      const minuteur=setTimeout(()=>{
+        if(fini)return; fini=true;
+        reject(new Error('Délai dépassé : '+url));
+      },delaiMs);
+      s.src=url; s.async=true;
+      s.onload=()=>{if(fini)return;fini=true;clearTimeout(minuteur);resolve();};
+      s.onerror=()=>{if(fini)return;fini=true;clearTimeout(minuteur);reject(new Error('Échec de chargement : '+url));};
+      document.head.appendChild(s);
+    });
+  }
+
+  async function assurerClientAuthGoogle(){
+    if(AURORE_SUPABASE_AUTH){brancherEvenementsAuth(AURORE_SUPABASE_AUTH);return AURORE_SUPABASE_AUTH;}
+    if(supabaseLoadPromise)return supabaseLoadPromise;
+    supabaseLoadPromise=(async()=>{
+      if(!window.supabase?.createClient){
+        try{await chargerScriptSupabase('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',8000);}catch(e){
+          console.warn('[Aurore] jsDelivr indisponible, tentative unpkg',e);
+          try{await chargerScriptSupabase('https://unpkg.com/@supabase/supabase-js@2',8000);}catch(e2){
+            throw new Error('Impossible de charger le service de connexion.');
+          }
+        }
+      }
+      if(window.supabase?.createClient&&!AURORE_SUPABASE_AUTH)AURORE_SUPABASE_AUTH=creerClientAuthGoogle();
+      if(!AURORE_SUPABASE_AUTH)throw new Error('Service de connexion momentanément indisponible.');
+      brancherEvenementsAuth(AURORE_SUPABASE_AUTH);
+      return AURORE_SUPABASE_AUTH;
+    })();
+    try{return await supabaseLoadPromise;}finally{if(!AURORE_SUPABASE_AUTH)supabaseLoadPromise=null;}
+  }
+
+  // Compatibilité avec tout le code de Mon espace qui appelle getClient().
+  async function getClient(){return assurerClientAuthGoogle();}
+  window.getClient=getClient;
 
   function setGoogleLoading(on){
     googleBusy=on; const btn=document.getElementById('accessGoogleBtn'); if(!btn)return;
@@ -2868,65 +2970,111 @@ function appliquerTheme(choix){
 
   async function startGoogle(){
     if(googleBusy)return;
+    googleBusy=true;
+    // Filet de sécurité posé en tout premier, avant tout await : si pour une
+    // raison quelconque le site n'était plus verrouillé au moment du clic, on
+    // le reverrouille immédiatement pour qu'aucune page du site ne puisse
+    // jamais apparaître pendant l'attente du SDK / de la redirection Google.
+    document.body.classList.add('site-locked','auth-initializing');
+    try{sessionStorage.setItem('aurore-google-oauth-pending','1');}catch(_){}
     setGoogleLoading(true);
-    accessMessage('Ouverture de Google…','ok');
+    afficherVeuillezPatienter('Connexion sécurisée avec Google…');
+    accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
     try{
-      const c=await getClient();
-      // Utilise le flux OAuth officiel de Supabase : le SDK crée et conserve
-      // automatiquement le verifier PKCE nécessaire au retour depuis Google.
-      const redirectTo='https://auroresectioninstituts.vercel.app/';
-      const {error}=await c.auth.signInWithOAuth({
-        provider:'google',
-        options:{redirectTo}
-      });
+      const c=await assurerClientAuthGoogle();
+      const redirectTo=window.location.origin+window.location.pathname;
+      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
       if(error)throw error;
+      // Le navigateur quitte la page pour Google : on garde le verrouillage actif.
     }catch(err){
       console.error('[Google OAuth] démarrage impossible',err);
+      googleBusy=false;
       setGoogleLoading(false);
+      cacherVeuillezPatienter();
       const raw=String(err?.message||'');
-      if(/provider.*not enabled/i.test(raw)){
-        accessMessage('La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.','err');
-      }else{
-        accessMessage('Impossible de démarrer la connexion Google. Réessayez.','err');
-      }
+      accessMessage(/provider.*not enabled/i.test(raw)
+        ? 'La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.'
+        : 'Impossible de démarrer la connexion Google. Réessayez.','err');
     }
   }
   window.auroreGoogleLogin=function(e){e?.preventDefault();startGoogle();};
 
   async function handleGoogleReturn(){
-    const params=new URLSearchParams(location.search),code=params.get('code'),oauthError=params.get('error');
-    if(oauthError){showPortal();accessMessage('La connexion Google n’a pas abouti. Réessayez.','err');return true;}
+    const params=new URLSearchParams(window.location.search);
+    const code=params.get('code');
+    window.__auroreOAuthCallbackActive=!!code;
+    const oauthError=params.get('error');
+    if(oauthError){
+      cacherVeuillezPatienter(); showPortal();
+      accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');
+      return true;
+    }
     if(!code)return false;
     try{
-      showPortal(); accessMessage('Finalisation de votre connexion…','ok');
-      const c=await getClient();
-      let {data,error}=await c.auth.exchangeCodeForSession(code);
-      // Si le SDK a déjà consommé le code pendant le retour, relire la session.
-      if(error || !data?.session){
-        const again=await c.auth.getSession();
-        if(again?.data?.session){ data=again.data; error=null; }
-        else if(error) throw error;
-      }
-      const session=data?.session; if(!session)throw new Error('Session Google introuvable.');
+      afficherVeuillezPatienter('Finalisation de votre connexion Google…');
+      const c=await assurerClientAuthGoogle();
+      const flowId=params.get('sb_flow_id');
+      const {data,error}=await c.auth.exchangeCodeForSession(code,flowId?{flowId}:undefined);
+      if(error)throw error;
+      const session=data?.session;
+      if(!session?.access_token)throw new Error('Session Google introuvable après authentification.');
+
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
-      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess(); setGoogleLoading(false); history.replaceState({},document.title,location.pathname+location.hash); return true;
-    }catch(err){setGoogleLoading(false);accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
+      // Ne pas bloquer l'arrivée dans l'espace sur la copie de session Supabase.
+      // setSession() est utile pour la persistance, mais n'est pas nécessaire pour
+      // poursuivre la navigation avec la session déjà échangée.
+      synchroniserSessionSupabase(session).catch(()=>{});
+
+      // Important : on NE révèle PAS le site tout de suite. Tant que le profil et la
+      // destination (choix de rôle / espace personnel) ne sont pas prêts, l'écran reste
+      // verrouillé derrière l'animation « Finalisation… » avec fond flou. Cela évite tout
+      // accès instantané et non désiré à la page principale avant que le bon écran ne
+      // soit affiché.
+      window.__auroreAuthenticated=true;
+      closeSignup();
+      setGoogleLoading(false);
+      history.replaceState({},document.title,window.location.pathname+window.location.hash);
+
+      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
+      let isNewAccount=false;
+      let destinationReady=false;
+      try{
+        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+        // La base de données est la source de vérité : nouveau compte = aucun rôle
+        // et aucun établissement encore choisis. Aucun timestamp fragile.
+        isNewAccount=!hasChosenRoleEver();
+        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,isNewAccount);
+        destinationReady=true;
+      }catch(postLoginErr){
+        console.warn('[Google OAuth] profil/espace impossible à préparer',postLoginErr);
+        openAuthPage({push:false});
+        renderAuthStart?.();
+      }finally{
+        document.body.classList.remove('aurore-oauth-callback-pending');
+        window.__auroreOAuthCallbackActive=false;
+        // Jamais de déverrouillage si la destination n'est pas réellement prête.
+        if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
+        else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
+      }
+      return true;
+    }catch(err){
+      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
+      console.error('[Google OAuth PKCE] callback impossible',err);
+      setGoogleLoading(false);
+      const msg=String(err?.message||'');
+      const friendly=/verifier|pkce|code.*(invalid|expired)|invalid.*code/i.test(msg)
+        ? 'La connexion Google a expiré ou a perdu sa vérification sécurisée. Relancez la connexion depuis Aurore.'
+        : 'La connexion Google n’a pas pu être finalisée. Réessayez.';
+      recoverAuthScreen(friendly);
+      return true;
+    }
   }
 
   async function restoreGoogleSession(){
-    try{
-      const c=await getClient(); const {data}=await c.auth.getSession();
-      if(!data?.session)return false;
-      const session=data.session;
-      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
-      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-      if(typeof renderAccountHome==='function')renderAccountHome();
-      unlockAccess(); return true;
-    }catch(_){return false;}
+    // Désactivé volontairement : une ouverture normale du site ne doit pas
+    // reconnecter automatiquement le dernier compte du navigateur.
+    return false;
   }
 
   function openSignup(){
@@ -2955,24 +3103,79 @@ function appliquerTheme(choix){
     try{
       const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
       const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof renderAccountHome==='function')renderAccountHome();}
+      if(body.access_token){
+        currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
+        window.__auroreAuthenticated=true;
+        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
+        await synchroniserSessionSupabase(currentAuroreSession);
+        closeSignup(); afficherVeuillezPatienter('Création de votre espace…');
+        let ready=false;
+        try{if(typeof loadAuroreProfile==='function')await loadAuroreProfile();if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,true);ready=true;}catch(e){console.warn('[Aurore] création/espace impossible à préparer',e);}
+        if(ready){unlockAccess();cacherVeuillezPatienter();}else recoverAuthScreen('Votre compte a été créé, mais votre espace n’a pas pu être préparé. Réessayez.');
+      }
       else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
   }
   window.auroreSignup=signup;
 
+  async function auroreInitAuth(){
+    if(window.__auroreAuthInitDone)return;
+    window.__auroreAuthInitDone=true;
+    const hasGoogleCode=!!new URLSearchParams(window.location.search).get('code');
+    // Au retour Google, l'écran Aurore reste totalement bloqué jusqu'à l'échange PKCE.
+    showPortal();
+    if(hasGoogleCode) document.body.classList.add('aurore-oauth-callback-pending');
+    afficherVeuillezPatienter(hasGoogleCode?'Finalisation de votre connexion Google…':'Aurore prépare votre accès…');
+    // Au retour Google, traiter immédiatement le code PKCE : aucun frame
+    // supplémentaire ne doit retarder l'échange contre la session.
+    const handled=await handleGoogleReturn();
+    if(!handled){
+      let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
+      const restored=false;
+      if(!restored){
+        // Aucun compte actif : l’animation d’introduction doit TOUJOURS précéder
+        // l’ouverture de l’écran de choix Google. Le contenu public reste invisible.
+        if(authWaitText)authWaitText.textContent='Ouverture de l’accès sécurisé…';
+        cacherVeuillezPatienter();
+        showPortal();
+        document.body.classList.remove('auth-initializing');
+        const lock=document.getElementById('accessLock');
+        if(lock){lock.style.visibility='visible';lock.style.opacity='1';}
+      }
+    }
+  }
+
+  // Précharge discrètement le SDK pendant que l'écran de connexion est affiché.
+  // Le clic Google réutilise alors la même promesse au lieu d'attendre le CDN.
+  function warmupGoogleSdk(){
+    if(window.__auroreOAuthCallbackActive)return;
+    const warm=window.requestIdleCallback||((cb)=>setTimeout(cb,350));
+    warm(()=>{assurerClientAuthGoogle().catch(()=>{});},{timeout:1800});
+  }
+
   function wire(){
-    // Les onclick sont volontairement présents sur les boutons : aucun délai de chargement du SDK ne bloque l'interface.
     document.getElementById('signupClose')?.addEventListener('click',closeSignup);
     document.getElementById('showLoginBtn')?.addEventListener('click',()=>{closeSignup();if(typeof openAuthPage==='function')openAuthPage();});
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
-    showPortal();
-    // Ne bloque jamais l'affichage de la page pendant la restauration de session.
-    handleGoogleReturn().then(handled=>{if(!handled)restoreGoogleSession();});
+    auroreInitAuth();
+    warmupGoogleSdk();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+
+  // Protection contre le cache de navigation (bfcache) : sur mobile, quand
+  // l'aller-retour vers Google est très rapide, certains navigateurs peuvent
+  // restaurer une version figée de CETTE page (telle qu'elle était juste avant
+  // le clic sur « Continuer avec Google ») au lieu de charger la vraie réponse
+  // du serveur — l'utilisateur voit alors un instant la page du site avant que
+  // l'écran de finalisation ne prenne le relais. `pageshow` avec
+  // `event.persisted` détecte précisément ce cas ; on force un rechargement
+  // propre pour repartir sur l'état verrouillé initial plutôt que sur un DOM
+  // obsolète (jeton PKCE potentiellement déjà consommé, variables JS périmées).
+  window.addEventListener('pageshow',function(e){
+    if(e.persisted){window.location.reload();}
+  });
 })();
 </script>
 </body>
