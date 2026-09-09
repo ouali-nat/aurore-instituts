@@ -730,7 +730,7 @@ body{min-height:100vh;display:flex;flex-direction:column}body>header,body>main,b
   @media(max-width:520px){.access-lock{padding:14px}.access-card-body{padding:24px 20px 20px}.access-tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.access-logo{width:52px;height:52px;flex-basis:52px;border-radius:14px}.signup-card{padding:23px 19px}}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<!-- Supabase est chargé à la demande uniquement lors d’une connexion. -->
 <style id="aurore-adaptive-theme-v3">
 /* Thème réellement adaptatif : aucune couleur fixe ne doit empêcher Clair/Sombre + les 25 palettes. */
 html[data-theme="light"]{--fond:#f7f7f9;--papier:#fff;--bordure:#ded9e6;--encre:#17131f;--gris:#625d69;--violet:var(--accent-strong);--bleu:var(--accent2)}
@@ -3140,7 +3140,7 @@ function appliquerTheme(choix){
     if(hasGoogleCode) document.body.classList.add('aurore-oauth-callback-pending');
     afficherVeuillezPatienter(hasGoogleCode?'Finalisation de votre connexion Google…':'Aurore prépare votre accès…');
     // Même principe que Archives : DOMContentLoaded, jamais window.load.
-    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    await new Promise(resolve=>requestAnimationFrame(resolve));
     const handled=await handleGoogleReturn();
     if(!handled){
       let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
@@ -3149,7 +3149,6 @@ function appliquerTheme(choix){
         // Aucun compte actif : l’animation d’introduction doit TOUJOURS précéder
         // l’ouverture de l’écran de choix Google. Le contenu public reste invisible.
         if(authWaitText)authWaitText.textContent='Ouverture de l’accès sécurisé…';
-        await new Promise(resolve=>setTimeout(resolve,220));
         cacherVeuillezPatienter();
         showPortal();
         document.body.classList.remove('auth-initializing');
