@@ -2247,6 +2247,11 @@ async function openSpace(role,options={}){
     if(accountEmail==='oualikevin9@gmail.com' && options.etablissementId){
       allowed=true;
     }
+    // L’Administration générale peut contrôler un espace d’établissement
+    // sans être ajoutée comme membre de cet établissement.
+    if(!allowed && options.etablissementId){
+      try{allowed=await verifyAurorePlatformAdmin();}catch(_){ }
+    }
     try{
       const etabFilter=options.etablissementId?`&etablissement_id=eq.${encodeURIComponent(options.etablissementId)}`:'';
       const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_membres?profile_id=eq.${encodeURIComponent(profileId)}&role=eq.${encodeURIComponent(role)}${etabFilter}&statut=eq.valide&select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`}});
@@ -2293,7 +2298,7 @@ async function openSpace(role,options={}){
       ['Documents et fichiers','Importer les documents de l’établissement dans le stockage sécurisé Aurore.','⇧','admin-documents']
     ]},
     parent:{title:'Espace parent',subtitle:'Un espace pour suivre la scolarité de votre enfant.',items:[['Suivi scolaire','Suivi de la scolarité et informations transmises.','♙','parent-suivi'],['Bulletins','Consulter les bulletins disponibles.','▤','parent-bulletins']]},
-    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Diagnostic affichage','Contrôler les établissements, classes, élèves et demandes réellement visibles depuis Supabase.','DG','general-diagnostic']]}
+    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Espaces établissements','Ouvrir l’espace d’un établissement validé et contrôler ses classes, élèves inscrits et inscriptions.','ET','general-establishments'],['Diagnostic affichage','Contrôler les établissements, classes, élèves et demandes réellement visibles depuis Supabase.','DG','general-diagnostic']]}
   };
   const cfg=configs[role]; if(!cfg)return;
   const cards=cfg.items.map((item,i)=>role==='general'?
@@ -2497,27 +2502,49 @@ async function adminElevesView(){const root=$('spaceDashboard');if(!root)return;
 
 async function getAdminInstituteIds(){
   const token=currentAuroreSession?.access_token||'';if(!token)return[];
+  // L’Administration générale peut ouvrir un espace d’établissement pour contrôle
+  // sans devenir membre de cet établissement. L’établissement choisi par openSpace()
+  // devient alors la cible explicite des outils d’administration.
+  if(currentSpaceEstablishmentId){
+    try{if(await verifyAurorePlatformAdmin())return [currentSpaceEstablishmentId];}catch(_){}
+  }
   try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:'{}'});const rows=r.ok?await r.json():[];const ids=rows.filter(x=>['administration','proviseur'].includes(x.role)&&x.etablissement_id).map(x=>x.etablissement_id);if(currentSpaceEstablishmentId&&ids.includes(currentSpaceEstablishmentId))return [currentSpaceEstablishmentId];return ids;}catch(_){return[]}
 }
-async function loadAdminClasses(){
-  const board=$('adminClassBoard'),requests=$('classRequestList');if(!board)return;const token=currentAuroreSession?.access_token||'';const ids=await getAdminInstituteIds();if(!ids.length){board.innerHTML='<div class="admin-card">Aucun établissement administré n’a été trouvé pour ce compte.</div>';if(requests)requests.innerHTML='<div class="admin-card">Aucune demande disponible.</div>';return;}
+
+async function loadAdminValidatedStudents(ids,h){
+  const box=$('validatedStudentsAdmin');if(!box)return;
+  const instituteIds=[...(Array.isArray(ids)?ids:[])].filter(Boolean);
+  if(!instituteIds.length){box.innerHTML='<div class="admin-card">Aucun établissement sélectionné.</div>';return;}
+  const headers=h||{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`};
   try{
-    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};await loadAdminValidatedStudents(ids,h);
-    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(id)}&select=id,etablissement_id,nom,niveau,annee_scolaire,actif&order=nom.asc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));
-    const all=results.flat();
-    board.innerHTML=all.length?all.map(c=>`<article class="class-board-card" draggable="true" data-class-id="${esc(c.id)}" data-etab-id="${esc(c.etablissement_id)}"><button class="class-board-menu" type="button" onclick="renameInstituteClass('${esc(c.id)}','${esc(c.nom)}');event.stopPropagation()">⋯</button><span class="class-board-kicker">Classe</span><h4>${esc(c.nom)}</h4><div class="class-board-meta">${esc([c.niveau,c.annee_scolaire].filter(Boolean).join(' · ')||'Informations à compléter')}</div><span class="class-board-count" id="classCount-${esc(c.id)}">Effectif…</span><div class="class-student-panel" id="classStudents-${esc(c.id)}"></div></article>`).join(''):'<div class="admin-card">Aucune classe. Créez la première classe ci-dessus.</div>';
-    board.querySelectorAll('.class-board-card').forEach(card=>{card.addEventListener('dragstart',()=>{draggedAdminClassId=card.dataset.classId;card.classList.add('dragging')});card.addEventListener('dragend',()=>{draggedAdminClassId=null;card.classList.remove('dragging');board.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'))});card.addEventListener('dragover',e=>{e.preventDefault();if(draggedAdminClassId!==card.dataset.classId)card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(draggedAdminClassId&&draggedAdminClassId!==card.dataset.classId)reorderAdminClassCards(draggedAdminClassId,card.dataset.classId)});});
-    await Promise.all(all.map(c=>loadClassStudents(c.id)));
-    if(requests)await loadClassRequests(ids);
-  }catch(e){board.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les classes.')}</div>`;}
+    // Les profils rattachés à l’établissement sont lisibles par ses gestionnaires.
+    // On ne dépend pas de etablissement_membres ici car cette table est volontairement
+    // protégée par RLS. Le rattachement établissement + rôle élève est la donnée utile
+    // à l’affichage de l’effectif dans l’espace d’administration.
+    const results=await Promise.all(instituteIds.map(async etabId=>{
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(etabId)}&role=eq.eleve&select=id,nom,prenom,full_name,email,avatar_url,photo_profil_url,profil_statut,classe_id,classe,niveau,filiere&order=nom.asc,prenom.asc`,{headers,cache:'no-store'});
+      if(!r.ok)throw new Error(`Impossible de charger les élèves (${r.status}).`);
+      return await r.json();
+    }));
+    const rows=results.flat();
+    if(!rows.length){
+      box.innerHTML='<div class="admin-card"><strong>Aucun élève rattaché à cet établissement.</strong><p style="color:var(--muted);margin-top:5px">Les élèves apparaîtront ici dès que leur dossier sera associé à l’établissement.</p></div>';
+      return;
+    }
+    box.innerHTML=rows.map(p=>{
+      const name=p.full_name||[p.prenom,p.nom].filter(Boolean).join(' ')||'Élève';
+      const classe=p.classe||'Classe non attribuée';
+      const avatar=p.avatar_url||p.photo_profil_url;
+      const status=String(p.profil_statut||'').toLowerCase();
+      const statusText=status==='valide'?'Profil validé':status==='en_attente'?'Inscription en cours':'Élève rattaché';
+      return `<article class="member-request-card validated-member-card"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>Élève · ${esc(statusText)}${classe?' · '+esc(classe):''}</span><div class="member-request-details">${[p.niveau,p.filiere,p.email].filter(Boolean).map(x=>`<i>${esc(x)}</i>`).join('')||'<i>Dossier élève</i>'}</div></div><span class="member-valid-badge">✓ Inscrit</span></article>`;
+    }).join('');
+  }catch(e){
+    box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les élèves inscrits.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p></div>`;
+  }
 }
-async function createInstituteClass(){
-  const name=$('newClassName')?.value.trim(),niveau=$('newClassLevel')?.value.trim()||null,annee=$('newClassYear')?.value.trim()||null,btn=$('newClassBtn'),msg=$('classAdminMessage');if(!name)return;const ids=await getAdminInstituteIds();if(!ids.length){if(msg)msg.textContent='Aucun établissement administré.';return;}if(btn)btn.disabled=true;
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/classes`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({etablissement_id:ids[0],nom:name,niveau,annee_scolaire:annee,actif:true})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Création de la classe refusée.');}if(msg)msg.textContent='Classe créée avec succès.';$('newClassName').value='';await loadAdminClasses();}catch(e){if(msg)msg.textContent=e.message||'Impossible de créer la classe.';}finally{if(btn)btn.disabled=false;}
-}
-async function renameInstituteClass(id,current){const name=prompt('Nouveau nom de la classe :',current||'');if(!name||name.trim()===current)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({nom:name.trim()})});if(!r.ok)throw new Error('Modification refusée.');await loadAdminClasses();}catch(e){alert(e.message||'Impossible de modifier la classe.');}}
-function reorderAdminClassCards(fromId,toId){const board=$('adminClassBoard');const from=board?.querySelector(`[data-class-id="${CSS.escape(fromId)}"]`),to=board?.querySelector(`[data-class-id="${CSS.escape(toId)}"]`);if(from&&to)board.insertBefore(from,to);}
-async function loadClassStudents(classId){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};try{const cr=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,etablissement_id`,{headers:h,cache:'no-store'});const cls=cr.ok?(await cr.json())[0]:null;const etabId=cls?.etablissement_id;const r=etabId?await fetch(`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(etabId)}&classe_id=eq.${encodeURIComponent(classId)}&profil_statut=eq.valide&role=eq.eleve&select=id,nom,prenom,full_name,avatar_url&order=nom.asc,prenom.asc`,{headers:h,cache:'no-store'}):null;const rows=r&&r.ok?await r.json():[];const c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?rows.slice(0,5).map(x=>`<div class="class-student-row"><div><strong>${esc(x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève')}</strong><span>Profil validé</span></div></div>`).join('')+(rows.length>5?`<div class="class-select-note">+ ${rows.length-5} autre${rows.length-5>1?'s':''} élève${rows.length-5>1?'s':''}</div>`:''):'<div class="class-select-note">Aucun élève validé dans cette classe.</div>';}catch(_){} }
+
+async function loadClassStudents(classId){const token=currentAuroreSession?.access_token||'',h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};try{const cr=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,etablissement_id`,{headers:h,cache:'no-store'});const cls=cr.ok?(await cr.json())[0]:null;const etabId=cls?.etablissement_id;const r=etabId?await fetch(`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(etabId)}&classe_id=eq.${encodeURIComponent(classId)}&role=eq.eleve&select=id,nom,prenom,full_name,avatar_url,photo_profil_url,profil_statut&order=nom.asc,prenom.asc`,{headers:h,cache:'no-store'}):null;const rows=r&&r.ok?await r.json():[];const c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?rows.slice(0,5).map(x=>`<div class="class-student-row"><div><strong>${esc(x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève')}</strong><span>${String(x.profil_statut||'').toLowerCase()==='valide'?'Profil validé':'Élève inscrit'}</span></div></div>`).join('')+(rows.length>5?`<div class="class-select-note">+ ${rows.length-5} autre${rows.length-5>1?'s':''} élève${rows.length-5>1?'s':''}</div>`:''):'<div class="class-select-note">Aucun élève inscrit dans cette classe.</div>';}catch(_){} }
 
 async function adminDisciplinesView(){
   const root=$('spaceDashboard');if(!root)return;
@@ -2621,6 +2648,10 @@ function openSpaceTool(role,key){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Demandes d’établissements</span><h3>Demandes non validées</h3><p>Les demandes restent privées jusqu’à leur validation.</p></div>${common}</div><div id="adminRequestsList" class="admin-list"><div class="admin-card">Chargement des demandes…</div></div></section>`;
     loadAdminRequests();return;
   }
+  if(role==='general' && key==='general-establishments'){
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale · Espaces</span><h3>Espaces des établissements</h3><p>Ouvrez un espace d’établissement validé pour contrôler ses classes, élèves inscrits et inscriptions, sans modifier son rattachement.</p></div>${common}</div><div id="generalEstablishmentsList" class="admin-list"><div class="admin-card">Chargement des établissements…</div></div></section>`;
+    loadGeneralEstablishmentSpaces();return;
+  }
   if(role==='general' && key==='general-diagnostic'){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale · Diagnostic</span><h3>Diagnostic d’affichage</h3><p>Contrôle réservé à l’Administration générale pour identifier pourquoi un établissement ne voit pas ses élèves, classes ou demandes.</p></div>${common}</div><div id="generalDisplayDiagnostic"><div class="admin-card">Diagnostic en cours…</div></div></section>`;
     loadGeneralDisplayDiagnostic();return;
@@ -2640,6 +2671,17 @@ function openSpaceTool(role,key){
 }
 
 
+async function loadGeneralEstablishmentSpaces(){
+  const box=$('generalEstablishmentsList');if(!box||!isAurorePlatformAdmin())return;
+  const token=await getFreshAccessToken();if(!token){box.innerHTML='<div class="admin-card"><strong>Connexion requise.</strong></div>';return;}
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,type,ville,logo_url&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
+    const rows=r.ok?await r.json():[];
+    if(!r.ok)throw new Error(`Impossible de charger les établissements (${r.status}).`);
+    box.innerHTML=rows.length?rows.map(e=>`<article class="admin-row" style="grid-template-columns:72px 1fr auto"><div class="accepted-logo-fallback" style="width:72px;height:60px">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}" style="width:100%;height:100%;object-fit:contain;border-radius:12px">`:esc((e.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div><strong>${esc(e.nom)}</strong><div class="admin-meta">${esc([e.type,e.ville].filter(Boolean).join(' · ')||'Établissement validé')}</div></div><div class="admin-actions"><button class="admin-btn primary" type="button" onclick="openSpace('administration',{etablissementId:'${esc(e.id)}'})">Ouvrir l’espace</button></div></article>`).join(''):'<div class="admin-card">Aucun établissement validé et actif.</div>';
+  }catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les établissements.</strong><p class="admin-meta">${esc(e.message||'Erreur Supabase')}</p></div>`;}
+}
+
 async function loadGeneralDisplayDiagnostic(){
   const box=$('generalDisplayDiagnostic');if(!box||!isAurorePlatformAdmin())return;
   const token=await getFreshAccessToken();if(!token){box.innerHTML='<div class="admin-card"><strong>Connexion requise.</strong></div>';return;}
@@ -2649,7 +2691,7 @@ async function loadGeneralDisplayDiagnostic(){
   const etablissements=out[out.length-1]?.data||[];
   for(const e of (Array.isArray(etablissements)?etablissements.slice(0,30):[])){
     await run(`Classes · ${e.nom}`,`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(e.id)}&select=id,nom,niveau,actif`);
-    await run(`Élèves validés · ${e.nom}`,`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(e.id)}&profil_statut=eq.valide&role=eq.eleve&select=id,prenom,nom,full_name,classe_id`);
+    await run(`Élèves validés · ${e.nom}`,`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&select=id,prenom,nom,full_name,profil_statut,classe_id`);
     await run(`Demandes élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.en_attente&select=id,profile_id,classe_id,created_at`);
     await run(`Membres élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/etablissement_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.valide&select=profile_id,role,statut`);
   }
