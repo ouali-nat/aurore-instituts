@@ -1285,6 +1285,7 @@ async function restoreAuroreSession(){
 }
 
 async function auroreLogin(){
+  window.__auroreAuthActionInProgress=true;
   try{
     authMessage('Connexion sécurisée…');
     const email=$('authEmail').value.trim(),password=$('authPassword').value;
@@ -1297,6 +1298,7 @@ async function auroreLogin(){
     await loadAuroreProfile();
     await afterLoginToPersonalSpace(true);
   }catch(err){authMessage(err.message||'Connexion impossible.');}
+  finally{window.__auroreAuthActionInProgress=false;}
 }
 
 async function auroreSignup(){
@@ -2094,7 +2096,7 @@ const loadData=loadInstituts;
 window.addEventListener('popstate',e=>handleHash(e.state));
 // Démarrage non bloquant : l’interface est peinte immédiatement, puis les données et la session arrivent en parallèle.
 try{ if(!data.length){ data=demoData.map(normalize); render(); } }catch(_){ }
-Promise.allSettled([loadInstituts(),restoreAuroreSession()]).then(()=>handleHash());
+Promise.allSettled([loadInstituts()]).then(()=>handleHash());
 handleHash();
 
 
@@ -2821,6 +2823,13 @@ function appliquerTheme(choix){
   const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
   let client=null, googleBusy=false;
 
+  // Une nouvelle ouverture de l'URL ne doit JAMAIS déduire l'identité depuis
+  // une ancienne session du navigateur. L'utilisateur doit d'abord choisir
+  // son mode/compte de connexion. La session ne devient active qu'après une
+  // connexion explicite (mot de passe ou Google). On conserve le verifier PKCE
+  // séparément pour permettre le retour OAuth.
+  try{localStorage.removeItem('aurore-session');}catch(_){ }
+
   const authWait=document.getElementById('auroreAuthWait');
   const authWaitText=document.getElementById('auroreAuthWaitText');
   function afficherVeuillezPatienter(texte='Aurore prépare votre espace…'){
@@ -2879,7 +2888,7 @@ function appliquerTheme(choix){
   // également les attentes infinies sur certains réseaux mobiles.
   function creerClientAuthGoogle(){
     const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,storage:window.localStorage}
+      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:false,detectSessionInUrl:false,storage:window.localStorage}
     });
     brancherEvenementsAuth(client);
     return client;
@@ -2901,6 +2910,11 @@ function appliquerTheme(choix){
         // session courante, ou s'il n'y en a pas encore.
         const incomingId=session.user?.id||'';
         const currentId=currentAuroreSession?.user?.id||'';
+        // Une session reçue sans action de connexion de cette page ne doit pas
+        // devenir une authentification automatique. Les sessions OAuth sont
+        // acceptées uniquement pendant le retour explicite Google, et les
+        // connexions mot de passe passent par auroreLogin().
+        if(!window.__auroreAuthActionInProgress && !window.__auroreOAuthCallbackActive && event!=='TOKEN_REFRESH') return;
         if(currentId && incomingId && currentId!==incomingId) return;
         currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
         try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
@@ -3009,6 +3023,7 @@ function appliquerTheme(choix){
   async function handleGoogleReturn(){
     const params=new URLSearchParams(window.location.search);
     const code=params.get('code');
+    window.__auroreOAuthCallbackActive=!!code;
     const oauthError=params.get('error');
     if(oauthError){
       cacherVeuillezPatienter(); showPortal();
@@ -3053,6 +3068,7 @@ function appliquerTheme(choix){
         renderAuthStart?.();
       }finally{
         document.body.classList.remove('aurore-oauth-callback-pending');
+        window.__auroreOAuthCallbackActive=false;
         // Jamais de déverrouillage si la destination n'est pas réellement prête.
         if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
         else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
@@ -3068,30 +3084,9 @@ function appliquerTheme(choix){
   }
 
   async function restoreGoogleSession(){
-    try{
-      const c=await assurerClientAuthGoogle();
-      const {data}=await c.auth.getSession();
-      if(!data?.session)return false;
-      const session=data.session;
-      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-      window.__auroreAuthenticated=true;
-      closeSignup();
-      // Même principe qu'au retour Google : on attend que la destination soit prête
-      // avant de lever le verrou, pour ne jamais laisser entrevoir la page principale.
-      let destinationReady=false;
-      try{
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(false);
-        destinationReady=true;
-      }catch(e){console.warn('[Aurore Auth] profil/espace impossible à préparer',e);}
-      if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
-      else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
-      return true;
-    }catch(err){
-      console.warn('[Aurore Auth]',err);
-      return false;
-    }
+    // Désactivé volontairement : une ouverture normale du site ne doit pas
+    // reconnecter automatiquement le dernier compte du navigateur.
+    return false;
   }
 
   function openSignup(){
@@ -3149,7 +3144,7 @@ function appliquerTheme(choix){
     const handled=await handleGoogleReturn();
     if(!handled){
       let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
-      const restored=oauthPending?false:await restoreGoogleSession();
+      const restored=false;
       if(!restored){
         // Aucun compte actif : l’animation d’introduction doit TOUJOURS précéder
         // l’ouverture de l’écran de choix Google. Le contenu public reste invisible.
