@@ -12,6 +12,7 @@
      premier appel réseau (connexion, chargement des établissements) pour le
      faire. Gain net sur mobile, surtout en 3G/4G. -->
 <link rel="preconnect" href="https://fdstrbqvkemtjyxxaxbj.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://aurore-instituts.oualikevin9.workers.dev" crossorigin>
 
 <script>
@@ -1109,18 +1110,6 @@ function normalize(e){
 }
 
 function showHome(push=true){
-  // Un profil explicitement non finalisé doit rester dans « Mon espace ».
-  // IMPORTANT : ne pas appliquer ce verrou lorsque le profil n'est pas encore
-  // chargé. Sinon, en navigation normale (session persistante + réseau lent),
-  // un clic sur « Retour à l'accueil » peut être intercepté avant le chargement
-  // du profil et donner l'impression que le bouton ne fonctionne pas.
-  const profileKnown=!!currentAuroreProfile;
-  if(window.__auroreAuthenticated && profileKnown && !hasSavedPersonalRole()){
-    if(location.hash!=='#mon-espace') pushRoute('#mon-espace');
-    openAuthPage({push:false});
-    renderPersonalSpace().catch(()=>{});
-    return;
-  }
   restoreSiteLogo();
   if(push && location.hash!=='#accueil') pushRoute('#accueil');
   $('homeView').classList.remove('hide-home','directory-mode');
@@ -1599,8 +1588,8 @@ function renderPersonalSpaceEdit(){
 
 async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   if(!currentAuroreSession)return;
-  const ctx=await getPersonalSpaceContext();
-  // isNewAccount est optionnel : le profil DB reste la source de vérité.
+  // Chemin critique Google : pour un nouveau compte, aucune requête « mes espaces »
+  // n'est nécessaire avant l'écran de choix du rôle.
   const actuallyNew=!hasChosenRoleEver();
   if(actuallyNew)isNewAccount=true;
   if(!hasChosenRoleEver()){
@@ -1609,6 +1598,7 @@ async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
     if(showWelcome){accessMessage(`Bienvenue${currentAuroreProfile?.prenom?' '+currentAuroreProfile.prenom:''} ! Choisissons votre rôle…`,'ok');if(typeof window.auroreAfficherVeuillezPatienter==='function')window.auroreAfficherVeuillezPatienter('Bienvenue sur Aurore… préparation de votre espace');await new Promise(r=>requestAnimationFrame(r));}
     $('homeView')?.classList.add('hide-home');$('profileView')?.classList.remove('show');$('authView')?.classList.add('show');document.body.classList.remove('spaces-focus');$('spacePanel')?.classList.remove('page-mode','visible');if(location.hash!=='#mon-espace')pushRoute('#mon-espace');renderRoleChoice(isNewAccount);if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();return;
   }
+  const ctx=await getPersonalSpaceContext();
   if(!hasSavedPersonalRole()){
     // Compte déjà engagé (rôle déjà choisi, établissement pas encore choisi ou dossier
     // en attente) : jamais de retour au choix de rôle, direction l'espace personnel.
@@ -2011,17 +2001,6 @@ function restoreRoutePosition(state){
 function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
   if(lastHandledHash && h!==lastHandledHash) startPageTransition();
-  // Un utilisateur connecté sans profil validé reste dans Mon espace.
-  // Cela protège aussi les URLs saisies manuellement (#accueil, #apropos, etc.).
-  if(window.__auroreAuthenticated && currentAuroreProfile && !hasSavedPersonalRole() && h!=='#mon-espace' && !h.startsWith('#compte')){
-    applyingRoute=true;
-    try{
-      if(location.hash!=='#mon-espace') history.replaceState({scrollY:0},document.title,'#mon-espace');
-      openAuthPage({push:false});
-      renderPersonalSpace().catch(()=>{});
-    }finally{applyingRoute=false;}
-    return;
-  }
   if(h===lastHandledHash && eventState!==null)return;
   lastHandledHash=h;
   applyingRoute=true;
@@ -3043,9 +3022,10 @@ function appliquerTheme(choix){
 
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
       try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-      // Le client Supabase persiste désormais aussi la session OAuth. Cela évite
-      // qu'un appel ultérieur à getSession() ou un rafraîchissement perde le compte.
-      await synchroniserSessionSupabase(session);
+      // Ne pas bloquer l'arrivée dans l'espace sur la copie de session Supabase.
+      // setSession() est utile pour la persistance, mais n'est pas nécessaire pour
+      // poursuivre la navigation avec la session déjà échangée.
+      synchroniserSessionSupabase(session).catch(()=>{});
 
       // Important : on NE révèle PAS le site tout de suite. Tant que le profil et la
       // destination (choix de rôle / espace personnel) ne sont pas prêts, l'écran reste
@@ -3148,8 +3128,8 @@ function appliquerTheme(choix){
     showPortal();
     if(hasGoogleCode) document.body.classList.add('aurore-oauth-callback-pending');
     afficherVeuillezPatienter(hasGoogleCode?'Finalisation de votre connexion Google…':'Aurore prépare votre accès…');
-    // Même principe que Archives : DOMContentLoaded, jamais window.load.
-    await new Promise(resolve=>requestAnimationFrame(resolve));
+    // Au retour Google, traiter immédiatement le code PKCE : aucun frame
+    // supplémentaire ne doit retarder l'échange contre la session.
     const handled=await handleGoogleReturn();
     if(!handled){
       let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
@@ -3167,12 +3147,21 @@ function appliquerTheme(choix){
     }
   }
 
+  // Précharge discrètement le SDK pendant que l'écran de connexion est affiché.
+  // Le clic Google réutilise alors la même promesse au lieu d'attendre le CDN.
+  function warmupGoogleSdk(){
+    if(window.__auroreOAuthCallbackActive)return;
+    const warm=window.requestIdleCallback||((cb)=>setTimeout(cb,350));
+    warm(()=>{assurerClientAuthGoogle().catch(()=>{});},{timeout:1800});
+  }
+
   function wire(){
     document.getElementById('signupClose')?.addEventListener('click',closeSignup);
     document.getElementById('showLoginBtn')?.addEventListener('click',()=>{closeSignup();if(typeof openAuthPage==='function')openAuthPage();});
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
     auroreInitAuth();
+    warmupGoogleSdk();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 
