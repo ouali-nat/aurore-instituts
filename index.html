@@ -1558,7 +1558,9 @@ async function getPersonalSpaceContext(){
     ville:space.etablissement_ville||'',
     logo_url:space.etablissement_logo_url||null
   }:null;
-  return {role:space?.role||currentAuroreProfile?.role||'eleve',etab:etab||((currentAuroreProfile?.etablissement_id)?{id:currentAuroreProfile.etablissement_id,nom:currentAuroreProfile.etablissement_nom,logo_url:currentAuroreProfile.etablissement_logo_url||null}:null),spaces};
+  // Un etablissement_id présent sur profiles ne suffit jamais à ouvrir un espace : un dossier refusé ou simplement en attente peut encore le conserver.
+  const profileEtab=hasSavedPersonalRole()&&currentAuroreProfile?.etablissement_id?{id:currentAuroreProfile.etablissement_id,nom:currentAuroreProfile.etablissement_nom,logo_url:currentAuroreProfile.etablissement_logo_url||null}:null;
+  return {role:space?.role||currentAuroreProfile?.role||'eleve',etab:etab||profileEtab,spaces};
 }
 
 function personalRoleText(role){
@@ -1601,7 +1603,9 @@ async function savePersonalProfile(){
   const etabId=document.getElementById('personalEtab')?.value||'',etabName=document.getElementById('personalEtab')?.selectedOptions?.[0]?.dataset?.name||'';
   const niveau=document.getElementById('personalNiveau')?.value.trim()||'',classe=document.getElementById('personalClasse')?.selectedOptions?.[0]?.dataset?.name||'';
   const classeId=document.getElementById('personalClasseId')?.value||document.getElementById('personalClasse')?.value||'';
-  const filiere=document.getElementById('personalFiliere')?.value.trim()||'',discipline=document.getElementById('personalDiscipline')?.value.trim()||'',fonction=document.getElementById('personalFonction')?.value.trim()||'',enfant=document.getElementById('personalEnfant')?.value.trim()||'';
+  const filiere=document.getElementById('personalFiliere')?.value.trim()||'',discipline=document.getElementById('personalDiscipline')?.value.trim()||'',fonction=document.getElementById('personalFonction')?.value.trim()||'';
+  const enfantNom=document.getElementById('personalEnfantNom')?.value.trim()||'',enfantPrenom=document.getElementById('personalEnfantPrenom')?.value.trim()||'',enfantClasse=document.getElementById('personalEnfantClasse')?.value.trim()||'';
+  const enfant=document.getElementById('personalEnfant')?.value.trim()||[enfantPrenom,enfantNom,enfantClasse].filter(Boolean).join(' — ');
   const telephone=document.getElementById('personalTelephone')?.value.trim()||'',adresse=document.getElementById('personalAdresse')?.value.trim()||'',dateNaissance=document.getElementById('personalDateNaissance')?.value||'';
   const avatarFile=document.getElementById('personalAvatarFile')?.files?.[0]||null;
   if(!nom||!prenom||!etabId){if(msg){msg.textContent='Veuillez renseigner votre nom, votre prénom et votre établissement.';msg.className='personal-profile-message err';}return;}
@@ -1610,7 +1614,7 @@ async function savePersonalProfile(){
   try{
     let avatarUrl=currentAuroreProfile?.avatar_url||null;
     if(avatarFile){if(msg)msg.textContent='Téléversement de votre photo…';avatarUrl=await uploadPersonalAvatar(avatarFile,id);}
-    const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,enfant_informations:enfant,telephone,adresse,date_naissance:dateNaissance};
+    const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,enfant_informations:enfant,enfant_nom:enfantNom,enfant_prenom:enfantPrenom,enfant_classe:enfantClasse,telephone,adresse,date_naissance:dateNaissance};
     const client=await getClient();
     const pendingId=document.getElementById('personalPendingRequestId')?.value||'';
     let demande=null;
@@ -1628,6 +1632,12 @@ async function savePersonalProfile(){
     const updated=await client.auth.updateUser({data:{prenom,nom,full_name:`${prenom} ${nom}`,avatar_url:avatarUrl||null,role:role}});if(updated.error)console.warn(updated.error);
     await loadAuroreProfile();selectedOnboardingRole=role;
     if(msg){msg.textContent=pendingId?'Vos informations ont été mises à jour dans votre dossier en attente.':'Votre dossier a bien été enregistré et transmis à l’administration pour validation.';msg.className='personal-profile-message ok';}
+    if(role==='parent'&&etabId){
+      try{
+        const {error:relationError}=await client.rpc('soumettre_demande_rattachement',{p_etablissement_id:etabId,p_informations:{nom_parent:nom,prenom_parent:prenom,enfant_nom:enfantNom,enfant_prenom:enfantPrenom,enfant_classe:enfantClasse,ancien_texte:enfant||null},p_type_lien:'parent'});
+        if(relationError)console.warn('[Parent] demande de rattachement non créée',relationError);
+      }catch(relationErr){console.warn('[Parent] demande de rattachement non créée',relationErr);}
+    }
     if(role==='administration'&&!pendingId){await renderAdministrationRequestStatus();}else{await renderPersonalSpace();}
   }catch(e){if(msg){msg.textContent=e.message||'Impossible d’envoyer votre dossier.';msg.className='personal-profile-message err';}}
   finally{if(btn){btn.disabled=false;btn.textContent='Envoyer mon dossier';}}
@@ -1686,6 +1696,8 @@ function closeMemberRefusalNotice(){
   if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
 }
 function ignoreMemberRefusalNotice(){
+  const requestId=document.getElementById('memberRefusalModal')?.dataset?.requestId||'';
+  if(requestId){try{sessionStorage.setItem('aurore-refusal-ignored',`${currentAuroreSession?.user?.id||''}:${requestId}`);}catch(_){}}
   closeMemberRefusalNotice();
   showHome(true);
 }
@@ -1705,6 +1717,9 @@ function openMemberRefusalNotice(request){
   }
   const reason=document.getElementById('memberRefusalReason');
   if(reason)reason.textContent=String(request.commentaire||request.commentaire_admin||'Le lycée n’a pas indiqué de motif détaillé.');
+  modal.dataset.requestId=request.id||'';
+  let ignored=false;try{ignored=sessionStorage.getItem('aurore-refusal-ignored')===`${currentAuroreSession?.user?.id||''}:${request.id||''}`;}catch(_){ }
+  if(ignored)return;
   modal.classList.add('show');
   modal.setAttribute('aria-hidden','false');
   requestAnimationFrame(()=>document.getElementById('memberRefusalCorrectBtn')?.focus());
@@ -1745,7 +1760,7 @@ async function renderPersonalSpace(preloadedCtx=null){
   } else if(role==='proviseur'){
     roleFields=`<div class="profile-page-kicker">Profil proviseur</div><p class="profile-form-help">Indiquez votre lycée et votre fonction de direction.</p><label>Fonction<input id="personalFonction" value="${esc(formP.fonction||'Proviseur')}" required placeholder="Proviseur"></label>`;
   } else if(role==='parent'){
-    roleFields=`<div class="profile-page-kicker">Profil parent</div><p class="profile-form-help">Indiquez le lycée concerné et les informations permettant d’identifier votre enfant.</p><label>Informations sur votre enfant<textarea id="personalEnfant" placeholder="Nom, prénom, classe et toute information utile">${esc(formP.enfant_informations||'')}</textarea></label>`;
+    roleFields=`<div class="profile-page-kicker">Profil parent</div><p class="profile-form-help">Indiquez le lycée concerné puis les informations d’identification de votre enfant. Ces informations servent à établir une demande de rattachement privée : elles ne créent pas un annuaire public des élèves.</p><div class="personal-profile-grid"><label>Prénom de l’enfant<input id="personalEnfantPrenom" value="${esc(formP.enfant_prenom||'')}" placeholder="Prénom"></label><label>Nom de l’enfant<input id="personalEnfantNom" value="${esc(formP.enfant_nom||'')}" placeholder="Nom"></label></div><label>Classe de l’enfant (si connue)<input id="personalEnfantClasse" value="${esc(formP.enfant_classe||'')}" placeholder="Ex. 3e A"></label><input type="hidden" id="personalEnfant" value="${esc(formP.enfant_informations||'')}">`;
   }
   roleFields+=`<div class="personal-profile-grid"><label>Téléphone (facultatif)<input id="personalTelephone" value="${esc(formP.telephone||'')}" autocomplete="tel" placeholder="+226 …"></label><label>Date de naissance (facultatif)<input id="personalDateNaissance" type="date" value="${esc(formP.date_naissance||'')}"></label></div><label>Adresse (facultatif)<input id="personalAdresse" value="${esc(formP.adresse||'')}" placeholder="Ville / secteur / adresse"></label>`;
   const tiles={
@@ -1902,7 +1917,7 @@ async function afterLoginToPersonalSpace(showWelcome=true,isNewAccount=false){
   }
   // Un espace déjà validé doit être ouvert directement, sans repasser par la fiche d'inscription.
   // mes_espaces est la source de vérité pour les accès réellement validés.
-  if(ctx.etab && ['eleve','parent','professeur','administration','proviseur'].includes(currentRole)){
+  if(ctx.etab && hasSavedPersonalRole() && ['eleve','parent','professeur','administration','proviseur'].includes(currentRole)){
     await openSpace(currentRole,{etablissementId:ctx.etab.id});
     if(typeof window.auroreCacherVeuillezPatienter==='function')window.auroreCacherVeuillezPatienter();
     return;
