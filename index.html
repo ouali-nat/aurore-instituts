@@ -2390,11 +2390,16 @@ function reorderAdminClassCards(fromId,toId){const board=$('adminClassBoard');co
 async function loadClassStudents(classId){const token=await getFreshAccessToken(),h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};if(!token)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_eleves_classe`,{method:'POST',headers:h,body:JSON.stringify({p_classe_id:classId}),cache:'no-store'});const b=await r.json().catch(()=>[]);if(!r.ok)throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);const rows=Array.isArray(b)?b:[],c=$(`classCount-${classId}`),box=$(`classStudents-${classId}`);if(c)c.textContent=`${rows.length} élève${rows.length>1?'s':''}`;if(box)box.innerHTML=rows.length?`<div class="class-student-grid-admin">${rows.map(x=>{const name=x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève';return `<div class="class-student-card-admin"><div class="class-student-avatar">${x.avatar_url?`<img src="${esc(x.avatar_url)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div><strong>${esc(name)}</strong><span>${esc(x.matricule||'Élève validé')}</span><small>✓ Profil validé</small></div></div>`}).join('')}</div>`:'<div class="class-select-note">Aucun élève validé dans cette classe.</div>';}catch(e){const box=$(`classStudents-${classId}`);if(box)box.innerHTML=`<div class="class-select-note err">${esc(e.message||'Impossible de charger les élèves.')}</div>`;}}
 
 async function loadClassRequests(ids){
-  const box=$('classRequestList');if(!box)return;const token=await getFreshAccessToken();
-  if(!token){box.innerHTML='<div class="admin-card">Session expirée. Reconnectez-vous.</div>';return;}
-  try{const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_demandes_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:id}),cache:'no-store'}).then(async r=>{if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);}return r.json();})));const all=results.flat();box.innerHTML=all.length?all.map(d=>`<article class="class-request-card"><div class="class-request-main"><strong>Demande d’inscription</strong><span>Classe : ${esc(d.classe_nom||'Classe')} · ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):''}</span><span>Profil : ${esc(d.profile_name||d.profile_id||'Utilisateur')}</span></div><div class="class-request-actions"><span class="class-request-status">En attente</span><button class="admin-btn primary" type="button" onclick="decideClassRequest('${esc(d.id)}','valide')">Valider</button><button class="admin-btn danger" type="button" onclick="decideClassRequest('${esc(d.id)}','refuse')">Refuser</button></div></article>`).join(''):'<div class="admin-card">Aucune demande d’inscription en attente.</div>';}catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les demandes.</strong><p>${esc(e.message||'Erreur Supabase')}</p><button class="admin-btn" type="button" onclick="loadClassRequests(${JSON.stringify(ids)})">Réessayer</button></div>`;}
+  const token=await getFreshAccessToken();if(!token)return;
+  const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+  const box=$('classRequestList');if(!box)return;
+  try{
+    const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_lister_demandes_membres`,{method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:id}),cache:'no-store'}).then(async r=>{const b=await r.json().catch(()=>[]);if(!r.ok)throw new Error(b?.message||b?.hint||`Erreur ${r.status}`);return Array.isArray(b)?b:[]}).catch(()=>[])));
+    const all=results.flat().filter(d=>String(d.role||'').toLowerCase()==='eleve');
+    box.innerHTML=all.length?all.map(d=>{const name=d.full_name||[d.prenom,d.nom].filter(Boolean).join(' ')||'Élève';const info=d.informations||{};const details=[info.telephone,info.date_naissance,info.adresse].filter(Boolean);return `<article class="class-request-card" data-request-id="${esc(d.id)}"><div class="class-request-main"><strong>Demande d’inscription élève</strong><span>${esc(name)}</span><span>Classe demandée : ${esc(d.classe_nom||'À préciser')} · ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):''}</span>${details.length?`<div class="class-request-details">${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div>`:''}</div><span class="member-pending-badge">En attente</span></article>`}).join(''):'<div class="admin-card">Aucune demande d’inscription en attente.</div>';
+    box.querySelectorAll('.class-request-card').forEach(card=>card.addEventListener('click',()=>card.classList.toggle('is-open')));
+  }catch(e){box.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les demandes d’inscription.')}</div>`;}
 }
-
 async function decideClassRequest(id,decision){const comment=decision==='refuse'?prompt('Motif du refus (facultatif) :','Informations à compléter')||null:null;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_commentaire:comment})});if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Décision impossible.');}await loadAdminClasses();}catch(e){alert(e.message||'Impossible de traiter la demande.');}}
 
 async function adminDisciplinesView(){
@@ -2825,125 +2830,35 @@ function appliquerTheme(choix){
   const SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_OL43ifat8UlV8zwpeFFiNg_tC0-GmJa';
   let client=null, googleBusy=false;
 
-  const authWait=document.getElementById('auroreAuthWait');
-  const authWaitText=document.getElementById('auroreAuthWaitText');
-  function afficherVeuillezPatienter(texte='Aurore prépare votre espace…'){
-    if(authWaitText)authWaitText.textContent=texte;
-    if(authWait){authWait.classList.add('show');authWait.setAttribute('aria-hidden','false');}
-  }
-  function cacherVeuillezPatienter(){
-    if(authWait){authWait.classList.remove('show');authWait.setAttribute('aria-hidden','true');}
-    document.body.classList.remove('auth-initializing');
-  }
-  window.auroreAfficherVeuillezPatienter=afficherVeuillezPatienter;
-  window.auroreCacherVeuillezPatienter=cacherVeuillezPatienter;
-
   function accessMessage(text,type='ok'){
     const el=document.getElementById('accessMessage'); if(!el)return;
     el.textContent=text; el.className='access-message '+type; el.style.display='block';
   }
   function unlockAccess(){
-    document.body.classList.remove('site-locked','auth-initializing');
+    document.body.classList.remove('site-locked');
     const lock=document.getElementById('accessLock'); if(lock)lock.style.display='none';
   }
   function showPortal(){
     document.body.classList.add('site-locked');
-    document.body.classList.remove('aurore-oauth-callback-pending');
-    const lock=document.getElementById('accessLock');
-    if(lock){lock.style.display='flex';lock.style.visibility='visible';lock.style.opacity='1';}
-  }
-  function recoverAuthScreen(message='Votre connexion est prête. Vous pouvez réessayer.'){
-    try{
-      document.body.classList.remove('aurore-oauth-callback-pending','aurore-transitioning');
-      document.body.classList.add('site-locked');
-      const wait=document.getElementById('auroreAuthWait');
-      const lock=document.getElementById('accessLock');
-      // Règle absolue : le site ne devient jamais visible pendant la récupération.
-      if(lock){lock.style.display='flex';lock.style.visibility='hidden';lock.style.opacity='0';}
-      if(wait){
-        wait.classList.add('show');
-        wait.setAttribute('aria-hidden','false');
-        if(authWaitText)authWaitText.textContent='Aurore prépare l’accès sécurisé…';
-      }
-      if(typeof openAuthPage==='function')openAuthPage({push:false});
-      if(typeof renderAuthStart==='function')renderAuthStart();
-      window.setTimeout(()=>{
-        if(wait){wait.classList.remove('show');wait.setAttribute('aria-hidden','true');}
-        if(lock){lock.style.visibility='visible';lock.style.opacity='1';}
-        document.body.classList.remove('auth-initializing');
-        accessMessage(message,'err');
-      },520);
-    }catch(e){console.error('[Aurore] récupération écran connexion impossible',e);}
+    const lock=document.getElementById('accessLock'); if(lock)lock.style.display='flex';
   }
   window.auroreUnlockAccess=unlockAccess;
 
-  // ===== AUTH GOOGLE — même architecture que la Section Archives =====
-  // Le SDK est chargé en asynchrone : un CDN lent ne doit jamais bloquer le parsing
-  // ni retarder le traitement du retour Google. Un CDN de secours + timeout évitent
-  // également les attentes infinies sur certains réseaux mobiles.
-  function creerClientAuthGoogle(){
-    const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-      auth:{flowType:'pkce',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,storage:window.localStorage}
-    });
-    brancherEvenementsAuth(client);
+  async function getClient(){
+    if(client)return client;
+    if(window.supabase?.createClient){
+      client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+      return client;
+    }
+    if(!document.querySelector('script[data-aurore-supabase-fallback]')){
+      const s=document.createElement('script'); s.src='https://unpkg.com/@supabase/supabase-js@2'; s.async=true; s.dataset.auroreSupabaseFallback='1'; document.head.appendChild(s);
+    }
+    const started=Date.now();
+    while(!window.supabase?.createClient && Date.now()-started<3500) await new Promise(r=>setTimeout(r,40));
+    if(!window.supabase?.createClient)throw new Error('Service de connexion momentanément indisponible.');
+    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
     return client;
   }
-  let AURORE_SUPABASE_AUTH = window.supabase?.createClient ? creerClientAuthGoogle() : null;
-  let supabaseLoadPromise=null;
-  let authEventsBound=false;
-
-  function brancherEvenementsAuth(c){
-    if(authEventsBound||!c?.auth)return;
-    authEventsBound=true;
-    c.auth.onAuthStateChange((event,session)=>{
-      if(session){
-        currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-      }else if(event==='SIGNED_OUT'){
-        currentAuroreSession=null;
-        try{localStorage.removeItem('aurore-session');}catch(_){}
-      }
-    });
-  }
-
-  function chargerScriptSupabase(url,delaiMs=8000){
-    return new Promise((resolve,reject)=>{
-      const s=document.createElement('script');
-      let fini=false;
-      const minuteur=setTimeout(()=>{
-        if(fini)return; fini=true;
-        reject(new Error('Délai dépassé : '+url));
-      },delaiMs);
-      s.src=url; s.async=true;
-      s.onload=()=>{if(fini)return;fini=true;clearTimeout(minuteur);resolve();};
-      s.onerror=()=>{if(fini)return;fini=true;clearTimeout(minuteur);reject(new Error('Échec de chargement : '+url));};
-      document.head.appendChild(s);
-    });
-  }
-
-  async function assurerClientAuthGoogle(){
-    if(AURORE_SUPABASE_AUTH){brancherEvenementsAuth(AURORE_SUPABASE_AUTH);return AURORE_SUPABASE_AUTH;}
-    if(supabaseLoadPromise)return supabaseLoadPromise;
-    supabaseLoadPromise=(async()=>{
-      if(!window.supabase?.createClient){
-        try{await chargerScriptSupabase('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',8000);}catch(e){
-          console.warn('[Aurore] jsDelivr indisponible, tentative unpkg',e);
-          try{await chargerScriptSupabase('https://unpkg.com/@supabase/supabase-js@2',8000);}catch(e2){
-            throw new Error('Impossible de charger le service de connexion.');
-          }
-        }
-      }
-      if(window.supabase?.createClient&&!AURORE_SUPABASE_AUTH)AURORE_SUPABASE_AUTH=creerClientAuthGoogle();
-      if(!AURORE_SUPABASE_AUTH)throw new Error('Service de connexion momentanément indisponible.');
-      brancherEvenementsAuth(AURORE_SUPABASE_AUTH);
-      return AURORE_SUPABASE_AUTH;
-    })();
-    try{return await supabaseLoadPromise;}finally{if(!AURORE_SUPABASE_AUTH)supabaseLoadPromise=null;}
-  }
-
-  // Compatibilité avec tout le code de Mon espace qui appelle getClient().
-  async function getClient(){return assurerClientAuthGoogle();}
-  window.getClient=getClient;
 
   function setGoogleLoading(on){
     googleBusy=on; const btn=document.getElementById('accessGoogleBtn'); if(!btn)return;
@@ -2953,123 +2868,65 @@ function appliquerTheme(choix){
 
   async function startGoogle(){
     if(googleBusy)return;
-    googleBusy=true;
-    // Filet de sécurité posé en tout premier, avant tout await : si pour une
-    // raison quelconque le site n'était plus verrouillé au moment du clic, on
-    // le reverrouille immédiatement pour qu'aucune page du site ne puisse
-    // jamais apparaître pendant l'attente du SDK / de la redirection Google.
-    document.body.classList.add('site-locked','auth-initializing');
-    try{sessionStorage.setItem('aurore-google-oauth-pending','1');}catch(_){}
     setGoogleLoading(true);
-    afficherVeuillezPatienter('Connexion sécurisée avec Google…');
-    accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
+    accessMessage('Ouverture de Google…','ok');
     try{
-      // Nettoyage ciblé du verifier précédent, exactement avant une NOUVELLE tentative.
-      try{localStorage.removeItem('sb-fdstrbqvkemtjyxxaxbj-auth-token-code-verifier');}catch(_){}
-      const c=await assurerClientAuthGoogle();
-      const redirectTo=window.location.origin+window.location.pathname;
-      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
+      const c=await getClient();
+      // Utilise le flux OAuth officiel de Supabase : le SDK crée et conserve
+      // automatiquement le verifier PKCE nécessaire au retour depuis Google.
+      const redirectTo='https://auroresectioninstituts.vercel.app/';
+      const {error}=await c.auth.signInWithOAuth({
+        provider:'google',
+        options:{redirectTo}
+      });
       if(error)throw error;
-      // Le navigateur quitte la page pour Google : on garde le verrouillage actif.
     }catch(err){
       console.error('[Google OAuth] démarrage impossible',err);
-      googleBusy=false;
       setGoogleLoading(false);
-      cacherVeuillezPatienter();
       const raw=String(err?.message||'');
-      accessMessage(/provider.*not enabled/i.test(raw)
-        ? 'La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.'
-        : 'Impossible de démarrer la connexion Google. Réessayez.','err');
+      if(/provider.*not enabled/i.test(raw)){
+        accessMessage('La connexion Google n’est pas encore activée pour Section Instituts dans Supabase.','err');
+      }else{
+        accessMessage('Impossible de démarrer la connexion Google. Réessayez.','err');
+      }
     }
   }
   window.auroreGoogleLogin=function(e){e?.preventDefault();startGoogle();};
 
   async function handleGoogleReturn(){
-    const params=new URLSearchParams(window.location.search);
-    const code=params.get('code');
-    const oauthError=params.get('error');
-    if(oauthError){
-      cacherVeuillezPatienter(); showPortal();
-      accessMessage('La connexion Google n’a pas abouti. Vérifiez votre connexion Internet puis réessayez.','err');
-      return true;
-    }
+    const params=new URLSearchParams(location.search),code=params.get('code'),oauthError=params.get('error');
+    if(oauthError){showPortal();accessMessage('La connexion Google n’a pas abouti. Réessayez.','err');return true;}
     if(!code)return false;
     try{
-      afficherVeuillezPatienter('Finalisation de votre connexion Google…');
-      const c=await assurerClientAuthGoogle();
-      const {data,error}=await c.auth.exchangeCodeForSession(code);
-      if(error)throw error;
-      const session=data?.session;
-      if(!session?.access_token)throw new Error('Session Google introuvable après authentification.');
-
-      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-
-      // Important : on NE révèle PAS le site tout de suite. Tant que le profil et la
-      // destination (choix de rôle / espace personnel) ne sont pas prêts, l'écran reste
-      // verrouillé derrière l'animation « Finalisation… » avec fond flou. Cela évite tout
-      // accès instantané et non désiré à la page principale avant que le bon écran ne
-      // soit affiché.
-      window.__auroreAuthenticated=true;
-      closeSignup();
-      setGoogleLoading(false);
-      history.replaceState({},document.title,window.location.pathname+window.location.hash);
-
-      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
-      let isNewAccount=false;
-      let destinationReady=false;
-      try{
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        // La base de données est la source de vérité : nouveau compte = aucun rôle
-        // et aucun établissement encore choisis. Aucun timestamp fragile.
-        isNewAccount=!hasChosenRoleEver();
-        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,isNewAccount);
-        destinationReady=true;
-      }catch(postLoginErr){
-        console.warn('[Google OAuth] profil/espace impossible à préparer',postLoginErr);
-        openAuthPage({push:false});
-        renderAuthStart?.();
-      }finally{
-        document.body.classList.remove('aurore-oauth-callback-pending');
-        // Jamais de déverrouillage si la destination n'est pas réellement prête.
-        if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
-        else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
+      showPortal(); accessMessage('Finalisation de votre connexion…','ok');
+      const c=await getClient();
+      let {data,error}=await c.auth.exchangeCodeForSession(code);
+      // Si le SDK a déjà consommé le code pendant le retour, relire la session.
+      if(error || !data?.session){
+        const again=await c.auth.getSession();
+        if(again?.data?.session){ data=again.data; error=null; }
+        else if(error) throw error;
       }
-      return true;
-    }catch(err){
-      try{sessionStorage.removeItem('aurore-google-oauth-pending');}catch(_){}
-      console.error('[Google OAuth PKCE] callback impossible',err);
-      setGoogleLoading(false);
-      recoverAuthScreen('La connexion Google n’a pas pu être finalisée. Réessayez.');
-      return true;
-    }
+      const session=data?.session; if(!session)throw new Error('Session Google introuvable.');
+      currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
+      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+      if(typeof renderAccountHome==='function')renderAccountHome();
+      unlockAccess(); setGoogleLoading(false); history.replaceState({},document.title,location.pathname+location.hash); return true;
+    }catch(err){setGoogleLoading(false);accessMessage('La connexion Google n’a pas pu être finalisée. Réessayez.','err');return true;}
   }
 
   async function restoreGoogleSession(){
     try{
-      const c=await assurerClientAuthGoogle();
-      const {data}=await c.auth.getSession();
+      const c=await getClient(); const {data}=await c.auth.getSession();
       if(!data?.session)return false;
       const session=data.session;
       currentAuroreSession={...session,expires_at:(session.expires_at||Math.floor(Date.now()/1000)+3600)*1000};
-      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){}
-      window.__auroreAuthenticated=true;
-      closeSignup();
-      // Même principe qu'au retour Google : on attend que la destination soit prête
-      // avant de lever le verrou, pour ne jamais laisser entrevoir la page principale.
-      let destinationReady=false;
-      try{
-        if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
-        if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(false);
-        destinationReady=true;
-      }catch(e){console.warn('[Aurore Auth] profil/espace impossible à préparer',e);}
-      if(destinationReady){unlockAccess();cacherVeuillezPatienter();}
-      else{recoverAuthScreen('Votre compte est bien connecté, mais votre espace n’a pas pu être préparé. Réessayez.');}
-      return true;
-    }catch(err){
-      console.warn('[Aurore Auth]',err);
-      return false;
-    }
+      try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
+      if(typeof loadAuroreProfile==='function')await loadAuroreProfile();
+      if(typeof renderAccountHome==='function')renderAccountHome();
+      unlockAccess(); return true;
+    }catch(_){return false;}
   }
 
   function openSignup(){
@@ -3098,69 +2955,24 @@ function appliquerTheme(choix){
     try{
       const r=await fetch(SUPABASE_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password,data:{full_name:name,nom_complet:name}})});
       const body=await r.json().catch(()=>({})); if(!r.ok)throw new Error(body.msg||body.error_description||'Création du compte impossible.');
-      if(body.access_token){
-        currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};
-        try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }
-        closeSignup(); afficherVeuillezPatienter('Création de votre espace…');
-        let ready=false;
-        try{if(typeof loadAuroreProfile==='function')await loadAuroreProfile();if(typeof afterLoginToPersonalSpace==='function')await afterLoginToPersonalSpace(true,true);ready=true;}catch(e){console.warn('[Aurore] création/espace impossible à préparer',e);}
-        if(ready){unlockAccess();cacherVeuillezPatienter();}else recoverAuthScreen('Votre compte a été créé, mais votre espace n’a pas pu être préparé. Réessayez.');
-      }
+      if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};try{localStorage.setItem('aurore-session',JSON.stringify(currentAuroreSession));}catch(_){ }if(typeof loadAuroreProfile==='function')await loadAuroreProfile();closeSignup();unlockAccess();if(typeof renderAccountHome==='function')renderAccountHome();}
       else show('Compte créé. Vérifiez votre e-mail pour confirmer votre adresse, puis revenez vous connecter.','ok');
     }catch(err){show(err?.message||'Création du compte impossible.','err');}
     finally{if(submit){submit.disabled=false;submit.textContent='CRÉER MON COMPTE';}}
   }
   window.auroreSignup=signup;
 
-  async function auroreInitAuth(){
-    if(window.__auroreAuthInitDone)return;
-    window.__auroreAuthInitDone=true;
-    const hasGoogleCode=!!new URLSearchParams(window.location.search).get('code');
-    // Au retour Google, l'écran Aurore reste totalement bloqué jusqu'à l'échange PKCE.
-    showPortal();
-    if(hasGoogleCode) document.body.classList.add('aurore-oauth-callback-pending');
-    afficherVeuillezPatienter(hasGoogleCode?'Finalisation de votre connexion Google…':'Aurore prépare votre accès…');
-    // Même principe que Archives : DOMContentLoaded, jamais window.load.
-    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-    const handled=await handleGoogleReturn();
-    if(!handled){
-      let oauthPending=false;try{oauthPending=sessionStorage.getItem('aurore-google-oauth-pending')==='1';}catch(_){}
-      const restored=oauthPending?false:await restoreGoogleSession();
-      if(!restored){
-        // Aucun compte actif : l’animation d’introduction doit TOUJOURS précéder
-        // l’ouverture de l’écran de choix Google. Le contenu public reste invisible.
-        if(authWaitText)authWaitText.textContent='Ouverture de l’accès sécurisé…';
-        await new Promise(resolve=>setTimeout(resolve,520));
-        cacherVeuillezPatienter();
-        showPortal();
-        document.body.classList.remove('auth-initializing');
-        const lock=document.getElementById('accessLock');
-        if(lock){lock.style.visibility='visible';lock.style.opacity='1';}
-      }
-    }
-  }
-
   function wire(){
+    // Les onclick sont volontairement présents sur les boutons : aucun délai de chargement du SDK ne bloque l'interface.
     document.getElementById('signupClose')?.addEventListener('click',closeSignup);
     document.getElementById('showLoginBtn')?.addEventListener('click',()=>{closeSignup();if(typeof openAuthPage==='function')openAuthPage();});
     document.getElementById('signupModal')?.addEventListener('click',e=>{if(e.target.id==='signupModal')closeSignup();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
-    auroreInitAuth();
+    showPortal();
+    // Ne bloque jamais l'affichage de la page pendant la restauration de session.
+    handleGoogleReturn().then(handled=>{if(!handled)restoreGoogleSession();});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
-
-  // Protection contre le cache de navigation (bfcache) : sur mobile, quand
-  // l'aller-retour vers Google est très rapide, certains navigateurs peuvent
-  // restaurer une version figée de CETTE page (telle qu'elle était juste avant
-  // le clic sur « Continuer avec Google ») au lieu de charger la vraie réponse
-  // du serveur — l'utilisateur voit alors un instant la page du site avant que
-  // l'écran de finalisation ne prenne le relais. `pageshow` avec
-  // `event.persisted` détecte précisément ce cas ; on force un rechargement
-  // propre pour repartir sur l'état verrouillé initial plutôt que sur un DOM
-  // obsolète (jeton PKCE potentiellement déjà consommé, variables JS périmées).
-  window.addEventListener('pageshow',function(e){
-    if(e.persisted){window.location.reload();}
-  });
 })();
 </script>
 </body>
