@@ -2143,8 +2143,8 @@ async function renderAccountHome(){
   const roleHtml=roles.length?roles.map(r=>`<span class="auth-role-chip">${esc(roleNames[r]||r)}</span>`).join(''):'<span class="auth-role-chip">Aucun espace configuré</span>';
   const adminAccess=isPlatformAdmin?'<button class="auth-secondary platform-admin-access" type="button" id="generalAdminBtn">Administration générale Aurore</button>':'';
   const configuredSpaces=[...spaces].sort((a,b)=>String(a.etablissement_nom||'').localeCompare(String(b.etablissement_nom||''),'fr',{sensitivity:'base'})||String(a.role||'').localeCompare(String(b.role||''),'fr',{sensitivity:'base'}));
-   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}" role="button" tabindex="0" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="event.stopPropagation();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="event.stopPropagation();removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
-  const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
+   const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}" role="button" tabindex="0" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="event.stopPropagation();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir mon espace</button><button class="admin-btn danger" type="button" onclick="event.stopPropagation();removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
+  const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
   const configureBtn=isPlatformAdmin?`<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace${spaces.length>=10?' (limite atteinte)':''}</button></div>`:'';
   root.innerHTML=`<section class="aurore-account-page"><div class="auth-step account-page-top"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side aurore-account-card" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
   if(isPlatformAdmin){
@@ -4425,5 +4425,65 @@ function appliquerTheme(choix){
   }
 })();
 </script>
+
+<style id="aurore-space-control-final-fix">
+/* ===== Correction finale — espaces de compte + administration générale ===== */
+/* Les cartes de contrôle doivent rester compactes et être entourées d'un anneau/bande d'accent. */
+.aurore-account-card .config-test{padding:14px!important;border-radius:20px!important}
+.aurore-account-card .config-test-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important}
+.aurore-account-card .config-chip{
+  position:relative!important;min-height:62px!important;height:62px!important;padding:9px 10px!important;
+  display:flex!important;align-items:center!important;gap:8px!important;border-radius:15px!important;
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;
+  background:color-mix(in srgb,var(--panel2) 94%,var(--accent))!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 7%,transparent),0 8px 18px rgba(0,0,0,.045)!important;
+  overflow:hidden!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important
+}
+.aurore-account-card .config-chip:before,
+.aurore-general-tools .admin-general-card:before{
+  content:"";position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:0 6px 6px 0;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+}
+.aurore-account-card .config-chip:hover{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--accent) 46%,var(--line))!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 9%,transparent),0 12px 24px rgba(0,0,0,.08)!important}
+.aurore-account-card .config-chip-ico{width:29px!important;height:29px!important;min-width:29px!important;border-radius:9px!important;display:grid!important;place-items:center!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;color:var(--accent)!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;font-size:.68rem!important}
+.aurore-account-card .config-chip>span:last-child{font-size:.59rem!important;line-height:1.2!important;font-weight:800!important}
+/* Retire les libellés de rôle administrateur redondants dans Mon compte. */
+.aurore-account-card .auth-role-chip{display:none!important}
+.aurore-account-card .auth-role-chip:not(:empty){display:none!important}
+/* Espace configuré : bouton plus fin, plus élégant, sans gros pilule rouge. */
+.aurore-account-card .configured-row.admin-space{border-color:color-mix(in srgb,var(--accent) 22%,var(--line))!important;background:linear-gradient(165deg,color-mix(in srgb,var(--accent) 8%,var(--panel)),var(--panel))!important}
+.aurore-account-card .configured-row.admin-space .space-open-btn,
+.configured-row .space-open-btn{
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2))!important;
+  color:#fff!important;border:0!important;border-radius:12px!important;padding:10px 15px!important;
+  width:auto!important;min-width:150px!important;margin:2px auto -16px!important;
+  box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 24%,transparent)!important;font-size:.68rem!important;font-weight:850!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important
+}
+.configured-row .space-open-btn:hover{transform:translateY(-2px)!important;filter:brightness(1.04);box-shadow:0 12px 23px color-mix(in srgb,var(--accent) 28%,transparent)!important}
+.configured-row.admin-space .space-open-btn{background:linear-gradient(135deg,var(--accent-strong),var(--accent2))!important;box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 24%,transparent)!important}
+.configured-row.admin-space{border-color:color-mix(in srgb,var(--accent) 25%,var(--line))!important}
+.configured-row .admin-btn.danger:hover{color:var(--accent)!important}
+/* Administration générale : même philosophie visuelle que le Centre de gestion du lycée, sans rouge. */
+.aurore-general-tools{
+  margin-top:14px!important;padding:15px!important;border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line))!important;
+  border-radius:24px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 97%,var(--accent)),var(--panel2))!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.06)!important
+}
+.aurore-general-tools .admin-general-card{
+  position:relative!important;min-height:92px!important;height:92px!important;padding:10px 12px 10px 15px!important;
+  border-radius:15px!important;border:1px solid color-mix(in srgb,var(--accent) 16%,var(--line))!important;
+  background:color-mix(in srgb,var(--panel2) 94%,var(--accent))!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 6%,transparent),0 7px 18px rgba(0,0,0,.045)!important;
+  overflow:hidden!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important
+}
+.aurore-general-tools .admin-general-card:hover{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--accent) 44%,var(--line))!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 8%,transparent),0 12px 25px rgba(0,0,0,.08)!important}
+.aurore-general-tools .admin-general-card .space-tool-icon{width:31px!important;height:31px!important;border-radius:9px!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;color:var(--accent)!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important}
+.aurore-general-tools .admin-general-card .space-tool-kicker{font-size:.49rem!important;color:var(--muted)!important}
+.aurore-general-tools .admin-general-card h3{font-size:.71rem!important;line-height:1.18!important;margin:2px 0 0!important}
+.aurore-general-tools .admin-general-card .space-tool-counter{min-width:25px!important;height:25px!important;padding:0 7px!important;border-radius:9px!important;background:color-mix(in srgb,var(--accent) 12%,var(--panel))!important;color:var(--accent)!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;font-size:.62rem!important}
+@media(max-width:900px){.aurore-account-card .config-test-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.aurore-general-tools .admin-general-card{min-height:88px!important;height:88px!important}}
+@media(max-width:650px){.aurore-account-card .config-test-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.aurore-account-card .config-chip{height:58px!important;min-height:58px!important}.aurore-general-tools{padding:11px!important}.aurore-general-tools .admin-general-card{min-height:82px!important;height:82px!important}}
+@media(max-width:430px){.aurore-account-card .config-chip>span:last-child{font-size:.55rem!important}.aurore-general-tools .admin-general-card h3{font-size:.66rem!important}}
+</style>
 </body>
 </html>
