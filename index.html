@@ -3666,7 +3666,7 @@ function openSpaceTool(role,key){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
   if(role==='eleve' && key==='class'){ renderStudentClassDashboard(root,common); return; }
-  if(role==='eleve' && key==='parcours'){ renderStudentParcours(root,common); return; }
+  if(role==='eleve' && (key==='parcours'||key==='apropos')){ renderStudentParcours(root,common); return; }
   if(role==='eleve' && (key==='professeurs'||key==='camarades')){
     const teacher=key==='professeurs'; const people=teacher?[['Awa Traoré','Mathématiques · Professeur principal','42 élèves'],['Moussa Kaboré','Français','38 élèves'],['Clarisse Ouédraogo','Anglais','41 élèves'],['Idrissa Sawadogo','Physique-Chimie','40 élèves'],['Fatimata Diallo','Histoire-Géographie','42 élèves']]:[['Adama Kinda','3e A · Élève','42 élèves'],['Mariam Compaoré','3e A · Élève','42 élèves'],['Salif Ouédraogo','3e A · Élève','42 élèves'],['Nadia Zongo','3e A · Élève','42 élèves'],['Issouf Kaboré','3e A · Élève','42 élèves']];
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
@@ -4870,10 +4870,11 @@ async function renderStudentParcours(root,common){
   try{
     // Le profil est déjà chargé à l'ouverture de l'espace élève.
     // On l'utilise directement pour afficher Mon parcours sans attendre un nouvel appel réseau.
-    let row=currentAuroreProfile||{};
-    if(!row.id && currentAuroreSession?.user?.id)row={...row,id:currentAuroreSession.user.id};
-    // Secours uniquement si le profil local ne contient réellement aucune donnée CV.
-    if(!row.a_propos_cv){
+    let row={...(currentAuroreProfile||{})};
+    if(!row.id && currentAuroreSession?.user?.id)row.id=currentAuroreSession.user.id;
+    // Le profil principal est chargé avec select=* : ne bloque jamais l'ouverture
+    // du bloc pour attendre un second appel réseau simplement parce que le JSON CV est vide.
+    if(!Object.prototype.hasOwnProperty.call(row,'a_propos_cv')){
       const token=currentAuroreSession?.access_token;
       const uid=currentAuroreSession?.user?.id||currentAuroreSession?.user?.sub;
       if(!token||!uid)throw new Error('Session élève introuvable. Veuillez vous reconnecter.');
