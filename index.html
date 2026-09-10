@@ -5501,7 +5501,7 @@ function prepareClassInformationImages(event){
 async function uploadClassInformationImage(file,classId,index,etabId){
   const client=await getClient();if(!client)throw new Error('Client Supabase indisponible.');
   const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-  const path=`actualites/classes/${etabId}/${classId}/${Date.now()}-${index}-${crypto.randomUUID()}.${ext}`;
+  const path=`actualites/${etabId}/classes/${classId}/${Date.now()}-${index}-${crypto.randomUUID()}.${ext}`;
   const up=await client.storage.from('profiles').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg',cacheControl:'31536000'});
   if(up.error)throw up.error;
   const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;if(!url)throw new Error('URL de l’image introuvable.');
@@ -5515,12 +5515,21 @@ async function submitClassCommunication(classId,type){
     if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent=type==='devoir'?'Programmation…':'Publication…';}
     const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée. Veuillez vous reconnecter.');
     const client=await getClient();if(!client)throw new Error('Client Supabase indisponible.');
+    // Le reste de l’espace utilise parfois des appels REST avec currentAuroreSession,
+    // tandis que storage/rpc utilisent le client Supabase. On resynchronise donc
+    // explicitement le client avant cette chaîne sensible afin d’éviter un jeton
+    // interne obsolète après un refresh ou une restauration de session.
+    if(currentAuroreSession?.refresh_token){
+      const synced=await client.auth.setSession({access_token:token,refresh_token:currentAuroreSession.refresh_token});
+      if(synced?.error)throw synced.error;
+    }
     if(type==='devoir'){
       const start=localDateTimeToISO($('ccStart')?.value),end=localDateTimeToISO($('ccEnd')?.value);
       if(!start||!end)throw new Error('Renseignez les deux dates.');
       if(new Date(end)<=new Date(start))throw new Error('La fin doit être après le début.');
       const payload={p_etablissement_id:etabId,p_classe_id:classId,p_matiere:$('ccSubject')?.value.trim(),p_titre:$('ccTitle')?.value.trim(),p_consigne:$('ccContent')?.value.trim()||null,p_date_debut:start,p_date_fin:end};
-      const {data,error}=await client.rpc('creer_devoir_classe',payload);if(error)throw error;if(!data)throw new Error('Supabase n’a pas confirmé la création du devoir.');
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/creer_devoir_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Création du devoir impossible.');if(!body)throw new Error('Supabase n’a pas confirmé la création du devoir.');
     }else{
       const title=$('ccTitle')?.value.trim()||'',text=$('ccContent')?.value.trim()||'',files=window.__classInformationFiles||[],carousel=!!$('ccCarousel')?.checked;
       if(!files.length&&!title&&!text)throw new Error('Renseignez un titre ou un contenu, ou ajoutez au moins une image.');
@@ -5530,7 +5539,8 @@ async function submitClassCommunication(classId,type){
         for(let i=0;i<files.length;i++){show(`Téléversement de l’image ${i+1}/${files.length}…`);const url=await uploadClassInformationImage(files[i],classId,i,etabId);images.push({url,nom:files[i].name});}
         contenu='__AURORE_CLASS_INFO_MEDIA__'+JSON.stringify({text,carousel:carousel&&images.length>1,images});
       }
-      const {data,error}=await client.rpc('publier_information_classe',{p_etablissement_id:etabId,p_classe_id:classId,p_titre:title||'Information de la classe',p_contenu:contenu||' '});if(error)throw error;if(!data)throw new Error('Supabase n’a pas confirmé la publication.');
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/publier_information_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:etabId,p_classe_id:classId,p_titre:title||'Information de la classe',p_contenu:contenu||' '})});
+      const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Publication impossible.');if(!body)throw new Error('Supabase n’a pas confirmé la publication.');
     }
     closeClassCommunication();await renderAdminClassPage(classId);
   }catch(e){
