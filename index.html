@@ -2451,6 +2451,15 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 .prof-students-board .prof-student-card .foot button{display:inline-flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;white-space:nowrap!important}
 @media(max-width:600px){.prof-students-board .prof-student-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.prof-students-board .prof-student-card .foot button{width:100%!important}}
 </style>
+
+<style id="aurore-prof-student-detail-v11">
+.prof-class-detail-board{background:var(--card-bg,rgba(255,255,255,.72));border:1px solid var(--border-color,rgba(0,0,0,.08));border-radius:24px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.07);backdrop-filter:blur(18px)}
+.prof-class-detail-board .prof-students-board-head{margin-bottom:0}
+.prof-class-detail-board .prof-student-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.prof-class-detail-board .prof-student-card{min-width:0}
+@media(max-width:700px){.prof-class-detail-board .prof-student-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+@media(max-width:430px){.prof-class-detail-board .prof-student-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.prof-class-detail-board{padding:12px;border-radius:20px}}
+</style>
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -4945,7 +4954,7 @@ async function validerAttributionProfesseur(profileId){
     if(status)status.textContent=`Attribution de ${selected.length} classe${selected.length>1?'s':''}…`;
     let done=0;
     for(const classeId of selected){
-      const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/affecter_professeur_classe`,{
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/attribuer_professeur_classe`,{
         method:'POST',
         headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
         body:JSON.stringify({p_professeur_profile_id:profileId,p_classe_id:classeId})
@@ -5334,8 +5343,31 @@ async function renderProfessorClassesView(){
 }
 window.openProfessorClass=async function(classId,className){
   const root=$('spaceDashboard');if(!root)return;
-  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes classes</span><h3>${esc(className)}</h3><p>Espace de travail de cette classe.</p></div><button class="space-back" type="button" onclick="auroreBack(()=>{renderProfessorClassesView()})">← Mes classes</button></div><div id="professorClassDetail" class="prof-class-detail"><div class="admin-card">Chargement de l’effectif…</div></div></section>`;
-  try{const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/eleves_de_mes_classes`,{method:'POST',headers:h,body:JSON.stringify({p_classe_id:classId}),cache:'no-store'});if(!r.ok)throw new Error('Cette classe n’est pas accessible.');const students=await r.json();$('professorClassDetail').innerHTML=`<div class="prof-class-detail-grid"><div class="prof-class-detail-card"><span>Effectif</span><strong>${students.length}</strong><small>élève${students.length>1?'s':''}</small></div><div class="prof-class-detail-card"><span>Niveau</span><strong>${esc(students[0]?.niveau||'')}</strong><small>Classe affectée</small></div></div><div class="admin-card" style="margin-top:14px"><strong>Élèves de ${esc(className)}</strong><p class="admin-meta" style="margin-top:6px">Les outils d’évaluation et de suivi de cette classe seront accessibles depuis cet espace.</p></div>`;}catch(e){$('professorClassDetail').innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger cette classe.')}</div>`;}
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes classes</span><h3>${esc(className)}</h3><p>Espace de travail de cette classe.</p></div><button class="space-back" type="button" onclick="auroreBack(()=>{renderProfessorClassesView()})">← Mes classes</button></div><div id="professorClassDetail"><div class="admin-card">Chargement de l’effectif…</div></div></section>`;
+  try{
+    const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+    const cr=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_classes_professeur`,{method:'POST',headers:h,body:'{}',cache:'no-store'});
+    if(!cr.ok)throw new Error('Impossible de vérifier vos classes affectées.');
+    const classes=await cr.json();
+    const classe=Array.isArray(classes)?classes.find(x=>String(x.classe_id)===String(classId)):null;
+    if(!classe)throw new Error('Cette classe ne vous est plus affectée.');
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_cv_eleves_professeur`,{method:'POST',headers:h,body:'{}',cache:'no-store'});
+    if(!r.ok)throw new Error('Impossible de charger les élèves de cette classe.');
+    const all=await r.json();
+    const students=(Array.isArray(all)?all:[]).filter(x=>String(x.classe_id)===String(classId));
+    const effectif=students.length;
+    const cards=students.map((x,i)=>{
+      const name=x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève';
+      const av=x.avatar_url||x.photo_profil_url||'';
+      const hasCV=!!(x.a_propos_cv&&Object.keys(x.a_propos_cv).length);
+      return `<article class="card prof-student-card" tabindex="0">
+        <div class="cover prof-student-cover${av?'':' adaptive-logo'}"><div class="badge">${av?`<img src="${esc(av)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div></div>
+        <div class="body"><div class="tags"><span class="tag">Élève</span><span class="tag green">${hasCV?'CV disponible':'Profil scolaire'}</span></div><h3>${esc(name)}</h3><div class="meta">${esc(x.classe||className)}${x.niveau?' · '+esc(x.niveau):''}</div><div class="foot"><span>Élève #${i+1}</span><button type="button" onclick="event.stopPropagation();openProfessorStudentCV('${esc(x.id)}')">Voir le CV</button></div></div>
+      </article>`;
+    }).join('');
+    $('professorClassDetail').innerHTML=`<section class="prof-class-detail-board"><div class="prof-students-board-head"><div><span class="space-panel-label">CLASSE AFFECTÉE</span><h4>${esc(className)}</h4><p>Les élèves de cette classe, avec leur profil scolaire et leur CV lorsque celui-ci est renseigné.</p></div><span class="prof-student-total">${effectif}</span></div><div class="prof-class-detail-grid"><div class="prof-class-detail-card"><span>Effectif</span><strong>${effectif}</strong><small>élève${effectif>1?'s':''}</small></div><div class="prof-class-detail-card"><span>Niveau</span><strong>${esc(classe.niveau||students[0]?.niveau||'—')}</strong><small>Classe affectée</small></div></div><div class="prof-student-grid" style="margin-top:18px">${cards||'<div class="admin-card">Aucun élève actif visible dans cette classe.</div>'}</div></section>`;
+  }catch(e){$('professorClassDetail').innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger cette classe.')}</div>`;}
 };
 async function renderProfessorStudentsView(){
   const root=$('spaceDashboard');if(!root)return;
