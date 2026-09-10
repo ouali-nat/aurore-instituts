@@ -2146,7 +2146,7 @@ async function renderAccountHome(){
    const configuredHtml=spaces.length?`<div class="configured-spaces"><div class="configured-head"><div><span class="auth-kicker">Mes espaces</span><h3>Accès à vos espaces</h3></div><span>${spaces.length} / 10 accès</span></div><div class="configured-list">${configuredSpaces.map(x=>{const isAdmin=['administration','proviseur'].includes(x.role);return `<div class="configured-row ${isAdmin?'admin-space':''}" role="button" tabindex="0" onclick="openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )}"><div class="configured-main"><strong>${esc(x.etablissement_nom||'Établissement')}</strong><span>${esc(roleNames[x.role]||x.role)}${x.etablissement_ville?' · '+esc(x.etablissement_ville):''}</span></div><div class="configured-actions"><button class="space-open-btn" type="button" onclick="event.stopPropagation();openSpace('${esc(x.role)}',{etablissementId:'${esc(x.etablissement_id||'')}'} )">Ouvrir l’espace</button><button class="admin-btn danger" type="button" onclick="event.stopPropagation();removeConfiguredSpace('${x.etablissement_id}','${x.role}')">Supprimer</button></div></div>`}).join('')}</div></div>`:'<div class="configured-empty">Aucun espace d’établissement n’est encore configuré.</div>';
   const configTest=isPlatformAdmin?`<div class="config-test"><div><span class="auth-kicker">Configuration test</span><h3>Centre de contrôle des espaces</h3><p>Compte de réparation : accès direct à toutes les administrations et possibilité de reconfigurer les espaces.</p></div><div class="config-test-grid"><button type="button" class="config-chip" onclick="openSpace('general')"><span class="config-chip-ico">⚑</span><span>Administration générale</span></button><button type="button" class="config-chip" onclick="openSpace('administration')"><span class="config-chip-ico">⌂</span><span>Administration établissement</span></button><button type="button" class="config-chip" onclick="openSpace('professeur')"><span class="config-chip-ico">◉</span><span>Espace professeur</span></button><button type="button" class="config-chip" onclick="openSpace('eleve')"><span class="config-chip-ico">♙</span><span>Espace élève</span></button><button type="button" class="config-chip" onclick="openSpace('parent')"><span class="config-chip-ico">❖</span><span>Espace parent</span></button><button type="button" class="config-chip config-chip-secondary" onclick="renderOnboarding()"><span class="config-chip-ico">⚙</span><span>Reconfigurer / ajouter</span></button></div></div>`:'';
   const configureBtn=isPlatformAdmin?`<div class="auth-actions" style="margin-top:18px"><button class="auth-primary" type="button" onclick="renderOnboarding()">⚙ Configurer un espace${spaces.length>=10?' (limite atteinte)':''}</button></div>`:'';
-  root.innerHTML=`<section><div class="auth-step"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
+  root.innerHTML=`<section class="aurore-account-page"><div class="auth-step account-page-top"><b>Compte connecté</b><span>·</span><button class="auth-secondary" type="button" onclick="auroreLogout()">Se déconnecter</button></div><div class="auth-side aurore-account-card" style="margin-top:15px"><span class="auth-kicker">Bienvenue</span><h3>${esc(name)}</h3><div class="account-email-row"><p>${esc(currentAuroreSession?.user?.email||'')}</p>${adminAccess}</div><div class="auth-actions" style="margin-top:15px;display:flex;flex-wrap:wrap">${roleHtml}</div>${configuredHtml}${configTest}${configureBtn}</div></section>`;
   if(isPlatformAdmin){
     const btn=$('generalAdminBtn'); if(btn)btn.addEventListener('click',async function(e){e.preventDefault();e.stopPropagation();btn.disabled=true;try{await openSpace('general')}catch(err){authMessage(err?.message||'Impossible d’ouvrir l’Administration générale Aurore.')}finally{btn.disabled=false;}});
   }
@@ -2820,11 +2820,11 @@ async function openSpace(role,options={}){
     if(siteFooter)document.body.insertBefore(panel,siteFooter);else document.body.appendChild(panel);
   }
   if(panel){
-    const generalAccountControl=role==='general'?`<div class="general-account-switch" style="margin:18px 0 22px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--line,#d9d9e3) 80%,transparent);border-radius:18px;background:color-mix(in srgb,var(--surface,#fff) 82%,transparent);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(0,0,0,.04)">
+    const generalAccountControl=role==='general'?`<div class="general-account-switch aurore-admin-account-card" style="margin:18px 0 22px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--line,#d9d9e3) 80%,transparent);border-radius:18px;background:color-mix(in srgb,var(--surface,#fff) 82%,transparent);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(0,0,0,.04)">
       <div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div>
       <button class="auth-secondary" type="button" id="switchGoogleAccountBtn" onclick="switchGoogleAccount()">Changer de compte Google</button>
     </div>`:'';
-    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
+    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head aurore-general-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid aurore-general-tools':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
   }
   if(role==='general') setTimeout(()=>loadAdminOverview(),0);
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
@@ -3246,7 +3246,7 @@ async function adminProfesseursView(){
 
 async function adminInscriptionsView(){
   const root=$('spaceDashboard');if(!root)return;
-  root.innerHTML=`<section class="space-dashboard admin-inscriptions-page"><div class="space-dashboard-head"><div><span class="space-panel-label">Demandes d’inscription</span><h3>Centre des demandes</h3><p>Chaque type de demande est rangé dans son propre espace pour faciliter l’examen des dossiers.</p></div><div class="admin-class-actions"><button class="admin-btn" type="button" onclick="loadMemberRequestsAdmin()">Actualiser</button><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('administration',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})})">Retour aux rubriques</button></div></div><div id="adminRequestSummary"></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des demandes…</div></div></section>`;
+  root.innerHTML=`<section class="space-dashboard admin-inscriptions-page aurore-request-center"><div class="space-dashboard-head aurore-request-head"><div><span class="space-panel-label">Demandes d’inscription</span><h3>Centre des demandes</h3><p>Chaque type de demande est rangé dans son propre espace pour faciliter l’examen des dossiers.</p></div><div class="admin-class-actions"><button class="admin-btn" type="button" onclick="loadMemberRequestsAdmin()">Actualiser</button><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('administration',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})})">Retour aux rubriques</button></div></div><div id="adminRequestSummary"></div><div id="memberRequestsAdmin"><div class="admin-card">Chargement des demandes…</div></div></section>`;
   await loadMemberRequestsAdmin(true);
 }
 
@@ -3287,7 +3287,7 @@ async function openAdminRequestCategory(kind){
   const root=$('spaceDashboard');if(!root)return;
   if(kind==='parents'){await adminParentsView();return;}
   const labels={eleves:['Demandes élèves','Dossiers d’inscription des élèves à examiner et valider.','♙','eleve'],professeurs:['Demandes professeurs','Dossiers des enseignants, discipline et informations professionnelles.','◉','professeur'],autres:['Autres profils','Profils complémentaires reçus par l’établissement.','＋','autres']};
-  const cfg=labels[kind]||labels.eleves;root.innerHTML=`<section class="admin-request-page"><div class="admin-request-page-head"><div><span class="space-panel-label">Centre des demandes · ${cfg[0]}</span><h3>${cfg[0]}</h3><p>${cfg[1]}</p></div><button class="admin-btn" type="button" onclick="openAdminRequestCategory('${kind}')">Actualiser</button></div><div id="adminRequestCategoryList" class="admin-request-page-list"><div class="admin-card">Chargement…</div></div></section>`;
+  const cfg=labels[kind]||labels.eleves;root.innerHTML=`<section class="admin-request-page aurore-request-category"><div class="admin-request-page-head aurore-request-category-head"><div><span class="space-panel-label">Centre des demandes · ${cfg[0]}</span><h3>${cfg[0]}</h3><p>${cfg[1]}</p></div><button class="admin-btn" type="button" onclick="openAdminRequestCategory('${kind}')">Actualiser</button></div><div id="adminRequestCategoryList" class="admin-request-page-list"><div class="admin-card">Chargement…</div></div></section>`;
   await loadAdminRequestCategoryPage(kind,cfg[3]);
 }
 async function loadAdminRequestCategoryPage(kind,roleFilter){
@@ -3367,7 +3367,7 @@ function openSpaceTool(role,key){
   const panel=document.getElementById('spacePanel');
   if(!panel)return;
   panel.classList.add('page-mode','tool-page','visible');
-  const generalToolAccountControl=role==='general'?`<div class="general-account-switch" style="margin:18px 0 22px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--line,#d9d9e3) 80%,transparent);border-radius:18px;background:color-mix(in srgb,var(--surface,#fff) 82%,transparent);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(0,0,0,.04)"><div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div><button class="auth-secondary" type="button" id="switchGoogleAccountBtnGeneral" onclick="switchGoogleAccount()">Changer de compte Google</button></div>`:'';
+  const generalToolAccountControl=role==='general'?`<div class="general-account-switch aurore-admin-account-card" style="margin:18px 0 22px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--line,#d9d9e3) 80%,transparent);border-radius:18px;background:color-mix(in srgb,var(--surface,#fff) 82%,transparent);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(0,0,0,.04)"><div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div><button class="auth-secondary" type="button" id="switchGoogleAccountBtnGeneral" onclick="switchGoogleAccount()">Changer de compte Google</button></div>`:'';
   panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour à ${role==='general'?'l’Administration générale':'l’espace'}</button><h2>${role==='general'?'Administration générale Aurore':'Espace'}</h2><p>Cette rubrique s’ouvre comme une page dédiée.</p></div>${generalToolAccountControl}<div id="spaceDashboard"></div>`;
   applyOrResetSpaceScroll();
   const root=document.getElementById('spaceDashboard'); if(!root)return;
@@ -4332,6 +4332,81 @@ function appliquerTheme(choix){
 @media(max-width:900px){.admin-control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-control-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.admin-control-center{padding:17px 14px 18px;border-radius:22px}.admin-control-head{flex-direction:column}.admin-control-status{align-self:flex-start}.admin-control-grid,.admin-control-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-control-card{min-height:105px!important;padding:11px!important}.admin-control-group-label small{font-size:.56rem}.admin-establishment-profile-card{grid-template-columns:76px minmax(0,1fr)!important;gap:13px!important;padding:14px!important;border-radius:21px!important}.admin-establishment-profile-logo{width:76px!important;height:76px!important;border-radius:18px!important}.admin-establishment-profile-actions{width:100%}.admin-establishment-actions button{padding:8px 10px!important;font-size:.59rem!important}}
 @media(max-width:430px){.admin-control-grid,.admin-control-grid-2{grid-template-columns:1fr 1fr}.admin-control-card h3{font-size:.7rem!important}.admin-control-card p{font-size:.55rem!important}.admin-establishment-profile-card{grid-template-columns:1fr!important}.admin-establishment-profile-logo{width:82px!important;height:82px!important}}
+</style>
+<style id="aurore-shared-page-redesign">
+/* ===== Refonte harmonisée — demandes, compte et administration générale ===== */
+.aurore-account-page{max-width:1080px;margin:0 auto;padding-bottom:30px}
+.account-page-top{margin-bottom:12px!important;padding:8px 2px!important}
+.aurore-account-card{position:relative;overflow:hidden;margin-top:0!important;padding:26px!important;border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line))!important;border-radius:28px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent)),var(--panel2))!important;box-shadow:0 20px 60px rgba(0,0,0,.09)!important}
+.aurore-account-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 34%)}
+.aurore-account-card>*{position:relative}
+.aurore-account-card>h3{font-size:clamp(1.2rem,3vw,1.7rem)!important;letter-spacing:-.025em!important;margin-top:5px!important}
+.aurore-account-card .account-email-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:13px 15px;margin-top:14px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--panel2) 84%,var(--accent))}
+.aurore-account-card .account-email-row p{margin:0!important;font-weight:700}
+.aurore-account-card .auth-actions{gap:8px!important}
+.aurore-account-card .auth-role-chip{border-radius:999px!important;padding:7px 11px!important;border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line))!important;background:color-mix(in srgb,var(--accent) 7%,var(--panel))!important}
+.aurore-account-card .configured-spaces,.aurore-account-card .config-test{margin-top:18px!important;border:1px solid var(--line)!important;border-radius:21px!important;background:color-mix(in srgb,var(--panel2) 88%,transparent)!important;box-shadow:none!important;padding:17px!important}
+.aurore-account-card .configured-head,.aurore-account-card .config-test{position:relative}
+.aurore-account-card .configured-row{border:1px solid var(--line)!important;border-radius:16px!important;background:var(--panel)!important;margin-top:8px!important;padding:12px!important;transition:.18s ease}
+.aurore-account-card .configured-row:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))!important;box-shadow:0 10px 25px rgba(0,0,0,.07)}
+.aurore-account-card .config-test-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:13px}
+.aurore-account-card .config-chip{min-height:68px!important;border-radius:15px!important;border:1px solid var(--line)!important;background:var(--panel)!important;transition:.18s ease}
+.aurore-account-card .config-chip:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 42%,var(--line))!important}
+.aurore-request-center{max-width:1080px;margin:0 auto;padding-bottom:30px}
+.aurore-request-head{padding:20px 20px 18px!important;margin-bottom:12px;border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line));border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent)),var(--panel2));box-shadow:0 14px 40px rgba(0,0,0,.07)}
+.aurore-request-head h3,.aurore-request-category-head h3{font-size:clamp(1.15rem,2.6vw,1.5rem)!important;letter-spacing:-.025em}
+.aurore-request-head p,.aurore-request-category-head p{max-width:700px;line-height:1.55!important}
+.aurore-request-center #adminRequestSummary{margin:0 0 12px}
+.aurore-request-center #memberRequestsAdmin,.aurore-request-category-list{padding:3px 0}
+.aurore-request-category{max-width:1080px;margin:0 auto;padding-bottom:28px}
+.aurore-request-category-head{padding:18px 20px!important;border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line));border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 97%,var(--accent)),var(--panel2));box-shadow:0 12px 35px rgba(0,0,0,.06)}
+.aurore-request-category .admin-request-page-list{margin-top:12px}
+.aurore-request-category .admin-request-card-modern{border-radius:19px!important;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel2) 92%,var(--accent))!important;box-shadow:0 8px 24px rgba(0,0,0,.05)!important;transition:.18s ease}
+.aurore-request-category .admin-request-card-modern:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 38%,var(--line))!important;box-shadow:0 14px 30px rgba(0,0,0,.08)!important}
+.aurore-general-panel-head{padding-bottom:18px!important}
+.aurore-general-panel-head .admin-lycee-panel-kicker{letter-spacing:.16em!important}
+.aurore-admin-account-card{border-color:color-mix(in srgb,var(--accent) 14%,var(--line))!important;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent)),var(--panel2))!important;box-shadow:0 14px 38px rgba(0,0,0,.07)!important}
+.aurore-general-tools{margin-top:14px!important;padding:18px!important;border:1px solid color-mix(in srgb,var(--accent) 13%,var(--line));border-radius:25px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 97%,var(--accent)),var(--panel2));box-shadow:0 16px 45px rgba(0,0,0,.07)}
+.aurore-general-tools .admin-general-card{min-height:132px!important;border-radius:18px!important;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel2) 90%,var(--accent))!important;box-shadow:none!important;transition:.18s ease}
+.aurore-general-tools .admin-general-card:hover{transform:translateY(-3px)!important;border-color:color-mix(in srgb,var(--accent) 42%,var(--line))!important;box-shadow:0 13px 28px rgba(0,0,0,.08)!important}
+.aurore-general-tools .admin-general-card .space-tool-icon{border-radius:11px!important}
+.aurore-general-tools .admin-general-card h3{font-size:.78rem!important}
+.aurore-general-tools .admin-general-card .space-tool-counter{font-size:1.15rem!important;font-weight:900!important}
+@media(max-width:700px){.aurore-account-card{padding:19px!important;border-radius:22px!important}.aurore-account-card .config-test-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aurore-request-head,.aurore-request-category-head{padding:16px!important;border-radius:19px}.aurore-general-tools{padding:12px!important;border-radius:20px}.aurore-general-tools .admin-general-card{min-height:110px!important}}
+@media(max-width:430px){.aurore-account-card .config-test-grid{grid-template-columns:1fr 1fr}.aurore-account-card .configured-row{padding:10px!important}.aurore-general-tools .admin-general-card{min-height:100px!important}.aurore-request-head,.aurore-request-category-head{padding:14px!important}}
+</style>
+<style id="aurore-info-final-redesign">
+/* ===== Refonte finale — Informations à passer ===== */
+.space-dashboard:has(.admin-info-compose){max-width:1080px;margin:0 auto;padding-bottom:30px}
+.space-dashboard:has(.admin-info-compose)>.space-dashboard-head{position:relative;margin-bottom:14px;padding:20px 22px!important;border:1px solid color-mix(in srgb,var(--accent) 14%,var(--line));border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent)),var(--panel2));box-shadow:0 14px 40px rgba(0,0,0,.07);overflow:hidden}
+.space-dashboard:has(.admin-info-compose)>.space-dashboard-head:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 11%,transparent),transparent 35%)}
+.space-dashboard:has(.admin-info-compose)>.space-dashboard-head>*{position:relative}
+.space-dashboard:has(.admin-info-compose)>.space-dashboard-head h3{font-size:clamp(1.15rem,2.6vw,1.5rem)!important;letter-spacing:-.025em}
+.space-dashboard:has(.admin-info-compose)>.space-dashboard-head p{max-width:700px;line-height:1.55!important}
+.admin-info-compose,.admin-info-published{position:relative!important;overflow:hidden!important;border:1px solid color-mix(in srgb,var(--accent) 13%,var(--line))!important;border-radius:25px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 97%,var(--accent)),var(--panel2))!important;box-shadow:0 16px 45px rgba(0,0,0,.07)!important;padding:20px!important}
+.admin-info-compose:before,.admin-info-published:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 32%)}
+.admin-info-compose>* ,.admin-info-published>*{position:relative}
+.admin-info-compose>div:first-child{padding-bottom:15px;border-bottom:1px solid var(--line)}
+.admin-info-compose>div:first-child h3,.admin-info-published h3{font-size:1rem!important;letter-spacing:-.015em}
+.admin-info-form{gap:12px!important;margin-top:2px}
+.admin-info-compose label{font-size:.62rem!important;letter-spacing:.01em}
+.admin-info-compose input,.admin-info-compose textarea{padding:12px 13px!important;border-radius:15px!important;background:color-mix(in srgb,var(--panel2) 92%,var(--accent))!important;border-color:var(--line)!important;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.admin-info-compose input:focus,.admin-info-compose textarea:focus{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)!important}
+.admin-info-compose textarea{min-height:155px!important;line-height:1.55!important}
+.admin-info-compose .compose-actions{padding-top:2px}
+.admin-info-published{margin-top:14px!important}
+.admin-info-published>p{font-size:.68rem!important;line-height:1.55!important}
+.admin-info-list{display:grid;gap:10px;margin-top:14px!important}
+.admin-info-list>.admin-card:only-child{border-radius:16px!important}
+.admin-info-card{position:relative!important;padding:17px 18px!important;border:1px solid var(--line)!important;border-radius:19px!important;background:color-mix(in srgb,var(--panel2) 91%,var(--accent))!important;box-shadow:0 8px 24px rgba(0,0,0,.05)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.admin-info-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))!important;box-shadow:0 14px 30px rgba(0,0,0,.08)!important}
+.admin-info-card:after{width:3px!important;border-radius:0 4px 4px 0}
+.admin-info-card h4{font-size:.82rem!important;line-height:1.35!important}
+.admin-info-card p{font-size:.7rem!important;line-height:1.7!important;margin-top:8px!important}
+.admin-info-card footer{padding-top:10px;margin-top:10px!important;border-top:1px solid color-mix(in srgb,var(--line) 75%,transparent);font-size:.58rem!important}
+.admin-info-card footer button{border-radius:999px!important}
+@media(max-width:700px){.space-dashboard:has(.admin-info-compose)>.space-dashboard-head{padding:16px!important;border-radius:20px}.admin-info-compose,.admin-info-published{padding:15px!important;border-radius:20px!important}.admin-info-compose .compose-actions{align-items:stretch}.admin-info-compose .compose-actions button{width:100%}}
+@media(max-width:430px){.space-dashboard:has(.admin-info-compose)>.space-dashboard-head{padding:14px!important}.admin-info-compose,.admin-info-published{padding:13px!important;border-radius:18px!important}.admin-info-card{padding:14px!important}}
 </style>
 <script id="aurore-integrity-check">
 // ---------------------------------------------------------------------------
