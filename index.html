@@ -2249,13 +2249,16 @@ async function submitEstablishmentRequest(event){
       headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json',Prefer:'return=representation'},
       body:JSON.stringify(payload)
     });
-    const b=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(b.message||b.hint||b.details||'Impossible d’enregistrer la demande.');
-    msg.textContent='Demande envoyée. Elle sera examinée par l’Administration générale Aurore avant toute publication.';
+    const b=await r.json().catch(()=>null);
+    if(!r.ok) throw new Error(b?.message||b?.hint||b?.details||'La demande n’a pas été enregistrée. Vérifiez votre connexion et réessayez.');
+    if(!Array.isArray(b)||!b.length) throw new Error('Le serveur n’a confirmé aucun enregistrement. La demande n’est pas considérée comme enregistrée.');
+    msg.className='auth-message ok';
+    msg.setAttribute('role','status');
+    msg.textContent='✓ Demande enregistrée avec succès. Elle sera examinée par l’Administration générale Aurore avant toute publication.';
     event.target.reset();
     if($('reqPhotoFile')){$('reqPhotoFile').dataset.dataUrl='';}
     if($('reqPhotoPreview'))$('reqPhotoPreview').style.display='none';
-  }catch(err){msg.textContent=err.message||'Une erreur est survenue.';}
+  }catch(err){msg.className='auth-message err';msg.setAttribute('role','alert');msg.textContent='⚠ '+(err.message||'La demande n’a pas été enregistrée.');}
 }
 
 function previewRequestLogo(event){
@@ -2800,7 +2803,7 @@ async function openSpace(role,options={}){
     ]},
     parent:{title:'Espace parent',subtitle:'Un espace pour suivre la scolarité de vos enfants.',items:[['Mes enfants','Uniquement les enfants dont le rattachement a été validé par l’établissement.','♙','parent-enfants'],['Bulletins','Consulter les bulletins disponibles.','▤','parent-bulletins']]},
     professeur:{title:'Espace professeur',subtitle:'Votre enseignement et vos classes affectées.',items:[['Mes classes','Uniquement les classes qui vous ont été affectées par l’administration.','⌂','prof-classes'],['Mes élèves','Élèves des classes qui vous sont affectées.','♙','prof-eleves'],['Mes évaluations','Préparer et suivre vos évaluations.','★','prof-evaluations']]},
-    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Modifications d’établissements','Valider ou refuser les demandes de modification envoyées par les administrations.','MD','general-modifications'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Espaces établissements','Ouvrir l’espace d’un établissement validé et contrôler ses classes, élèves inscrits et inscriptions.','ET','general-establishments'],['Diagnostic affichage','Contrôler les établissements, classes, élèves et demandes réellement visibles depuis Supabase.','DG','general-diagnostic']]}
+    general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Nouvelles administrations','Examiner séparément les nouvelles demandes de création d’administration et ouvrir chaque établissement pour consulter toutes ses informations.','NA','general-new-admins'],['Demandes d’établissements','Examiner les autres demandes non validées et décider de leur validation.','DE','general-demandes'],['Modifications d’établissements','Valider ou refuser les demandes de modification envoyées par les administrations.','MD','general-modifications'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Espaces établissements','Ouvrir l’espace d’un établissement validé et contrôler ses classes, élèves inscrits et inscriptions.','ET','general-establishments'],['Diagnostic affichage','Contrôler les établissements, classes, élèves et demandes réellement visibles depuis Supabase.','DG','general-diagnostic']]}
   };
   const cfg=configs[role]; if(!cfg)return;
   const renderSpaceCard=(item,i,extra='')=>`<article class="space-tool-card ${extra} ${item[1].length>58?'space-tool-card-wide':''}" tabindex="0" role="button" aria-label="${esc(item[0])}" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div class="space-tool-copy"><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow" aria-hidden="true">→</span></article>`;
@@ -3227,7 +3230,47 @@ async function creerAffectationProfesseur(){try{const prof=document.getElementBy
 async function retirerAffectationProfesseur(id){if(!confirm('Retirer cette affectation ?'))return;try{const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/retirer_professeur_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_affectation_id:id})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Retrait impossible.');await adminAffectationsView();}catch(e){alert(e.message||'Impossible de retirer l’affectation.');}}
 
 function prepareInstituteGallery(event){const box=$('adminGalleryPreview'),files=[...(event.target.files||[])].slice(0,20);window.__adminGalleryFiles=files;if(!box)return;box.innerHTML=files.map((f,i)=>`<div class="admin-gallery-edit"><img src="${URL.createObjectURL(f)}" alt="Aperçu ${i+1}"><label>Titre<input data-gallery-title value="${esc(f.name.replace(/\.[^.]+$/,''))}"></label><label>Description<input data-gallery-description placeholder="Facultatif"></label></div>`).join('');}
-async function saveInstituteGallery(etabId){const msg=$('adminGalleryMessage'),btn=document.querySelector('[onclick*="saveInstituteGallery"]'),files=window.__adminGalleryFiles||[];if(!files.length){if(msg){msg.textContent='⚠ Choisissez au moins une image avant de publier.';msg.className='auth-message';}return;}try{const token=await getFreshAccessToken(),uid=currentAuroreSession?.user?.id;if(!token||!uid)throw new Error('Session expirée. Reconnectez-vous puis réessayez.');if(msg){msg.textContent=`Chargement de ${files.length} image${files.length>1?'s':''}…`;msg.className='auth-message';}if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Publication en cours…';}const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},client=await getClient();const rr=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_galerie?etablissement_id=eq.${encodeURIComponent(etabId)}&select=id`,{headers:h});if(!rr.ok)throw new Error('Impossible de préparer la galerie.');const existing=await rr.json();for(const x of existing){const off=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_galerie?id=eq.${encodeURIComponent(x.id)}`,{method:'PATCH',headers:h,body:JSON.stringify({actif:false})});if(!off.ok)throw new Error('Impossible de remplacer la galerie existante.');}let done=0;for(let i=0;i<files.length;i++){const f=files[i],ext=(f.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`${uid}/etablissement-gallery/${etabId}-${Date.now()}-${i}-${crypto.randomUUID()}.${ext}`;const up=await client.storage.from('profiles').upload(path,f,{upsert:false,contentType:f.type||'image/jpeg',cacheControl:'31536000'});if(up.error)throw up.error;const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;if(!url)throw new Error(`URL publique introuvable pour l’image ${i+1}.`);const title=document.querySelectorAll('[data-gallery-title]')[i]?.value.trim()||'Présentation de l’établissement',description=document.querySelectorAll('[data-gallery-description]')[i]?.value.trim()||'',galleryPayload='__AURORE_GALLERY__'+JSON.stringify({title,description});const ins=await fetch(`${SUPABASE_URL}/rest/v1/etablissement_galerie`,{method:'POST',headers:h,body:JSON.stringify({etablissement_id:etabId,position:i+1,image_url:url,description:galleryPayload,actif:true})});if(!ins.ok){const b=await ins.json().catch(()=>null);throw new Error(b?.message||b?.details||`Impossible d’enregistrer l’image ${i+1}.`);}done=i+1;if(msg){msg.textContent=`Chargement : ${done}/${files.length} image${files.length>1?'s':''} ✓`;msg.className='auth-message ok';}}if(msg){msg.textContent=`✓ Publication réussie : ${done} image${done>1?'s':''} chargée${done>1?'s':''} et publiée${done>1?'s':''} dans la galerie du lycée.`;msg.className='auth-message ok';}window.__adminGalleryFiles=[];if($('adminGalleryImages'))$('adminGalleryImages').value='';if($('adminGalleryPreview'))$('adminGalleryPreview').innerHTML='';}catch(e){if(msg){msg.textContent='⚠ '+(e.message||'Impossible de publier la galerie.');msg.className='auth-message';}}finally{if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Publier les images de présentation';}}}
+async function saveInstituteGallery(etabId){
+  const msg=$('adminGalleryMessage'),wrap=document.querySelector('.gallery-admin-compose'),btn=wrap?.querySelector('button[onclick*="saveInstituteGallery"]'),files=[...(window.__adminGalleryFiles||[])];
+  const show=(text,type='info')=>{if(msg){msg.textContent=text;msg.className=`auth-message ${type}`;msg.style.display='block';}};
+  if(!files.length){show('⚠ Aucune image sélectionnée. La galerie n’a pas été enregistrée. Choisissez au moins une image puis réessayez.','err');return false;}
+  if(files.length>20){show('⚠ La galerie est limitée à 20 images. La publication n’a pas été enregistrée.','err');return false;}
+  try{
+    const token=await getFreshAccessToken(),uid=currentAuroreSession?.user?.id;
+    if(!token||!uid)throw new Error('Session expirée. La galerie n’a pas été enregistrée. Reconnectez-vous puis réessayez.');
+    const client=await getClient();
+    if(!client)throw new Error('Client Supabase indisponible. La galerie n’a pas été enregistrée.');
+    if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Publication en cours…';}
+    show(`Préparation : ${files.length} image${files.length>1?'s':''} à publier…`,'info');
+    const titles=[...document.querySelectorAll('[data-gallery-title]')],descs=[...document.querySelectorAll('[data-gallery-description]')],items=[];
+    for(let i=0;i<files.length;i++){
+      const f=files[i],ext=(f.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+      const path=`${uid}/etablissement-gallery/${etabId}-${Date.now()}-${i}-${crypto.randomUUID()}.${ext}`;
+      show(`Chargement de l’image ${i+1}/${files.length}…`,'info');
+      const up=await client.storage.from('profiles').upload(path,f,{upsert:false,contentType:f.type||'image/jpeg',cacheControl:'31536000'});
+      if(up.error)throw new Error(`Image ${i+1} : ${up.error.message||'échec du chargement.'}`);
+      const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;
+      if(!url)throw new Error(`Image ${i+1} : URL publique introuvable. La galerie n’a pas été enregistrée.`);
+      const title=titles[i]?.value.trim()||'Présentation de l’établissement',description=descs[i]?.value.trim()||'';
+      items.push({image_url:url,description:'__AURORE_GALLERY__'+JSON.stringify({title,description})});
+    }
+    show('Images chargées. Enregistrement de la galerie…','info');
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/remplacer_galerie_etablissement`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:etabId,p_images:items})});
+    const body=await r.json().catch(()=>null);
+    if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Les images ont été chargées mais la galerie n’a pas été enregistrée.');
+    const count=Number(body?.count||items.length);
+    show(`✓ Publication réussie : ${count} image${count>1?'s':''} chargée${count>1?'s':''} et enregistrée${count>1?'s':''} dans la galerie du lycée.`,'ok');
+    window.__adminGalleryFiles=[];
+    if($('adminGalleryImages'))$('adminGalleryImages').value='';
+    if($('adminGalleryPreview'))$('adminGalleryPreview').innerHTML='';
+    return true;
+  }catch(e){
+    show(`⚠ ${e.message||'La galerie n’a pas été enregistrée. Une erreur est survenue.'}`,'err');
+    return false;
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Publier les images de présentation';}
+  }
+}
 
 async function adminEstablishmentPresentationView(){
   const root=$('spaceDashboard'),id=currentSpaceEstablishmentId||'';if(!root||!id)return;
@@ -3257,7 +3300,30 @@ async function adminEstablishmentPresentationView(){
     <div id="apModificationStatus"></div><div class="gallery-admin-compose"><div><span class="profile-section-kicker">IMAGES DU LYCÉE</span><h4>Galerie de présentation</h4><p>Ajoutez des images qui seront visibles en petites vignettes sur la fiche publique puis dans une page dédiée.</p></div><input id="adminGalleryImages" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple onchange="prepareInstituteGallery(event)"><div id="adminGalleryPreview" class="admin-gallery-preview"></div><button type="button" class="admin-btn primary" onclick="saveInstituteGallery('${esc(e.id)}')">Publier les images de présentation</button><div id="adminGalleryMessage" class="auth-message"></div></div><div id="apMessage" class="auth-message"></div></form>`;await loadEstablishmentModificationStatus(id);
   }catch(err){$('adminPresentationEditor').innerHTML=`<div class="admin-card"><strong>Impossible de charger les informations.</strong><p>${esc(err.message||'Erreur.')}</p></div>`;}
 }
-async function submitEstablishmentModification(id){const msg=$('apMessage'),btn=document.querySelector('.establishment-edit-actions button[type=submit]');try{if(msg){msg.textContent='Envoi de la demande…';msg.className='auth-message';}if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Envoi en cours…';}const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée. Reconnectez-vous puis réessayez.');const uid=currentAuroreSession?.user?.id;if(!uid)throw new Error('Compte utilisateur introuvable.');const payload={nom:$('apNom')?.value.trim(),type:$('apType')?.value,niveau:$('apNiveau')?.value.trim()||null,domaine:$('apDomaine')?.value.trim()||null,ville:$('apVille')?.value.trim()||null,province:$('apProvince')?.value.trim()||null,adresse:$('apAdresse')?.value.trim()||null,telephone:$('apTelephone')?.value.trim()||null,email:$('apEmail')?.value.trim()||null,site_web:$('apSite')?.value.trim()||null,annee_fondation:$('apFondation')?.value?Number($('apFondation').value):null,latitude:$('apLat')?.value?Number($('apLat').value):null,longitude:$('apLng')?.value?Number($('apLng').value):null,presentation:$('apPresentation')?.value.trim()||null};if(!payload.nom)throw new Error('Le nom est obligatoire.');if(payload.latitude!==null&&(payload.latitude < -90||payload.latitude > 90))throw new Error('Latitude invalide.');if(payload.longitude!==null&&(payload.longitude < -180||payload.longitude > 180))throw new Error('Longitude invalide.');const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({demandeur_profile_id:uid,etablissement_id:id,nom_etablissement:payload.nom,type_etablissement:payload.type,ville:payload.ville,adresse:payload.adresse,telephone:payload.telephone,email_contact:payload.email,site_web:payload.site_web,description:'__AURORE_MODIFICATION__'+JSON.stringify(payload),justification:'Demande de modification des informations publiques de l’établissement.',statut:'en_attente',role_demande:'administration'})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||b?.details||'Impossible d’envoyer la demande.');if(msg){msg.textContent='✓ Demande envoyée avec succès à l’Administration générale Aurore. Elle sera appliquée uniquement après validation.';msg.className='auth-message ok';}await loadEstablishmentModificationStatus(id);}catch(e){if(msg){msg.textContent='⚠ '+(e.message||'Impossible d’envoyer la demande.');msg.className='auth-message';}}finally{if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Envoyer la demande de modification';}}}
+async function submitEstablishmentModification(id){
+  const msg=$('apMessage'),btn=document.querySelector('.establishment-edit-actions button[type=submit]');
+  const show=(text,type='info')=>{if(msg){msg.textContent=text;msg.className=`auth-message ${type}`;msg.style.display='block';msg.setAttribute('role','status');}};
+  try{
+    show('Envoi de la demande…','info');
+    if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent='Envoi en cours…';}
+    const token=await getFreshAccessToken();
+    if(!token)throw new Error('Session expirée. La demande n’a pas été enregistrée. Reconnectez-vous puis réessayez.');
+    const uid=currentAuroreSession?.user?.id;
+    if(!uid)throw new Error('Compte utilisateur introuvable. La demande n’a pas été enregistrée.');
+    const payload={nom:$('apNom')?.value.trim(),type:$('apType')?.value,niveau:$('apNiveau')?.value.trim()||null,domaine:$('apDomaine')?.value.trim()||null,ville:$('apVille')?.value.trim()||null,province:$('apProvince')?.value.trim()||null,adresse:$('apAdresse')?.value.trim()||null,telephone:$('apTelephone')?.value.trim()||null,email:$('apEmail')?.value.trim()||null,site_web:$('apSite')?.value.trim()||null,annee_fondation:$('apFondation')?.value?Number($('apFondation').value):null,latitude:$('apLat')?.value?Number($('apLat').value):null,longitude:$('apLng')?.value?Number($('apLng').value):null,presentation:$('apPresentation')?.value.trim()||null};
+    if(!payload.nom)throw new Error('Le nom est obligatoire. La demande n’a pas été enregistrée.');
+    if(payload.latitude!==null&&(payload.latitude < -90||payload.latitude > 90))throw new Error('Latitude invalide. La demande n’a pas été enregistrée.');
+    if(payload.longitude!==null&&(payload.longitude < -180||payload.longitude > 180))throw new Error('Longitude invalide. La demande n’a pas été enregistrée.');
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({demandeur_profile_id:uid,etablissement_id:id,nom_etablissement:payload.nom,type_etablissement:payload.type,ville:payload.ville,adresse:payload.adresse,telephone:payload.telephone,email_contact:payload.email,site_web:payload.site_web,description:'__AURORE_MODIFICATION__'+JSON.stringify(payload),justification:'Demande de modification des informations publiques de l’établissement.',statut:'en_attente',role_demande:'administration'})});
+    const b=await r.json().catch(()=>null);
+    if(!r.ok)throw new Error(b?.message||b?.hint||b?.details||'La demande n’a pas été enregistrée. Vérifiez votre connexion et réessayez.');
+    if(!Array.isArray(b)||!b.length)throw new Error('Le serveur n’a confirmé aucun enregistrement. La demande n’est pas considérée comme enregistrée.');
+    show('✓ Demande enregistrée avec succès. Elle a été transmise à l’Administration générale Aurore et sera appliquée uniquement après validation.','ok');
+    await loadEstablishmentModificationStatus(id);
+    return true;
+  }catch(e){show(`⚠ ${e.message||'La demande n’a pas été enregistrée.'}`,'err');return false;}
+  finally{if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Envoyer la demande de modification';}}
+}
 async function loadEstablishmentModificationStatus(id){const box=$('apModificationStatus');if(!box)return;try{const token=await getFreshAccessToken();if(!token)return;const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?etablissement_id=eq.${encodeURIComponent(id)}&role_demande=eq.administration&select=id,statut,commentaire_admin,created_at,traite_at&order=created_at.desc&limit=5`,{headers:h,cache:'no-store'});if(!r.ok)throw new Error();const rows=await r.json();box.innerHTML=rows.length?`<div class="modification-status-list"><span class="profile-section-kicker">SUIVI DES DEMANDES</span>${rows.map(d=>{const st=d.statut==='validee'?'approved':d.statut==='refusee'?'rejected':'pending',label=d.statut==='validee'?'Acceptée et appliquée':d.statut==='refusee'?'Refusée':'En attente';return `<div class="modification-status-item ${st}"><strong>${label}</strong><small>${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):'—'}</small><p>${esc(d.commentaire_admin||(d.statut==='validee'?'La modification a été appliquée.':d.statut==='refusee'?'La demande a été refusée.':'La demande est en cours d’examen.'))}</p></div>`}).join('')}</div>`:'';}catch(_){box.innerHTML='';}}
 
 
@@ -3528,8 +3594,12 @@ function openSpaceTool(role,key){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
   }
   if(role==='general' && key==='general-modifications'){ root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale</span><h3>Modifications d’établissements</h3><p>Examinez les changements proposés par les administrations des lycées avant leur publication.</p></div>${common}</div><div id="adminModificationRequestsList" class="admin-list"><div class="admin-card">Chargement…</div></div></section>`;loadAdminModificationRequests();return; }
+  if(role==='general' && key==='general-new-admins'){
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale · Nouvelles administrations</span><h3>Nouvelles demandes d’administration</h3><p>Les nouvelles administrations sont regroupées ici. Ouvrez une fiche pour consulter toutes les informations saisies lors de la demande, puis acceptez ou refusez l’établissement.</p></div>${common}</div><div id="adminNewAdminRequestsList" class="admin-list"><div class="admin-card">Chargement des nouvelles administrations…</div></div></section>`;
+    loadAdminNewAdministrationRequests();return;
+  }
   if(role==='general' && key==='general-demandes'){
-    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Demandes d’établissements</span><h3>Demandes non validées</h3><p>Les demandes restent privées jusqu’à leur validation.</p></div>${common}</div><div id="adminRequestsList" class="admin-list"><div class="admin-card">Chargement des demandes…</div></div></section>`;
+    root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Administration générale</span><h3>Autres demandes d’établissements</h3><p>Les demandes qui ne concernent pas la création d’une nouvelle administration sont regroupées séparément.</p></div>${common}</div><div id="adminRequestsList" class="admin-list"><div class="admin-card">Chargement des demandes…</div></div></section>`;
     loadAdminRequests();return;
   }
   if(role==='general' && key==='general-establishments'){
@@ -3600,12 +3670,13 @@ async function loadGeneralDisplayDiagnostic(){
 }
 
 async function loadAdminOverview(){
-  const ids=['general-demandes','general-accepted','general-refused','general-suspended','general-banned'];
+  const ids=['general-new-admins','general-demandes','general-accepted','general-refused','general-suspended','general-banned'];
   const token=currentAuroreSession?.access_token||'';
   if(!token)return;
   const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Prefer':'count=exact','Range':'0-0'};
   const queries=[
-    `${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&select=id`,
+    `${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&role_demande=eq.administration&select=id`,
+    `${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&role_demande=neq.administration&select=id`,
     `${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&statut=eq.actif&actif=eq.true&select=id`,
     `${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.refusee&select=id`,
     `${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&statut=eq.suspendu&select=id`,
@@ -3627,22 +3698,58 @@ async function loadAdminOverview(){
   }
 }
 
+async function loadAdminNewAdministrationRequests(){
+  const box=$('adminNewAdminRequestsList');if(!box)return;
+  try{
+    const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?role_demande=eq.administration&statut=eq.en_attente&select=*&order=created_at.desc`,{headers:h,cache:'no-store'});
+    const rows=await r.json().catch(()=>[]);if(!r.ok)throw new Error('Impossible de charger les nouvelles administrations.');
+    window.__auroreNewAdministrationRequests=rows;
+    if(!rows.length){box.innerHTML='<div class="admin-empty"><h3>Aucune nouvelle administration</h3><p>Il n’y a actuellement aucune demande de création d’administration en attente.</p></div>';return;}
+    box.innerHTML=rows.map(d=>{
+      const photo=d.photo_url?`<img class="request-logo" src="${esc(d.photo_url)}" alt="Logo de ${esc(d.nom_etablissement||'établissement')}">`:'<div class="request-logo empty">ETAB</div>';
+      return `<article class="general-establishment-request-card" onclick="openNewAdministrationRequest('${esc(d.id)}')"><div class="request-brand">${photo}<div><span class="request-kicker">Nouvelle administration</span><h3>${esc(d.nom_etablissement||'Sans nom')}</h3><p>${esc(d.type_etablissement||'Type non précisé')} · ${esc(d.ville||'Ville non précisée')}${d.commune?' · '+esc(d.commune):''}</p></div></div><div class="general-establishment-request-meta"><span class="request-status pending">En attente</span><span>Soumise le ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):'—'}</span></div><button class="admin-btn primary" type="button" onclick="event.stopPropagation();openNewAdministrationRequest('${esc(d.id)}')">Ouvrir la fiche complète →</button></article>`;
+    }).join('');
+  }catch(e){box.innerHTML=`<div class="admin-error"><strong>Chargement impossible.</strong><p>${esc(e.message||'Erreur.')}</p></div>`;}
+}
+
 async function loadAdminRequests(){
   try{
     const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${currentAuroreSession?.access_token||''}`};
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&select=*&order=created_at.desc`,{headers:h});
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_etablissements?statut=eq.en_attente&role_demande=neq.administration&select=*&order=created_at.desc`,{headers:h,cache:'no-store'});
     if(!r.ok)throw new Error('Impossible de charger les demandes.');
     const rows=await r.json(); const list=$('adminRequestsList');
-    if(!rows.length){list.innerHTML='<div class="admin-card">Aucune demande pour le moment.</div>';return;}
+    if(!rows.length){list.innerHTML='<div class="admin-card">Aucune autre demande pour le moment.</div>';return;}
     list.innerHTML=rows.map(d=>{
       const photo=d.photo_url?`<img class="request-logo" src="${esc(d.photo_url)}" alt="Logo de ${esc(d.nom_etablissement||'établissement')}">`:'<div class="request-logo empty">ETAB</div>';
-      const status=d.statut==='en_attente'?'En attente':d.statut==='validee'?'Validée':'Refusée';
-      const statusClass=d.statut==='en_attente'?'pending':d.statut==='validee'?'approved':'rejected';
-      const decision=d.statut==='en_attente'?`<div class="request-actions"><button class="admin-btn primary" type="button" onclick="decideEstablishmentRequest('${d.id}','validee')">Valider et publier</button><button class="admin-btn danger" type="button" onclick="decideEstablishmentRequest('${d.id}','refusee')">Refuser</button></div>`:'';
-      const refusal=d.statut==='refusee'&&d.commentaire_admin?`<div class="request-refusal"><b>Motif du refus</b><p>${esc(d.commentaire_admin)}</p></div>`:'';
-      return `<article class="request-card"><div class="request-card-head"><div class="request-brand">${photo}<div><span class="request-kicker">Demande d’établissement</span><h3>${esc(d.nom_etablissement||'Sans nom')}</h3><p>${esc(d.type_etablissement||'Type non précisé')} · ${esc(d.ville||'Ville non précisée')}${d.commune?' · '+esc(d.commune):''}</p></div></div><span class="request-status ${statusClass}">${status}</span></div><div class="request-detail-grid"><div class="request-detail"><span>Demandeur</span><strong>${esc(d.email_contact||'Non renseigné')}</strong></div><div class="request-detail"><span>Téléphone</span><strong>${esc(d.telephone||'Non renseigné')}</strong></div><div class="request-detail"><span>Adresse</span><strong>${esc(d.adresse||'Non renseignée')}</strong></div><div class="request-detail"><span>Rôle demandé</span><strong>${esc(d.role_demande||'Non précisé')}</strong></div></div><div class="request-copy"><div><span>Description</span><p>${esc(d.description||'Aucune description fournie.')}</p></div>${d.justification?`<div><span>Justification</span><p>${esc(d.justification)}</p></div>`:''}</div>${refusal}<div class="request-footer"><small>Soumise le ${new Date(d.created_at).toLocaleDateString('fr-FR')}</small>${d.statut==='validee'&&d.etablissement_id?'<span class="request-published">✓ Publiée dans l’annuaire</span>':''}${decision}</div></article>`;
+      return `<article class="request-card"><div class="request-card-head"><div class="request-brand">${photo}<div><span class="request-kicker">Demande d’établissement</span><h3>${esc(d.nom_etablissement||'Sans nom')}</h3><p>${esc(d.type_etablissement||'Type non précisé')} · ${esc(d.ville||'Ville non précisée')}</p></div></div><span class="request-status pending">En attente</span></div><div class="request-footer"><small>Soumise le ${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):'—'}</small><div class="request-actions"><button class="admin-btn primary" type="button" onclick="openNewAdministrationRequest('${esc(d.id)}')">Ouvrir la demande</button></div></div></article>`;
     }).join('');
   }catch(e){if($('adminRequestsList'))$('adminRequestsList').innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les demandes.')}</div>`;}
+}
+
+function closeNewAdministrationRequest(){
+  const modal=$('newAdministrationRequestModal');
+  if(modal){modal.classList.remove('visible');modal.setAttribute('aria-hidden','true');}
+  window.__activeNewAdministrationRequestId=null;
+}
+
+function openNewAdministrationRequest(id){
+  const rows=window.__auroreNewAdministrationRequests||[];
+  const d=rows.find(x=>String(x.id)===String(id));
+  if(!d)return;
+  let modal=$('newAdministrationRequestModal');
+  if(!modal){
+    modal=document.createElement('div');modal.id='newAdministrationRequestModal';modal.className='new-admin-request-modal';modal.setAttribute('aria-hidden','true');
+    document.body.appendChild(modal);
+  }
+  window.__activeNewAdministrationRequestId=id;
+  const photo=d.photo_url?`<img class="new-admin-request-logo" src="${esc(d.photo_url)}" alt="Logo de ${esc(d.nom_etablissement||'établissement')}">`:'<div class="new-admin-request-logo empty">ETAB</div>';
+  const fields=[
+    ['Nom de l’établissement',d.nom_etablissement],['Type',d.type_etablissement],['Ville',d.ville],['Commune',d.commune],['Adresse',d.adresse],['Téléphone',d.telephone],['E-mail',d.email_contact],['Site web',d.site_web],['Rôle demandé',d.role_demande],['Profil demandeur',d.demandeur_profile_id],['Date de la demande',d.created_at?new Date(d.created_at).toLocaleString('fr-FR'):'—']
+  ];
+  modal.innerHTML=`<div class="new-admin-request-backdrop" onclick="closeNewAdministrationRequest()"></div><section class="new-admin-request-dialog" role="dialog" aria-modal="true" aria-labelledby="newAdminRequestTitle"><button class="decision-close" type="button" onclick="closeNewAdministrationRequest()" aria-label="Fermer">×</button><div class="new-admin-request-hero">${photo}<div><span class="request-kicker">Nouvelle administration · Fiche complète</span><h2 id="newAdminRequestTitle">${esc(d.nom_etablissement||'Établissement sans nom')}</h2><p>${esc(d.type_etablissement||'Type non précisé')} · ${esc(d.ville||'Ville non précisée')}${d.province?' · '+esc(d.province):''}</p></div></div><div class="new-admin-request-section"><span class="profile-section-kicker">INFORMATIONS FOURNIES</span><h3>Toutes les informations de la demande</h3><div class="new-admin-request-grid">${fields.map(([k,v])=>`<div class="request-detail"><span>${esc(k)}</span><strong>${esc(v||'—')}</strong></div>`).join('')}</div></div><div class="new-admin-request-copy"><div><span>Description de l’établissement</span><p>${esc(d.description||'Aucune description fournie.')}</p></div><div><span>Motif de la demande</span><p>${esc(d.justification||'Aucun motif fourni.')}</p></div></div><div class="new-admin-request-section"><span class="profile-section-kicker">DÉCISION</span><p class="new-admin-request-note">Après vérification de toutes les informations, vous pouvez publier l’établissement ou refuser cette demande.</p><div class="new-admin-request-actions"><button class="admin-btn primary" type="button" onclick="closeNewAdministrationRequest();decideEstablishmentRequest('${esc(d.id)}','validee')">✓ Accepter et publier</button><button class="admin-btn danger" type="button" onclick="closeNewAdministrationRequest();decideEstablishmentRequest('${esc(d.id)}','refusee')">Refuser la demande</button></div></div></section>`;
+  modal.classList.add('visible');modal.setAttribute('aria-hidden','false');
 }
 
 let pendingEstablishmentDecision=null;
@@ -4639,6 +4746,15 @@ function appliquerTheme(choix){
 .gallery-presentation-controls{display:flex;align-items:center;justify-content:center;gap:16px;padding:11px;border-top:1px solid var(--line)}.gallery-presentation-controls button{width:38px;height:38px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--accent) 7%,var(--panel2));color:var(--accent2);font-size:1.45rem;line-height:1;cursor:pointer}.gallery-presentation-dots{display:flex;align-items:center;gap:6px}.gallery-presentation-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);cursor:pointer}.gallery-presentation-dots i.active{background:var(--accent);transform:scale(1.3)}
 @media(max-width:900px){.establishment-edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:620px){.establishment-edit-grid{grid-template-columns:1fr!important;padding:12px!important}.gallery-presentation-card{border-radius:19px}.gallery-presentation-slide img{max-height:560px}.gallery-presentation-slide figcaption{padding:13px 14px 15px}}
+</style>
+<style id="aurore-general-new-admin-requests">
+.general-establishment-request-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:18px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:0 14px 34px rgba(0,0,0,.07);cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;overflow:hidden}
+.general-establishment-request-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--accent-strong),var(--accent2));opacity:.9}
+.general-establishment-request-card:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 20px 42px rgba(0,0,0,.11)}
+.general-establishment-request-card>.request-brand{min-width:0}.general-establishment-request-meta{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.65rem}.general-establishment-request-card>.admin-btn{grid-column:1/-1;justify-self:end}
+.new-admin-request-modal{display:none;position:fixed;inset:0;z-index:1200;align-items:center;justify-content:center;padding:18px}.new-admin-request-modal.visible{display:flex}.new-admin-request-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(5px)}.new-admin-request-dialog{position:relative;width:min(940px,100%);max-height:min(90vh,900px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:24px;box-shadow:0 30px 100px rgba(0,0,0,.3)}
+.new-admin-request-hero{display:flex;gap:16px;align-items:center;padding:4px 28px 20px 0;border-bottom:1px solid var(--line)}.new-admin-request-logo{width:88px;height:88px;flex:0 0 88px;object-fit:cover;border-radius:20px;border:1px solid var(--line);background:var(--panel2)}.new-admin-request-logo.empty{display:grid;place-items:center;color:var(--muted);font-weight:900;font-size:.7rem}.new-admin-request-hero h2{margin:5px 0 5px;font-size:1.45rem}.new-admin-request-hero p{margin:0;color:var(--muted);font-size:.78rem}.new-admin-request-section{margin-top:20px}.new-admin-request-section h3{margin:5px 0 12px;font-size:1rem}.new-admin-request-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.new-admin-request-grid .request-detail{min-height:58px}.new-admin-request-copy{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.new-admin-request-copy>div{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel2)}.new-admin-request-copy span{display:block;color:var(--muted);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.new-admin-request-copy p{margin:7px 0 0;font-size:.78rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.new-admin-request-note{margin:0;color:var(--muted);font-size:.75rem;line-height:1.5}.new-admin-request-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.new-admin-request-actions .admin-btn{min-height:44px}.new-admin-request-dialog .decision-close{z-index:2}
+@media(max-width:760px){.general-establishment-request-card{grid-template-columns:1fr}.general-establishment-request-meta{justify-content:flex-start}.general-establishment-request-card>.admin-btn{justify-self:stretch;width:100%}.new-admin-request-dialog{padding:18px;border-radius:21px;max-height:94vh}.new-admin-request-hero{align-items:flex-start}.new-admin-request-grid,.new-admin-request-copy{grid-template-columns:1fr}.new-admin-request-actions{flex-direction:column}.new-admin-request-actions .admin-btn{width:100%}}
 </style>
 </body>
 </html>
