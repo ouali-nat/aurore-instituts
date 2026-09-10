@@ -4868,14 +4868,21 @@ async function renderStudentParcours(root,common){
   const box=$('parcoursContent');
   if(!box)return;
   try{
-    const token=currentAuroreSession?.access_token;
-    const uid=currentAuroreSession?.user?.id||currentAuroreSession?.user?.sub;
-    if(!token||!uid)throw new Error('Session élève introuvable. Veuillez vous reconnecter.');
-    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
-    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=nom,prenom,avatar_url,photo_profil_url,classe,niveau,a_propos_cv`,{headers:h,cache:'no-store'},8000);
-    if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Impossible de charger votre parcours (${r.status}).`);}
-    const data=await r.json();
-    const row=Array.isArray(data)?(data[0]||{}):{};
+    // Le profil est déjà chargé à l'ouverture de l'espace élève.
+    // On l'utilise directement pour afficher Mon parcours sans attendre un nouvel appel réseau.
+    let row=currentAuroreProfile||{};
+    if(!row.id && currentAuroreSession?.user?.id)row={...row,id:currentAuroreSession.user.id};
+    // Secours uniquement si le profil local ne contient réellement aucune donnée CV.
+    if(!row.a_propos_cv){
+      const token=currentAuroreSession?.access_token;
+      const uid=currentAuroreSession?.user?.id||currentAuroreSession?.user?.sub;
+      if(!token||!uid)throw new Error('Session élève introuvable. Veuillez vous reconnecter.');
+      const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+      const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=nom,prenom,avatar_url,photo_profil_url,classe,niveau,a_propos_cv`,{headers:h,cache:'no-store'},5000);
+      if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Impossible de charger votre parcours (${r.status}).`);}
+      const data=await r.json();
+      row=Array.isArray(data)?(data[0]||row):row;
+    }
     const cv={...(row.a_propos_cv||{})};window.__studentCVImages=cvNormalizeImages(cv.images);const hasContent=cvHasContent(cv);
     const fields=[['titre','Titre / intitulé','Ex. Élève en Terminale D, orientation Sciences'],['presentation','Présentation','Quelques lignes sur vous, votre motivation et votre parcours'],['competences','Compétences','Une compétence par ligne ou séparée par des virgules'],['langues','Langues','Ex. Français — courant · Anglais — intermédiaire'],['experiences','Expériences & activités','Stages, projets, clubs, bénévolat ou activités'],['distinctions','Distinctions & certifications','Concours, certificats, récompenses ou formations'],['centres_interet','Centres d’intérêt','Ce qui vous passionne en dehors des cours'],['objectif','Projet d’orientation','Filière, école, métier ou domaine envisagé']];
     const form=fields.map(([k,l,hint])=>`<label class="parcours-field ${k==='presentation'||k==='experiences'||k==='objectif'?'full':''}"><span>${parcoursEsc(l)}</span><small>${parcoursEsc(hint)}</small>${k==='titre'?`<input id="cvTitre" maxlength="120" value="${cvEsc(cv[k]||'')}" placeholder="Élève en classe de …">`:`<textarea id="cv${k==='centres_interet'?'CentresInteret':k.charAt(0).toUpperCase()+k.slice(1)}" maxlength="${k==='presentation'?600:k==='experiences'?900:k==='distinctions'||k==='objectif'?500:k==='competences'?500:k==='langues'?250:350}" placeholder="${cvEsc(hint)}">${cvEsc(cv[k]||'')}</textarea>`}`).join('');
