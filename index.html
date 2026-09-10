@@ -1137,9 +1137,7 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 @media(max-width:700px){.cv-paper-wrap{padding:12px 0 40px}.cv-paper{display:block;width:100%;min-height:0;border-left:0;border-right:0;box-shadow:none}.cv-paper-side{padding:28px 22px;border-right:0;border-bottom:1px solid #e8ebef}.cv-paper-main{padding:28px 22px}.cv-gallery{grid-template-columns:repeat(2,1fr)}.cv-viewer-toolbar{padding:10px 12px}.cv-viewer-btn{padding:8px 10px;font-size:11px}}
 @media print{body>*:not(#auroreCvViewer){display:none!important}.cv-viewer{position:static!important;overflow:visible!important}.cv-viewer-toolbar{display:none!important}.cv-paper-wrap{padding:0!important}.cv-paper{box-shadow:none!important;border:0!important;width:100%!important}.cv-paper-side{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style>
-<style id="aurore-student-parcours-style">
-.student-parcours{display:grid;gap:18px}.parcours-hero{position:relative;overflow:hidden;padding:28px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,var(--panel)),var(--panel));box-shadow:var(--shadow)}.parcours-hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-60px;top:-70px;background:color-mix(in srgb,var(--accent2) 18%,transparent)}.parcours-kicker{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);font-weight:900}.parcours-hero h3{margin:7px 0 5px;font-size:1.45rem}.parcours-hero p{max-width:680px;color:var(--muted);line-height:1.6;font-size:.78rem}.parcours-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:18px;align-items:start}.parcours-form,.parcours-preview{border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:var(--shadow)}.parcours-form{padding:20px}.parcours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.parcours-field{display:grid;gap:7px}.parcours-field.full{grid-column:1/-1}.parcours-field span{font-size:.68rem;font-weight:900}.parcours-field small{font-size:.6rem;color:var(--muted);line-height:1.4}.parcours-field input,.parcours-field textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);padding:11px 13px;font:inherit;font-size:.76rem;outline:none}.parcours-field input:focus,.parcours-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}.parcours-field textarea{min-height:105px;resize:vertical;line-height:1.55}.parcours-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.parcours-preview{position:static;overflow:hidden}.parcours-preview-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.parcours-preview-head strong{font-size:.76rem}.parcours-preview-head small{display:block;color:var(--muted);font-size:.6rem;margin-top:3px}.parcours-preview-body{max-height:none;overflow:visible;padding:20px}.parcours-paper{min-height:500px}.parcours-profile{display:flex;align-items:center;gap:13px;padding-bottom:18px;border-bottom:1px solid var(--line)}.parcours-avatar{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 15%,var(--panel));color:var(--accent2);font-weight:950;overflow:hidden;flex:none}.parcours-avatar img{width:100%;height:100%;object-fit:cover}.parcours-profile h4{margin:0;font-size:1rem}.parcours-profile p{margin:4px 0 0;color:var(--muted);font-size:.66rem}.parcours-section{padding:15px 0;border-bottom:1px solid var(--line)}.parcours-section:last-child{border-bottom:0}.parcours-section h5{margin:0 0 7px;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent2)}.parcours-section p{margin:0;white-space:pre-wrap;line-height:1.6;font-size:.72rem}.parcours-empty{padding:35px 10px;text-align:center;color:var(--muted);font-size:.72rem;line-height:1.6}@media(max-width:850px){.parcours-layout{grid-template-columns:1fr}.parcours-preview{position:static}.parcours-preview-body{max-height:none}}@media(max-width:600px){.parcours-grid{grid-template-columns:1fr}.parcours-field.full{grid-column:auto}.parcours-hero{padding:22px}.parcours-form{padding:15px}}
-</style>
+
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -2748,33 +2746,8 @@ async function openSpace(role,options={}){
   if(role!=='general' && options.etablissementId) currentSpaceEstablishmentId=String(options.etablissementId);
   else if(role!=='general' && !options.etablissementId && currentSpaceEstablishmentId) options.etablissementId=currentSpaceEstablishmentId;
 
-  // CHEMIN RAPIDE — Mon parcours
-  // Cette rubrique ne doit attendre ni vérification d'accès, ni bandeau établissement,
-  // ni RPC Supabase. Les données du profil sont déjà disponibles dans currentAuroreProfile.
-  // On rend donc la page directement, comme les rubriques légères de l'espace élève.
-  if(role==='eleve' && (options.tool==='parcours'||options.tool==='apropos')){
-    const etabParam=currentSpaceEstablishmentId?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
-    const route=`#espace/eleve/parcours${etabParam}`;
-    pendingRouteTransition='';
-    endPageTransition();
-    if(options.push!==false && location.hash!==route){
-      saveRoutePosition();
-      auroreInAppHistoryDepth++;
-      history.pushState({scrollY:0},'',route);
-    }
-    document.getElementById('auroreAuthWait')?.classList.remove('show');
-    document.body.classList.remove('aurore-transitioning');
-    document.body.classList.add('spaces-focus');
-    const panel=document.getElementById('spacePanel');
-    if(!panel)return;
-    panel.classList.add('page-mode','tool-page','visible');
-    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('eleve',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})})">Retour à l’espace</button><h2>Espace élèves</h2><p>Votre parcours scolaire et personnel.</p></div><div id="spaceDashboard"></div>`;
-    const root=document.getElementById('spaceDashboard');
-    if(root)renderStudentParcours(root,'<button class="space-back" type="button" onclick="auroreBack(()=>{openSpace(\'eleve\',{etablissementId:\''+esc(currentSpaceEstablishmentId)+'\'})})">Retour aux rubriques</button>');
-    applyOrResetSpaceScroll();
-    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
-    return;
-  }
+  if(role==='eleve' && (options.tool==='parcours'||options.tool==='apropos')){ openStudentParcoursPage({push:options.push!==false}); return; }
+
   if(role==='general') {
     const session=currentAuroreSession;
     if(!session){openAuthPage();return;}
@@ -2840,12 +2813,12 @@ async function openSpace(role,options={}){
   const configs={
     eleve:{title:'Espace élèves',subtitle:'Tout ce qui concerne votre vie scolaire.',items:[
       ['Ma classe','Votre classe, votre groupe et les informations essentielles.','⌂','class'],
-      ['Mon parcours','Présentez votre parcours, vos compétences et vos projets dans un espace moderne.','✦','parcours'],
       ['Mes devoirs','Devoirs à faire, consignes et échéances.','✓','devoirs'],
       ['Mes professeurs','Vos enseignants et les matières qu’ils enseignent.','◉','professeurs'],
       ['Mon bulletin','Vos bulletins scolaires publiés par l’établissement.','▤','bulletin'],
       ['Mes notes','Vos résultats, matières et tests.','★','notes'],
       ['Mes demandes','Demandes adressées à l’administration et leur suivi.','✦','demandes']
+      ,['Mon parcours','Présentez votre parcours, vos compétences et vos projets dans un espace moderne.','✦','parcours']
     ]},
     administration:{title:'Administration lycée',subtitle:'Gestion des informations et du suivi de l’établissement.',items:[
       ['Présentation du lycée','Identité, présentation, contacts et informations générales.','⌂','presentation'],
@@ -3661,32 +3634,8 @@ async function renderProfessorStudentsView(){
 }
 
 function openSpaceTool(role,key){
-  // Mon parcours est une page autonome : son ouverture ne doit dépendre
-  // d'aucune vérification réseau, d'aucun RPC et d'aucun chargement Supabase.
-  // Le clic doit donc toujours donner accès à la page immédiatement.
-  if(role==='eleve' && (key==='parcours'||key==='apropos')){
-    const etabParam=currentSpaceEstablishmentId?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
-    const route=`#espace/eleve/parcours${etabParam}`;
-    // Mon parcours est volontairement exempt de l'écran de transition global.
-    // Cette rubrique est locale et doit être affichée immédiatement sur mobile.
-    if(location.hash!==route){
-      pendingRouteTransition='';
-      saveRoutePosition();
-      auroreInAppHistoryDepth++;
-      history.pushState({scrollY:0},'',route);
-    }
-    endPageTransition();
-    const authWait=document.getElementById('auroreAuthWait');
-    if(authWait){authWait.classList.remove('show');authWait.setAttribute('aria-hidden','true');}
-    document.body.classList.remove('aurore-transitioning');
-    const panel=document.getElementById('spacePanel');
-    if(!panel)return;
-    panel.classList.add('page-mode','tool-page','visible');
-    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('eleve',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})})">Retour à l’espace</button><h2>Espace élèves</h2><p>Votre parcours scolaire et personnel.</p></div><div id="spaceDashboard"></div>`;
-    const root=document.getElementById('spaceDashboard');
-    if(root)renderStudentParcours(root,'<button class="space-back" type="button" onclick="auroreBack(()=>{openSpace(\'eleve\',{etablissementId:\''+esc(currentSpaceEstablishmentId)+'\'})})">Retour aux rubriques</button>');
-    return;
-  }
+  if(role==='eleve' && (key==='parcours'||key==='apropos')){ openStudentParcoursPage(); return; }
+
   const etabParam=(role!=='general'&&currentSpaceEstablishmentId)?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
   const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}${etabParam}`;
   if(location.hash!==route) pushRoute(route);
@@ -3721,7 +3670,7 @@ function openSpaceTool(role,key){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
   if(role==='eleve' && key==='class'){ renderStudentClassDashboard(root,common); return; }
-  if(role==='eleve' && (key==='parcours'||key==='apropos')){ renderStudentParcours(root,common); return; }
+  if(role==='eleve' && (key==='parcours'||key==='apropos')){ openStudentParcoursPage(); return; }
   if(role==='eleve' && (key==='professeurs'||key==='camarades')){
     const teacher=key==='professeurs'; const people=teacher?[['Awa Traoré','Mathématiques · Professeur principal','42 élèves'],['Moussa Kaboré','Français','38 élèves'],['Clarisse Ouédraogo','Anglais','41 élèves'],['Idrissa Sawadogo','Physique-Chimie','40 élèves'],['Fatimata Diallo','Histoire-Géographie','42 élèves']]:[['Adama Kinda','3e A · Élève','42 élèves'],['Mariam Compaoré','3e A · Élève','42 élèves'],['Salif Ouédraogo','3e A · Élève','42 élèves'],['Nadia Zongo','3e A · Élève','42 élèves'],['Issouf Kaboré','3e A · Élève','42 élèves']];
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
@@ -4917,6 +4866,29 @@ function bindStudentCVLivePreview(row,cv){
   buildStudentCVLivePreview(row,cv);
 }
 
+function openStudentParcoursPage(options={}){
+  options=options||{};
+  const panel=$('spacePanel');
+  if(!panel)return;
+  const etab=currentSpaceEstablishmentId||'';
+  const route=`#espace/eleve/parcours${etab?`?etab=${encodeURIComponent(etab)}`:''}`;
+  pendingRouteTransition='';
+  endPageTransition();
+  document.getElementById('auroreAuthWait')?.classList.remove('show');
+  document.body.classList.remove('aurore-transitioning');
+  document.body.classList.add('spaces-focus');
+  if(options.push!==false && location.hash!==route){
+    saveRoutePosition();
+    auroreInAppHistoryDepth++;
+    history.pushState({scrollY:0},'',route);
+  }
+  panel.classList.add('page-mode','tool-page','visible');
+  panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('eleve',{etablissementId:'${esc(etab)}'})})">Retour à l’espace</button><h2>Espace élèves</h2><p>Votre parcours scolaire et personnel.</p></div><div id="spaceDashboard"></div>`;
+  const root=$('spaceDashboard');
+  if(root)renderStudentParcours(root,`<button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('eleve',{etablissementId:'${esc(etab)}'})})">Retour aux rubriques</button>`);
+  applyOrResetSpaceScroll();
+  requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
+}
 function renderStudentParcours(root,common){
   if(!root)return;
   // IMPORTANT : cette page doit s'afficher immédiatement. Aucun appel réseau
@@ -5125,3 +5097,7 @@ window.renderStudentParcours=renderStudentParcours;window.saveStudentParcours=sa
 <style id="aurore-action-confirmations">.establishment-edit-actions button:disabled,.gallery-admin-compose button:disabled{opacity:.65;cursor:wait}.modification-status-list{margin:14px 0;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--shadow)}.modification-status-item{margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line)}.modification-status-item strong{display:block}.modification-status-item small{display:block;color:var(--muted);margin-top:3px}.modification-status-item p{margin:8px 0 0;color:var(--muted)}</style>
 
 
+
+<style id="aurore-student-parcours-rebuild">
+.student-parcours{display:grid;gap:14px}.student-parcours .space-dashboard-head{margin-bottom:0}.parcours-hero{padding:20px;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb,var(--accent) 7%,var(--panel));box-shadow:var(--shadow)}.parcours-kicker{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);font-weight:900}.parcours-hero h3{margin:6px 0;font-size:1.18rem}.parcours-hero p{margin:0;color:var(--muted);font-size:.72rem;line-height:1.55}.parcours-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.78fr);gap:14px;align-items:start}.parcours-form,.parcours-preview{border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--shadow)}.parcours-form{padding:15px}.parcours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.parcours-field{display:grid;gap:6px;min-width:0}.parcours-field.full{grid-column:1/-1}.parcours-field span{font-size:.66rem;font-weight:900}.parcours-field small{font-size:.58rem;color:var(--muted);line-height:1.35}.parcours-field input,.parcours-field textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);padding:10px 11px;font:inherit;font-size:.74rem;outline:none}.parcours-field textarea{min-height:92px;resize:vertical;line-height:1.5}.parcours-preview{overflow:hidden}.parcours-preview-body{padding:15px;max-height:none!important;overflow:visible!important}.parcours-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.cv-privacy-box{margin-top:12px}.cv-image-grid{overflow:hidden}.cv-image-item img{display:block;max-width:100%}@media(max-width:850px){.parcours-layout{grid-template-columns:1fr}}@media(max-width:600px){.parcours-grid{grid-template-columns:1fr}.parcours-field.full{grid-column:auto}.parcours-form{padding:13px}.parcours-hero{padding:17px}.parcours-actions{display:grid;grid-template-columns:1fr}.parcours-actions button{width:100%}}
+</style>
