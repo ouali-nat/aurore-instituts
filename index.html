@@ -3097,7 +3097,7 @@ async function loadAdminClasses(){
   try{
     const results=await Promise.all(ids.map(id=>fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(id)}&select=id,etablissement_id,nom,niveau,annee_scolaire,actif&order=nom.asc`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])));
     const all=results.flat();
-    board.innerHTML=all.length?all.map(c=>`<article class="class-board-card" data-class-id="${esc(c.id)}" onclick="openAdminClassPage('${esc(c.id)}',event)"><button class="class-board-menu" type="button" onclick="renameInstituteClass('${esc(c.id)}','${esc(c.nom)}');event.stopPropagation()">⋯</button><span class="class-board-kicker">Classe</span><h4>${esc(c.nom)}</h4><div class="class-board-meta">${esc([c.niveau,c.annee_scolaire].filter(Boolean).join(' · ')||'Informations à compléter')}</div><span class="class-board-count" id="classCount-${esc(c.id)}">Effectif…</span><span class="class-open-hint">Ouvrir la page de la classe →</span><div class="class-student-panel" id="classStudents-${esc(c.id)}"></div></article>`).join(''):'<div class="admin-card">Aucune classe. Créez la première classe ci-dessus.</div>';
+    board.innerHTML=all.length?all.map((c,idx)=>`<article class="class-board-card" data-class-id="${esc(c.id)}" tabindex="0" role="button" aria-label="Ouvrir la classe ${esc(c.nom)}" onclick="openAdminClassPage('${esc(c.id)}',event)"><div class="class-board-symbol">♙</div><div class="class-board-copy"><span class="class-board-kicker">${String(idx+1).padStart(2,'0')} · CLASSE</span><h4>${esc(c.nom)}</h4><div class="class-board-meta">${esc([c.niveau,c.annee_scolaire].filter(Boolean).join(' · ')||'Informations à compléter')}</div><span class="class-board-count" id="classCount-${esc(c.id)}">Effectif…</span></div><button class="class-board-menu" type="button" aria-label="Gérer ${esc(c.nom)}" onclick="renameInstituteClass('${esc(c.id)}','${esc(c.nom)}');event.stopPropagation()">⋯</button><span class="class-open-hint">Ouvrir la page →</span><div class="class-student-panel" id="classStudents-${esc(c.id)}"></div></article>`).join(''):'<div class="admin-card">Aucune classe. Créez la première classe ci-dessus.</div>';
     await Promise.all(all.map(c=>loadClassStudents(c.id)));
   }catch(e){board.innerHTML=`<div class="admin-card">${esc(e.message||'Impossible de charger les classes.')}</div>`;}
 }
@@ -4487,3 +4487,70 @@ function appliquerTheme(choix){
 </style>
 </body>
 </html>
+<style id="aurore-center-and-classes-size-fix">
+/* Taille harmonisée : le Centre de contrôle reprend le gabarit des cartes de l'Administration générale. */
+.admin-control-grid{gap:9px!important}
+.admin-control-card{
+  min-height:92px!important;
+  padding:9px!important;
+  border-radius:13px!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  gap:8px!important;
+  align-items:center!important;
+  position:relative!important;
+  overflow:hidden!important;
+  background:color-mix(in srgb,var(--panel2) 94%,var(--accent))!important;
+  border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line))!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.045)!important;
+}
+.admin-control-card:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border:1.5px solid color-mix(in srgb,var(--accent) 45%,transparent)!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  opacity:.9!important;
+}
+.admin-control-card .space-tool-icon{width:30px!important;height:30px!important;border-radius:10px!important;font-size:.76rem!important;flex:0 0 30px!important}
+.admin-control-card .space-tool-kicker{font-size:.48rem!important}
+.admin-control-card h3{font-size:.72rem!important;line-height:1.2!important;margin:3px 0!important}
+.admin-control-card p{font-size:.56rem!important;line-height:1.35!important;-webkit-line-clamp:2!important}
+.admin-control-card .space-tool-arrow{display:grid!important;place-items:center!important;width:22px!important;height:22px!important;border-radius:7px!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;color:var(--accent)!important;font-size:.72rem!important}
+.admin-control-card:hover{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--accent) 55%,var(--line))!important;box-shadow:0 12px 24px rgba(0,0,0,.08)!important}
+.admin-control-card-feature{min-height:92px!important}
+
+/* Élèves & classes : même gabarit compact, même langage visuel que le Centre de gestion. */
+.class-board{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;margin-top:12px!important}
+.class-board-card{
+  min-height:92px!important;
+  padding:9px!important;
+  border-radius:13px!important;
+  display:grid!important;
+  grid-template-columns:30px minmax(0,1fr) auto!important;
+  gap:8px!important;
+  align-items:center!important;
+  position:relative!important;
+  overflow:hidden!important;
+  background:color-mix(in srgb,var(--panel2) 94%,var(--accent))!important;
+  border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line))!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.045)!important;
+}
+.class-board-card:before{content:"";position:absolute;inset:0;border:1.5px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:inherit;pointer-events:none}
+.class-board-symbol{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));color:var(--accent);font-size:.78rem;font-weight:900;position:relative;z-index:1}
+.class-board-copy{min-width:0;position:relative;z-index:1}
+.class-board-kicker{font-size:.48rem!important;letter-spacing:.11em!important;color:var(--muted)!important}
+.class-board-card h4{font-size:.76rem!important;line-height:1.2!important;margin:4px 0 2px!important}
+.class-board-meta{font-size:.55rem!important;line-height:1.3!important;color:var(--muted)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.class-board-count{display:inline-flex!important;margin-top:4px!important;padding:4px 6px!important;border-radius:999px!important;background:color-mix(in srgb,var(--accent) 9%,var(--panel))!important;color:var(--text)!important;font-size:.5rem!important;font-weight:850!important}
+.class-board-menu{right:7px!important;top:7px!important;width:23px!important;height:23px!important;padding:0!important;display:grid!important;place-items:center!important;border-radius:7px!important;background:color-mix(in srgb,var(--panel) 92%,transparent)!important;border-color:color-mix(in srgb,var(--accent) 18%,var(--line))!important;z-index:3}
+.class-open-hint{display:block!important;position:absolute!important;right:9px!important;bottom:8px!important;margin:0!important;font-size:.48rem!important;color:var(--accent)!important;font-weight:850!important;z-index:2}
+.class-board-card:hover{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--accent) 55%,var(--line))!important;box-shadow:0 12px 24px rgba(0,0,0,.08)!important}
+.class-board-card.is-open{grid-column:1/-1!important;min-height:128px!important;display:block!important;padding:15px!important}
+.class-board-card.is-open .class-board-symbol{display:none!important}
+.class-board-card.is-open .class-open-hint{display:none!important}
+@media(max-width:1050px){.class-board{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:720px){.class-board{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.class-board-card{min-height:88px!important;padding:8px!important;grid-template-columns:28px minmax(0,1fr) auto!important}.class-board-symbol{width:28px;height:28px;border-radius:9px}.class-board-card h4{font-size:.7rem!important}.class-board-meta{font-size:.51rem!important}.class-open-hint{font-size:.45rem!important}}
+@media(max-width:430px){.class-board{grid-template-columns:1fr 1fr!important}.class-board-card{min-height:84px!important}.class-board-count{font-size:.47rem!important}}
+</style>
