@@ -3577,7 +3577,7 @@ document.addEventListener('click',e=>{const b=e.target.closest?.('[data-member-d
 async function getFreshAccessToken(){
   const cached=currentAuroreSession?.access_token,exp=Number(currentAuroreSession?.expires_at||0);
   if(cached&&exp>Date.now()+60000)return cached;
-  try{const c=await getClient();const {data}=await c.auth.getSession();if(data?.session?.access_token){currentAuroreSession={...data.session,expires_at:(data.session.expires_at||0)*1000};return data.session.access_token;}}catch(_){}
+  try{const c=await Promise.race([getClient(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Client Supabase indisponible.')),5000))]);const {data}=await Promise.race([c.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Session Supabase indisponible.')),5000))]);if(data?.session?.access_token){currentAuroreSession={...data.session,expires_at:(data.session.expires_at||0)*1000};return data.session.access_token;}}catch(_){}
   return currentAuroreSession?.access_token||'';
 }
 /* FIN ZONE VERROUILLÉE — RAFRAÎCHISSEMENT DU JETON */
@@ -4876,7 +4876,7 @@ async function renderStudentParcours(root,common){
     const uid=currentAuroreSession?.user?.id;
     if(!uid)throw new Error('Utilisateur non identifié. Veuillez vous reconnecter.');
     const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=nom,prenom,avatar_url,photo_profil_url,classe,niveau,a_propos_cv`,{headers:h,cache:'no-store'});
+    const r=await auroreFetchWithTimeout(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=nom,prenom,avatar_url,photo_profil_url,classe,niveau,a_propos_cv`,{headers:h,cache:'no-store'},8000);
     if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||b?.hint||`Impossible de charger votre parcours (${r.status}).`);}
     const data=await r.json();
     const row=Array.isArray(data)?(data[0]||{}):{};
