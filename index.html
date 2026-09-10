@@ -1256,6 +1256,25 @@ const API_HEADERS={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`};
 const WORKER_URL='https://aurore-instituts.oualikevin9.workers.dev';
 let currentAdminSession=null;
 
+// ---------------------------------------------------------------------------
+// Cache mémoire courte durée pour les listes de référence peu critiques
+// (ex. liste des établissements affichée dans un <select>). Objectif : éviter
+// de refaire le même aller-retour réseau à chaque ouverture d'un formulaire
+// pendant la même visite, sans jamais mettre en cache les données sensibles
+// (session, profil, dossiers) qui doivent toujours rester à jour.
+// N'affecte aucun appel marqué cache:'no-store' pour de bonnes raisons
+// (annuaire public, données affichées après une action de validation/refus).
+// ---------------------------------------------------------------------------
+window.__auroreRefCache=window.__auroreRefCache||{};
+async function auroreCachedFetchJSON(key,url,headers,ttlMs=60000){
+  const c=window.__auroreRefCache[key];
+  if(c&&Array.isArray(c.rows)&&(Date.now()-c.ts)<ttlMs) return c.rows;
+  const r=await fetch(url,{headers,cache:'no-store'});
+  const rows=r.ok?await r.json().catch(()=>[]):[];
+  if(r.ok) window.__auroreRefCache[key]={rows,ts:Date.now()};
+  return rows;
+}
+
 const demoData=[
   {id:'demo-1',nom:'Lycée exemple de Ouagadougou',type:'Lycée',ville:'Ouagadougou',province:'Kadiogo',formation:'Enseignement secondaire général',slug:'lycee-exemple-ouagadougou',code:'LO'},
   {id:'demo-2',nom:'Collège exemple de Bobo-Dioulasso',type:'Collège',ville:'Bobo-Dioulasso',province:'Houet',formation:'Collège général',slug:'college-exemple-bobo',code:'CB'},
@@ -1440,6 +1459,20 @@ function renderAuthSignup(){
   </div>`;
 }
 
+/* ============================================================================
+   🔒 ZONE VERROUILLÉE — AUTHENTIFICATION PAR E-MAIL/MOT DE PASSE
+   Ne pas réécrire, renommer ou « nettoyer » ce bloc sans raison précise.
+   Fonctions protégées : saveAuroreSession, clearAuroreSession,
+   restoreAuroreSession, auroreLogin, auroreSignup.
+   Règles pour toute intervention future (humaine ou IA) :
+     1. Conserver exactement ces noms de fonctions : tout le reste du fichier
+        (navigation, espaces, panneaux admin) les appelle directement.
+     2. Ne jamais changer la clé localStorage "aurore-session" ni la forme de
+        l'objet session sans écrire une migration pour les sessions déjà
+        stockées chez les utilisateurs.
+     3. Après toute modification, tester manuellement : inscription,
+        connexion, déconnexion, et rafraîchissement après expiration du jeton.
+   ============================================================================ */
 function saveAuroreSession(session){
   try{localStorage.setItem('aurore-session',JSON.stringify(session));}catch(_){ }
 }
@@ -1494,6 +1527,7 @@ async function auroreSignup(){
     if(body.access_token){currentAuroreSession={...body,expires_at:Date.now()+((Number(body.expires_in)||3600)*1000)};saveAuroreSession(currentAuroreSession);await saveOwnProfile(prenom,nom);renderOnboarding();}else{renderAuthStart();authMessage('Compte créé. Vérifiez votre e-mail si une confirmation est demandée, puis connectez-vous.');}
   }catch(err){authMessage(err.message||'Création impossible.');}
 }
+/* =================== FIN ZONE VERROUILLÉE — AUTHENTIFICATION E-MAIL/MDP === */
 
 async function loadAuroreProfile(){
   const token=currentAuroreSession?.access_token;if(!token)return null;
@@ -1809,8 +1843,8 @@ async function renderPersonalSpace(preloadedCtx=null){
   if(!complete){
     try{
       const token=currentAuroreSession.access_token;
-      const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
-      const rows=r.ok?await r.json():[]; const sel=$('personalEtab');
+      const rows=await auroreCachedFetchJSON('etabDropdown',`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`});
+      const sel=$('personalEtab');
       if(sel){
         sel.innerHTML='<option value="">Sélectionner votre établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}" data-name="${esc(e.nom)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');
         const savedEtabId=String(formP.etablissement_id||''); if(savedEtabId&&rows.some(e=>String(e.id)===savedEtabId))sel.value=savedEtabId;
@@ -2080,7 +2114,7 @@ async function selectOnboardingRole(role){
   document.querySelectorAll('.auth-role').forEach(b=>b.classList.toggle('selected',b.textContent.includes({eleve:'Élève',professeur:'Professeur',parent:'Parent',administration:'Administration',proviseur:'Proviseur'}[role])));
   const root=$('onboardingNext');if(!root)return;
   root.innerHTML=`<div class="auth-step" style="margin-top:8px"><b>Étape 2</b><span>Choisissez votre établissement</span></div><label style="display:block;margin-top:8px;font-size:.73rem;color:var(--muted);font-weight:700">Établissement<select id="onboardingEtab" style="margin-top:6px;width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text)"><option>Chargement…</option></select></label><div class="auth-actions"><button class="auth-primary" type="button" onclick="finishOnboarding()">Activer mon espace</button></div><div id="onboardingMessage" class="auth-message"></div>`;
-  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,{headers:API_HEADERS,cache:'no-store'});const body=await r.json().catch(()=>[]);if(onboardingVersion!==authViewVersion)return;if(!r.ok)throw new Error(body?.message||'Impossible de charger les établissements.');const rows=Array.isArray(body)?body:[];const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Sélectionner un établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');}catch(e){if(onboardingVersion!==authViewVersion)return;const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Aucun établissement disponible</option>';}
+  try{const rows=await auroreCachedFetchJSON('etabDropdown',`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=id,nom,type,ville&order=nom.asc`,API_HEADERS);if(onboardingVersion!==authViewVersion)return;const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Sélectionner un établissement…</option>'+rows.map(e=>`<option value="${esc(e.id)}">${esc(e.nom)}${e.ville?' · '+esc(e.ville):''}</option>`).join('');}catch(e){if(onboardingVersion!==authViewVersion)return;const sel=$('onboardingEtab');if(sel)sel.innerHTML='<option value="">Aucun établissement disponible</option>';}
 }
 
 async function finishOnboarding(){
@@ -2216,7 +2250,11 @@ async function renderAdministrationRequestStatus(request=null){
   root.innerHTML=`<section class="auth-profile"><div class="auth-step"><button class="auth-secondary" type="button" onclick="showHome(true)">← Retour à l’accueil</button><span>Ma demande d’administration</span></div><div class="request-card"><div class="request-card-head"><div class="request-brand"><div class="request-logo empty">ETAB</div><div><span class="request-kicker">Demande d’administration</span><h3>${esc(d.nom_etablissement||'Sans nom')}</h3><p>${esc(d.type_etablissement||'Type non précisé')} · ${esc(d.ville||'Ville non précisée')}</p></div></div><span class="request-status ${cls}">${status}</span></div><div class="request-detail-grid"><div class="request-detail"><span>Demandeur</span><strong>${esc(d.email_contact||currentAuroreSession.user?.email||'')}</strong></div><div class="request-detail"><span>Téléphone</span><strong>${esc(d.telephone||'Non renseigné')}</strong></div><div class="request-detail"><span>Adresse</span><strong>${esc(d.adresse||'Non renseignée')}</strong></div><div class="request-detail"><span>Soumise le</span><strong>${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):'—'}</strong></div></div><div class="request-copy"><div><span>Description</span><p>${esc(d.description||'Aucune description fournie.')}</p></div><div><span>Justification</span><p>${esc(d.justification||'Aucune justification fournie.')}</p></div></div>${detail}<div class="request-footer"><small>Statut : ${status}</small><div class="request-actions"><button class="admin-btn primary" type="button" onclick="renderAdministrationRequestStatus()">Actualiser le statut</button></div></div></div></section>`;
 }
 
+/* 🔒 ZONE VERROUILLÉE — DÉCONNEXION : doit toujours vider la session ET
+   revenir à l'accueil ; ne pas retirer showHome() ni changer l'ordre sans
+   revérifier que plus aucune vue d'espace connecté ne reste affichée. */
 function auroreLogout(){currentAuroreSession=null;currentAuroreProfile=null;selectedOnboardingRole='';clearAuroreSession();showHome();}
+/* FIN ZONE VERROUILLÉE — DÉCONNEXION */
 
 function requestEstablishment(){openAuthPage();setTimeout(()=>{if(currentAuroreSession)openEstablishmentRequestPage();else renderAuthStart();},0);}
 
@@ -2382,6 +2420,22 @@ async function loadSupport(){
 }
 
 const ROUTE_STATE_KEY='aurore-route-state';
+/* ============================================================================
+   🔒 ZONE VERROUILLÉE — NAVIGATION / ROUTEUR (hash + historique)
+   Tout le site est une seule page ; le passage d'une « page » à l'autre
+   (accueil, annuaire, fiche établissement, espace, administration…) se fait
+   ici, via le hash de l'URL et l'historique du navigateur.
+   Règles pour toute intervention future (humaine ou IA) :
+     1. Conserver les noms pushRoute, handleHash, showHome, auroreBack,
+        saveRoutePosition, restoreRoutePosition : ils sont appelés partout
+        ailleurs dans le fichier (boutons, liens, retour arrière).
+     2. Ne jamais retirer les écouteurs 'hashchange' et 'popstate' ci-dessous,
+        ni changer l'ordre pushState → startPageTransition dans pushRoute :
+        le bouton « Retour » du téléphone et le partage de lien en dépendent.
+     3. Après toute modification, tester : ouverture d'une fiche établissement,
+        navigation vers un espace, bouton retour du téléphone, lien partagé
+        collé directement dans le navigateur (arrivée directe sur un hash).
+   ============================================================================ */
 let applyingRoute=false;
 let lastHandledHash='';
 let currentSpaceEstablishmentId='';
@@ -2523,6 +2577,7 @@ window.addEventListener('hashchange',()=>handleHash());
 // Compatibilité avec les anciens appels : loadData était encore référencé dans l'interface admin.
 const loadData=loadInstituts;
 window.addEventListener('popstate',e=>{if(auroreInAppHistoryDepth>0)auroreInAppHistoryDepth--;handleHash(e.state);});
+/* FIN ZONE VERROUILLÉE — NAVIGATION / ROUTEUR */
 // Démarrage non bloquant : l’interface est peinte immédiatement, puis les données et la session arrivent en parallèle.
 try{ if(!data.length){ data=demoData.map(normalize); render(); } }catch(_){ }
 handleHash();
@@ -2557,13 +2612,12 @@ async function openSpace(role,options={}){
   if(role==='general') {
     const session=currentAuroreSession;
     if(!session){openAuthPage();return;}
-    let isAdminGeneral=false;
-    const accountEmail=(session.user?.email||'').trim().toLowerCase();
-    try{
-      const r=await fetch(`${SUPABASE_URL}/rest/v1/profil_roles?profile_id=eq.${encodeURIComponent(currentAuroreProfile?.id||session.user?.id||'')}&role=eq.admin_general&select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${session.access_token}`}});
-      isAdminGeneral=r.ok&&(await r.json()).length>0;
-    }catch(_){ }
-    if(accountEmail==='oualikevin9@gmail.com') isAdminGeneral=true;
+    // Optimisation vitesse : verifyAurorePlatformAdmin() court-circuite via
+    // window.__aurorePlatformAdmin dès que le rôle a été confirmé une fois
+    // pendant la session — on évite ainsi de refaire cette vérification
+    // réseau à chaque retour vers le menu de l'Administration générale
+    // (bouton « Retour » depuis une rubrique, ou retour arrière du téléphone).
+    const isAdminGeneral=await verifyAurorePlatformAdmin();
     if(!isAdminGeneral){openAuthPage();authMessage('Accès réservé à l’Administration générale Aurore.');return;}
   }
   // Optimisation vitesse : quand l'appelant connaît déjà l'établissement
@@ -3142,12 +3196,20 @@ async function loadAdminRequestCategoryPage(kind,roleFilter){
 window.openAdminRequestCategory=openAdminRequestCategory;
 
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-member-decision][data-member-request-id]');if(!b)return;e.preventDefault();if(b.dataset.busy==='1')return;b.dataset.busy='1';decideMemberRequest(b.dataset.memberRequestId,b.dataset.memberDecision).finally(()=>{b.dataset.busy='0';});});
+/* ============================================================================
+   🔒 ZONE VERROUILLÉE — RAFRAÎCHISSEMENT DU JETON D'ACCÈS
+   Appelée avant chaque action sensible (validation, suppression, publication…)
+   dans tout le panneau d'administration. Ne pas modifier la marge de sécurité
+   de 60000 ms (60s) ni le nom getFreshAccessToken sans vérifier tous ses
+   appelants dans le fichier.
+   ============================================================================ */
 async function getFreshAccessToken(){
   const cached=currentAuroreSession?.access_token,exp=Number(currentAuroreSession?.expires_at||0);
   if(cached&&exp>Date.now()+60000)return cached;
   try{const c=await getClient();const {data}=await c.auth.getSession();if(data?.session?.access_token){currentAuroreSession={...data.session,expires_at:(data.session.expires_at||0)*1000};return data.session.access_token;}}catch(_){}
   return currentAuroreSession?.access_token||'';
 }
+/* FIN ZONE VERROUILLÉE — RAFRAÎCHISSEMENT DU JETON */
 async function decideMemberRequest(id,decision){
   let comment=null;if(decision==='refuse')comment=prompt('Motif du refus (facultatif) :','Informations à compléter ou à vérifier')||null;
   try{
@@ -3267,9 +3329,9 @@ async function loadGeneralEstablishmentSpaces(){
   const box=$('generalEstablishmentsList');if(!box||!isAurorePlatformAdmin())return;
   const token=await getFreshAccessToken();if(!token){box.innerHTML='<div class="admin-card"><strong>Connexion requise.</strong></div>';return;}
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,type,ville,logo_url&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
-    const rows=r.ok?await r.json():[];
-    if(!r.ok)throw new Error(`Impossible de charger les établissements (${r.status}).`);
+    // Optimisation vitesse : liste en cache 30s pour ne pas tout recharger à
+    // chaque aller-retour entre cette rubrique et une autre du même menu.
+    const rows=await auroreCachedFetchJSON('generalEtabSpaces',`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&actif=eq.true&select=id,nom,type,ville,logo_url&order=nom.asc`,{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},30000);
     box.innerHTML=rows.length?rows.map(e=>`<article class="admin-row" style="grid-template-columns:72px 1fr auto"><div class="accepted-logo-fallback" style="width:72px;height:60px">${e.logo_url?`<img src="${esc(e.logo_url)}" alt="Logo de ${esc(e.nom)}" style="width:100%;height:100%;object-fit:contain;border-radius:12px">`:esc((e.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div><strong>${esc(e.nom)}</strong><div class="admin-meta">${esc([e.type,e.ville].filter(Boolean).join(' · ')||'Établissement validé')}</div></div><div class="admin-actions"><button class="admin-btn primary" type="button" onclick="openSpace('administration',{etablissementId:'${esc(e.id)}'})">Ouvrir l’espace</button></div></article>`).join(''):'<div class="admin-card">Aucun établissement validé et actif.</div>';
   }catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les établissements.</strong><p class="admin-meta">${esc(e.message||'Erreur Supabase')}</p></div>`;}
 }
@@ -3278,14 +3340,27 @@ async function loadGeneralDisplayDiagnostic(){
   const box=$('generalDisplayDiagnostic');if(!box||!isAurorePlatformAdmin())return;
   const token=await getFreshAccessToken();if(!token){box.innerHTML='<div class="admin-card"><strong>Connexion requise.</strong></div>';return;}
   const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},out=[];
-  const run=async(label,url)=>{try{const r=await fetch(url,{headers:h,cache:'no-store'});const text=await r.text();let data=null;try{data=text?JSON.parse(text):null}catch(_){}out.push({label,ok:r.ok,status:r.status,data,error:r.ok?'':(data?.message||data?.hint||text||'Erreur HTTP')});}catch(e){out.push({label,ok:false,status:0,data:null,error:e.message||'Erreur réseau'});}};
-  await run('Établissements validés',`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&select=id,nom,actif,validation_statut&order=nom.asc`);
+  const run=async(label,url)=>{try{const r=await fetch(url,{headers:h,cache:'no-store'});const text=await r.text();let data=null;try{data=text?JSON.parse(text):null}catch(_){}return {label,ok:r.ok,status:r.status,data,error:r.ok?'':(data?.message||data?.hint||text||'Erreur HTTP')};}catch(e){return {label,ok:false,status:0,data:null,error:e.message||'Erreur réseau'};}};
+  out.push(await run('Établissements validés',`${SUPABASE_URL}/rest/v1/etablissements?validation_statut=eq.valide&select=id,nom,actif,validation_statut&order=nom.asc`));
   const etablissements=out[out.length-1]?.data||[];
-  for(const e of (Array.isArray(etablissements)?etablissements.slice(0,30):[])){
-    await run(`Classes · ${e.nom}`,`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(e.id)}&select=id,nom,niveau,actif`);
-    await run(`Élèves validés · ${e.nom}`,`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&select=id,prenom,nom,full_name,profil_statut,classe_id`);
-    await run(`Demandes élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.en_attente&select=id,profile_id,classe_id,created_at`);
-    await run(`Membres élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/etablissement_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.valide&select=profile_id,role,statut`);
+  // Optimisation vitesse : ce diagnostic pouvait lancer jusqu'à ~120 requêtes
+  // Supabase l'une après l'autre (4 par établissement, attendues en série).
+  // On garde le même nombre total de requêtes et le même contenu affiché,
+  // mais on les lance par petits lots concurrents (5 établissements à la
+  // fois, 4 requêtes en parallèle par établissement) au lieu d'une file
+  // strictement séquentielle — le diagnostic reste lisible dans le même
+  // ordre, juste beaucoup plus rapide à charger.
+  const list=Array.isArray(etablissements)?etablissements.slice(0,30):[];
+  const CONCURRENCE=5;
+  for(let i=0;i<list.length;i+=CONCURRENCE){
+    const lot=list.slice(i,i+CONCURRENCE);
+    const resultatsLot=await Promise.all(lot.map(e=>Promise.all([
+      run(`Classes · ${e.nom}`,`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(e.id)}&select=id,nom,niveau,actif`),
+      run(`Élèves validés · ${e.nom}`,`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&select=id,prenom,nom,full_name,profil_statut,classe_id`),
+      run(`Demandes élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.en_attente&select=id,profile_id,classe_id,created_at`),
+      run(`Membres élèves · ${e.nom}`,`${SUPABASE_URL}/rest/v1/etablissement_membres?etablissement_id=eq.${encodeURIComponent(e.id)}&role=eq.eleve&statut=eq.valide&select=profile_id,role,statut`)
+    ])));
+    resultatsLot.forEach(arr=>out.push(...arr));
   }
   const okCount=out.filter(x=>x.ok).length,errCount=out.length-okCount;
   box.innerHTML=`<div class="diagnostic-summary"><div class="diagnostic-kpi"><b>${out.length}</b><span>Contrôles</span></div><div class="diagnostic-kpi ok"><b>${okCount}</b><span>Réussis</span></div><div class="diagnostic-kpi err"><b>${errCount}</b><span>Erreurs</span></div></div><div class="diagnostic-list">${out.map(x=>`<details class="diagnostic-row ${x.ok?'ok':'err'}"><summary><span>${x.ok?'✓':'✕'}</span><strong>${esc(x.label)}</strong><em>HTTP ${x.status||'—'} · ${Array.isArray(x.data)?x.data.length:'—'} ligne(s)</em></summary>${x.ok?`<pre>${esc(JSON.stringify(x.data,null,2).slice(0,6000))}</pre>`:`<p>${esc(x.error)}</p>`}</details>`).join('')}</div><p class="diagnostic-note">Visible uniquement par l’Administration générale. Les erreurs HTTP permettent d’identifier un problème de RLS/permissions ; des listes vides indiquent plutôt un problème de données ou de critères.</p>`;
@@ -3613,6 +3688,14 @@ function appliquerTheme(choix){
 
 <div class="decision-modal" id="decisionModal" aria-hidden="true"><div class="decision-backdrop" onclick="closeDecisionModal()"></div><div class="decision-dialog" role="dialog" aria-modal="true" aria-labelledby="decisionTitle"><button class="decision-close" type="button" onclick="closeDecisionModal()" aria-label="Fermer">×</button><span class="auth-kicker">Administration générale</span><h3 id="decisionTitle">Motif du refus</h3><p id="decisionContext"></p><label>Motif du refus<select id="decisionReasonCode"><option value="">Choisir un motif…</option><option value="informations_incompletes">Informations incomplètes</option><option value="etablissement_deja_existant">Établissement déjà existant</option><option value="informations_non_verifiables">Informations non vérifiables</option><option value="etablissement_non_conforme">Établissement non conforme</option><option value="autre">Autre</option></select></label><label id="decisionReasonWrap" style="display:none">Précision obligatoire<textarea id="decisionReason" maxlength="1000" rows="4" placeholder="Expliquez clairement le motif."></textarea></label><div id="decisionMessage" class="auth-message"></div><div class="decision-actions"><button class="auth-secondary" type="button" onclick="closeDecisionModal()">Annuler</button><button class="admin-btn danger" type="button" onclick="confirmRefusal()">Confirmer le refus</button></div></div></div>
 
+<!-- ============================================================================
+     🔒 ZONE VERROUILLÉE — CONNEXION GOOGLE (OAuth via Supabase)
+     Charge le SDK Supabase JS uniquement à la demande (bouton Google), gère le
+     retour PKCE et synchronise la session. Ne pas dupliquer/renommer les
+     fonctions internes ni changer l'ordre de chargement du SDK sans tester le
+     flux complet : clic « Continuer avec Google » → retour sur le site →
+     session active → rechargement de page (pageshow) → déconnexion propre.
+     ============================================================================ -->
 <script id="aurore-access-portal-logic">
 (function(){
   const SUPABASE_URL = window.SUPABASE_URL || 'https://fdstrbqvkemtjyxxaxbj.supabase.co';
@@ -4003,6 +4086,7 @@ function appliquerTheme(choix){
   });
 })();
 </script>
+<!-- FIN ZONE VERROUILLÉE — CONNEXION GOOGLE -->
 <style id="aurore-harmonisation-finale">
 /* =====================================================================
    HARMONISATION GLOBALE DU DESIGN — passe de nettoyage finale
@@ -4093,5 +4177,22 @@ function appliquerTheme(choix){
   .diagnostic-summary{grid-template-columns:1fr 1fr!important}
 }
 </style>
+<script id="aurore-integrity-check">
+// ---------------------------------------------------------------------------
+// Contrôle d'intégrité au démarrage : vérifie que les fonctions essentielles
+// de connexion et de navigation existent toujours. N'ALTÈRE aucun
+// comportement du site — c'est un simple filet de sécurité qui prévient
+// (dans la console) si une modification future en a supprimé ou renommé une
+// par erreur, avant que le problème ne soit découvert par un utilisateur.
+// Si un nom ci-dessous doit changer légitimement, mettre aussi à jour cette
+// liste dans le même correctif.
+(function(){
+  const essentielles=['auroreLogin','auroreSignup','auroreLogout','restoreAuroreSession','saveAuroreSession','clearAuroreSession','getFreshAccessToken','pushRoute','handleHash','showHome','auroreBack','openAuthPage'];
+  const manquantes=essentielles.filter(n=>typeof window[n]!=='function');
+  if(manquantes.length){
+    console.error('⚠️ Aurore — intégrité compromise : fonction(s) critique(s) manquante(s) ou renommée(s) :',manquantes.join(', '),'— la connexion et/ou la navigation risquent de ne plus fonctionner.');
+  }
+})();
+</script>
 </body>
 </html>
