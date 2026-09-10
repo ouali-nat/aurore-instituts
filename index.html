@@ -1757,18 +1757,14 @@ async function savePersonalProfile(){
   const enfant=document.getElementById('personalEnfant')?.value.trim()||[enfantPrenom,enfantNom,enfantClasse].filter(Boolean).join(' — ');
   const telephone=document.getElementById('personalTelephone')?.value.trim()||'',adresse=document.getElementById('personalAdresse')?.value.trim()||'',dateNaissance=document.getElementById('personalDateNaissance')?.value||'';
   const avatarFile=document.getElementById('personalAvatarFile')?.files?.[0]||null;
-  const professorClassSelect=document.getElementById('personalProfessorClass');
-  const professorClassIds=role==='professeur'?[...((professorClassSelect?.selectedOptions)||[])].map(o=>o.value).filter(Boolean):[];
-  const professorClassNames=role==='professeur'?[...((professorClassSelect?.selectedOptions)||[])].map(o=>o.dataset.name||o.textContent.split(' · ')[0]).filter(Boolean):[];
   if(!nom||!prenom||!etabId){if(msg){msg.textContent='Veuillez renseigner votre nom, votre prénom et votre établissement.';msg.className='personal-profile-message err';}return;}
   if(role==='eleve'&&!classeId){if(msg){msg.textContent='Choisissez une classe proposée par votre établissement.';msg.className='personal-profile-message err';}return;}
   if(role==='professeur'&&!discipline){if(msg){msg.textContent='Choisissez votre matière.';msg.className='personal-profile-message err';}return;}
-  if(role==='professeur'&&!professorClassIds.length){if(msg){msg.textContent='Choisissez au moins une classe souhaitée.';msg.className='personal-profile-message err';}return;}
   if(btn){btn.disabled=true;btn.textContent='Envoi du dossier…';}
   try{
     let avatarUrl=currentAuroreProfile?.avatar_url||null;
     if(avatarFile){if(msg)msg.textContent='Téléversement de votre photo…';avatarUrl=await uploadPersonalAvatar(avatarFile,id);}
-    const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,professeur_classe_id:professorClassIds[0]||null,professeur_classe_nom:professorClassNames[0]||null,professeur_classe_ids:professorClassIds,professeur_classes:professorClassNames,enfant_informations:enfant,enfant_nom:enfantNom,enfant_prenom:enfantPrenom,enfant_classe:enfantClasse,telephone,adresse,date_naissance:dateNaissance};
+    const informations={prenom,nom,full_name:`${prenom} ${nom}`,niveau,classe,filiere,discipline,fonction,enfant_informations:enfant,enfant_nom:enfantNom,enfant_prenom:enfantPrenom,enfant_classe:enfantClasse,telephone,adresse,date_naissance:dateNaissance};
     const client=await getClient();
     const pendingId=document.getElementById('personalPendingRequestId')?.value||'';
     let demande=null;
@@ -1907,7 +1903,7 @@ async function renderPersonalSpace(preloadedCtx=null){
   if(role==='eleve'){
     roleFields=`<div class="profile-page-kicker">Profil élève</div><p class="profile-form-help">Sélectionnez votre lycée puis la classe dans laquelle vous êtes actuellement inscrit.</p><div class="personal-profile-grid"><label>Niveau<input id="personalNiveau" value="${esc(formP.niveau||'')}" placeholder="Ex. Seconde"></label><label>Classe<select id="personalClasse" required><option value="">Sélectionnez d’abord votre établissement…</option></select><input type="hidden" id="personalClasseId" value="${esc(formP.classe_id||'')}"></label></div><div id="personalClassStatus" class="class-choice-status">Les classes actives du lycée apparaîtront après le choix de l’établissement.</div><label>Filière / série (facultatif)<input id="personalFiliere" value="${esc(formP.filiere||'')}" placeholder="Ex. Série D"></label>`;
   } else if(role==='professeur'){
-    roleFields=`<div class="profile-page-kicker">Profil professeur</div><p class="profile-form-help">Choisissez la matière que vous enseignez et les classes que vous souhaitez rejoindre. L’administration examinera ces choix puis décidera des affectations.</p><div class="prof-config-box"><div class="prof-config-grid"><label>Matière / discipline<select id="personalDiscipline" required><option value="">Sélectionner une discipline…</option></select></label><label>Classes d’affectation<select id="personalProfessorClass" multiple required size="5"></select><small class="prof-multi-help">Maintenez Ctrl (ordinateur) ou utilisez la sélection multiple sur mobile pour choisir plusieurs classes.</small></label></div><div id="personalProfessorClassStatus" class="prof-config-note">Les classes actives du lycée apparaîtront après le choix de l’établissement.</div></div>`;
+    roleFields=`<div class="profile-page-kicker">Profil professeur</div><p class="profile-form-help">Choisissez la matière que vous enseignez. L’administration décidera ensuite des classes qui vous sont affectées.</p><div class="prof-config-box"><div class="prof-config-grid"><label>Matière / discipline<select id="personalDiscipline" required><option value="">Sélectionner une discipline…</option></select></label></div></div>`;
   } else if(role==='administration'){
     roleFields=`<div class="profile-page-kicker">Profil administration</div><p class="profile-form-help">Choisissez votre lycée et indiquez votre fonction. L’administration peut ensuite gérer les disciplines de l’établissement.</p><label>Fonction<input id="personalFonction" value="${esc(formP.fonction||'')}" required placeholder="Ex. Secrétariat, Censeur…"></label>`;
   } else if(role==='proviseur'){
@@ -1974,20 +1970,6 @@ async function renderPersonalSpace(preloadedCtx=null){
           };
           sel.addEventListener('change',loadDisciplines);
           if(sel.value)await loadDisciplines();
-          const loadProfessorClasses=async()=>{
-            const cid=sel.value,csel=$('personalProfessorClass'),status=$('personalProfessorClassStatus');if(!csel)return;
-            csel.innerHTML='<option value="">Chargement des classes…</option>';
-            if(!cid){csel.innerHTML='<option value="">Sélectionnez d’abord votre lycée…</option>';if(status)status.textContent='Les classes actives du lycée apparaîtront après le choix de l’établissement.';return;}
-            try{
-              const cr=await fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(cid)}&actif=eq.true&select=id,nom,niveau,annee_scolaire&order=nom.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},cache:'no-store'});
-              const classes=cr.ok?await cr.json():[];
-              csel.innerHTML=classes.map(c=>`<option value="${esc(c.id)}" data-name="${esc(c.nom)}">${esc(c.nom)}${c.niveau?' · '+esc(c.niveau):''}${c.annee_scolaire?' · '+esc(c.annee_scolaire):''}</option>`).join('');
-              const savedIds=Array.isArray(formP.professeur_classe_ids)?formP.professeur_classe_ids:(formP.professeur_classe_id?[formP.professeur_classe_id]:[]);[...csel.options].forEach(o=>{if(savedIds.map(String).includes(String(o.value)))o.selected=true;});
-              if(status)status.textContent=classes.length?`${classes.length} classe${classes.length>1?'s':''} active${classes.length>1?'s':''} disponible${classes.length>1?'s':''}.`:'Aucune classe active n’est disponible pour le moment.';
-            }catch(_){csel.innerHTML='<option value="">Impossible de charger les classes</option>';if(status)status.textContent='Les classes ne sont pas disponibles pour le moment.';}
-          };
-          sel.addEventListener('change',loadProfessorClasses);
-          if(sel.value)await loadProfessorClasses();
         }
       }
     }catch(_){ }
@@ -2796,6 +2778,7 @@ async function openSpace(role,options={}){
   const configs={
     eleve:{title:'Espace élèves',subtitle:'Tout ce qui concerne votre vie scolaire.',items:[
       ['Ma classe','Votre classe, votre groupe et les informations essentielles.','⌂','class'],
+      ['À propos de moi','Complétez votre profil pour un CV clair et professionnel.','☺','apropos'],
       ['Mes devoirs','Devoirs à faire, consignes et échéances.','✓','devoirs'],
       ['Mes professeurs','Vos enseignants et les matières qu’ils enseignent.','◉','professeurs'],
       ['Mon bulletin','Vos bulletins scolaires publiés par l’établissement.','▤','bulletin'],
@@ -2852,6 +2835,13 @@ async function openSpace(role,options={}){
     restoreSiteLogo();
   }
   const bannerHtml=etab?`<section class="admin-establishment-profile-card" aria-label="Présentation de l’établissement"><div class="admin-establishment-profile-glow"></div><div class="admin-establishment-profile-logo${etab.logo_url?' adaptive-logo':''}">${etab.logo_url?`<img src="${esc(etab.logo_url)}" alt="Logo de ${esc(etab.nom||'établissement')}">`:esc((etab.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div class="admin-establishment-profile-body"><div class="admin-establishment-profile-top"><div><div class="admin-establishment-type">${esc(etab.type||'Lycée')} <span>✓ Établissement vérifié</span></div><h3>${esc(etab.nom||'Établissement')}</h3><p class="admin-establishment-location">${esc([etab.ville,etab.province,etab.adresse].filter(Boolean).join(' · ')||'Informations à compléter')}</p></div></div><div class="admin-establishment-actions">${etab.telephone?`<button type="button" onclick="location.href='tel:${esc(etab.telephone)}'">Appeler</button>`:''}${etab.email?`<button type="button" onclick="location.href='mailto:${esc(etab.email)}'">Écrire</button>`:''}${etab.site_web?`<button type="button" class="secondary" onclick="window.open('${esc(etab.site_web)}','_blank','noopener')">Site officiel</button>`:''}</div></div></section>`:'';
+  const studentWelcomeHtml=(()=>{
+    if(role!=='eleve')return '';
+    const p=currentAuroreProfile||{};
+    const prenom=p.prenom||'',nom=p.nom||'',fullName=[prenom,nom].filter(Boolean).join(' ')||p.full_name||'';
+    const av=p.avatar_url||p.photo_profil_url;
+    return `<section class="student-welcome-card" aria-label="Bienvenue"><div class="student-welcome-avatar">${av?`<img src="${esc(av)}" alt="Photo de ${esc(fullName)}">`:esc(initials(fullName||'É'))}</div><div class="student-welcome-body"><strong>${esc(fullName||'Élève')}</strong><p>Bienvenue dans ton espace${prenom?', '+esc(prenom):''} !</p></div></section>`;
+  })();
   let panel=document.getElementById('spacePanel');
   if(!panel){
     panel=document.createElement('section');
@@ -2865,7 +2855,7 @@ async function openSpace(role,options={}){
       <div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div>
       <button class="auth-secondary" type="button" id="switchGoogleAccountBtn" onclick="switchGoogleAccount()">Changer de compte Google</button>
     </div>`:'';
-    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head aurore-general-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid aurore-general-tools':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
+    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head aurore-general-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${studentWelcomeHtml}${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid aurore-general-tools':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
   }
   if(role==='general') setTimeout(()=>loadAdminOverview(),0);
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
@@ -3540,7 +3530,7 @@ async function openAdminRequestCategory(kind){
 }
 async function loadAdminRequestCategoryPage(kind,roleFilter){
   const box=$('adminRequestCategoryList');if(!box)return;const ids=await getAdminInstituteIds(),token=await getFreshAccessToken(),h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token||''}`};if(!ids.length){box.innerHTML='<div class="admin-card">Aucun établissement administré.</div>';return;}
-  try{const all=(await Promise.all(ids.map(async id=>{const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&select=id,created_at,role,informations,avatar_url,profile_id,classe_id&order=created_at.asc`,{headers:h,cache:'no-store'});if(!r.ok)throw new Error(`Demandes indisponibles (${r.status})`);return r.json();}))).flat();const rows=kind==='autres'?all.filter(d=>!['eleve','professeur'].includes(d.role)):all.filter(d=>d.role===roleFilter);const profileIds=[...new Set(rows.map(x=>x.profile_id).filter(Boolean))],classIds=[...new Set(rows.map(x=>x.classe_id).filter(Boolean))];const [profileRows,classRows]=await Promise.all([profileIds.length?fetch(`${SUPABASE_URL}/rest/v1/profiles?id=in.(${profileIds.map(encodeURIComponent).join(',')})&select=id,prenom,nom,full_name,avatar_url,photo_profil_url,date_naissance,niveau,classe,filiere,telephone,email,profil_statut`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]):Promise.resolve([]),classIds.length?fetch(`${SUPABASE_URL}/rest/v1/classes?id=in.(${classIds.map(encodeURIComponent).join(',')})&select=id,nom,niveau,annee_scolaire`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]):Promise.resolve([])]);const profilesById=new Map(profileRows.map(x=>[x.id,x])),classesById=new Map(classRows.map(x=>[x.id,x]));const ageOf=date=>{if(!date)return '';const d=new Date(date),now=new Date();let age=now.getFullYear()-d.getFullYear(),m=now.getMonth()-d.getMonth();if(m<0||(m===0&&now.getDate()<d.getDate()))age--;return age>=0&&age<120?`${age} ans`:''};const html=rows.map(d=>{const p=profilesById.get(d.profile_id)||{},i=d.informations||{},name=p.full_name||[p.prenom||i.prenom,p.nom||i.nom].filter(Boolean).join(' ')||i.full_name||'Utilisateur',avatar=p.avatar_url||p.photo_profil_url||d.avatar_url,cl=classesById.get(d.classe_id),classe=cl?.nom||i.classe||p.classe||'',requestedClasses=Array.isArray(i.professeur_classes)?i.professeur_classes:(i.professeur_classe_nom?[i.professeur_classe_nom]:[]),details=[ageOf(p.date_naissance||i.date_naissance),cl?.niveau||i.niveau||p.niveau,i.filiere||p.filiere,i.telephone||p.telephone].filter(Boolean);return `<article class="member-request-card admin-request-card-modern"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>${d.role==='eleve'?'Élève':d.role==='professeur'?'Professeur':esc(d.role)}${classe?' · '+esc(classe):''}</span><div class="member-request-details">${d.role==='professeur'&&i.discipline?`<i>Matière : ${esc(i.discipline)}</i>`:''}${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div>${d.role==='professeur'?`<div class="requested-classes"><span>Classes souhaitées</span><div>${requestedClasses.length?requestedClasses.map(x=>`<b>${esc(x)}</b>`).join(''):'<b>Aucune classe indiquée</b>'}</div></div>`:''}<span class="request-received">Dossier reçu le ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span></div><div class="member-request-actions"><button class="approve" type="button" data-member-decision="valide" data-member-request-id="${esc(d.id)}">✓ Accepter</button><button class="reject" type="button" data-member-decision="refuse" data-member-request-id="${esc(d.id)}">Refuser</button></div></article>`}).join('');box.innerHTML=rows.length?html:'<div class="admin-card"><strong>Aucune demande en attente.</strong><p style="color:var(--muted);margin-top:5px">Cette catégorie ne contient actuellement aucun dossier à examiner.</p></div>';}catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les dossiers.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p><button class="admin-btn" type="button" style="margin-top:10px" onclick="loadAdminRequestCategoryPage('${kind}','${roleFilter}')">Réessayer</button></div>`;}}
+  try{const all=(await Promise.all(ids.map(async id=>{const r=await fetch(`${SUPABASE_URL}/rest/v1/demandes_membres?etablissement_id=eq.${encodeURIComponent(id)}&statut=eq.en_attente&select=id,created_at,role,informations,avatar_url,profile_id,classe_id&order=created_at.asc`,{headers:h,cache:'no-store'});if(!r.ok)throw new Error(`Demandes indisponibles (${r.status})`);return r.json();}))).flat();const rows=kind==='autres'?all.filter(d=>!['eleve','professeur'].includes(d.role)):all.filter(d=>d.role===roleFilter);const profileIds=[...new Set(rows.map(x=>x.profile_id).filter(Boolean))],classIds=[...new Set(rows.map(x=>x.classe_id).filter(Boolean))];const [profileRows,classRows]=await Promise.all([profileIds.length?fetch(`${SUPABASE_URL}/rest/v1/profiles?id=in.(${profileIds.map(encodeURIComponent).join(',')})&select=id,prenom,nom,full_name,avatar_url,photo_profil_url,date_naissance,niveau,classe,filiere,telephone,email,profil_statut`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]):Promise.resolve([]),classIds.length?fetch(`${SUPABASE_URL}/rest/v1/classes?id=in.(${classIds.map(encodeURIComponent).join(',')})&select=id,nom,niveau,annee_scolaire`,{headers:h,cache:'no-store'}).then(r=>r.ok?r.json():[]):Promise.resolve([])]);const profilesById=new Map(profileRows.map(x=>[x.id,x])),classesById=new Map(classRows.map(x=>[x.id,x]));const ageOf=date=>{if(!date)return '';const d=new Date(date),now=new Date();let age=now.getFullYear()-d.getFullYear(),m=now.getMonth()-d.getMonth();if(m<0||(m===0&&now.getDate()<d.getDate()))age--;return age>=0&&age<120?`${age} ans`:''};const html=rows.map(d=>{const p=profilesById.get(d.profile_id)||{},i=d.informations||{},name=p.full_name||[p.prenom||i.prenom,p.nom||i.nom].filter(Boolean).join(' ')||i.full_name||'Utilisateur',avatar=p.avatar_url||p.photo_profil_url||d.avatar_url,cl=classesById.get(d.classe_id),classe=cl?.nom||i.classe||p.classe||'',details=[ageOf(p.date_naissance||i.date_naissance),cl?.niveau||i.niveau||p.niveau,i.filiere||p.filiere,i.telephone||p.telephone].filter(Boolean);return `<article class="member-request-card admin-request-card-modern"><div class="member-request-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div><div class="member-request-main"><strong>${esc(name)}</strong><span>${d.role==='eleve'?'Élève':d.role==='professeur'?'Professeur':esc(d.role)}${classe?' · '+esc(classe):''}</span><div class="member-request-details">${d.role==='professeur'&&i.discipline?`<i>Matière : ${esc(i.discipline)}</i>`:''}${details.map(x=>`<i>${esc(x)}</i>`).join('')}</div><span class="request-received">Dossier reçu le ${new Date(d.created_at).toLocaleDateString('fr-FR')}</span></div><div class="member-request-actions"><button class="approve" type="button" data-member-decision="valide" data-member-request-id="${esc(d.id)}">✓ Accepter</button><button class="reject" type="button" data-member-decision="refuse" data-member-request-id="${esc(d.id)}">Refuser</button></div></article>`}).join('');box.innerHTML=rows.length?html:'<div class="admin-card"><strong>Aucune demande en attente.</strong><p style="color:var(--muted);margin-top:5px">Cette catégorie ne contient actuellement aucun dossier à examiner.</p></div>';}catch(e){box.innerHTML=`<div class="admin-card"><strong>Impossible de charger les dossiers.</strong><p style="color:var(--muted);margin-top:5px">${esc(e.message||'Erreur Supabase')}</p><button class="admin-btn" type="button" style="margin-top:10px" onclick="loadAdminRequestCategoryPage('${kind}','${roleFilter}')">Réessayer</button></div>`;}}
 window.openAdminRequestCategory=openAdminRequestCategory;
 
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-member-decision][data-member-request-id]');if(!b)return;e.preventDefault();if(b.dataset.busy==='1')return;b.dataset.busy='1';decideMemberRequest(b.dataset.memberRequestId,b.dataset.memberDecision).finally(()=>{b.dataset.busy='0';});});
@@ -3643,6 +3633,7 @@ function openSpaceTool(role,key){
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Mes résultats</span><h3>Notes et tests</h3><p>Un aperçu des résultats par matière.</p></div>${common}</div><div class="space-big-square"><div><span class="space-tool-kicker">MOYENNE GÉNÉRALE</span><div class="big-number">14,8/20</div><p>Résultats de test — données de démonstration.</p></div><div class="space-mini-grid"><div class="space-mini-card"><strong>Mathématiques</strong><span>Test 01 · Algèbre</span><b>16/20</b></div><div class="space-mini-card"><strong>Français</strong><span>Test 01 · Lecture</span><b>14/20</b></div><div class="space-mini-card"><strong>Anglais</strong><span>Test 02 · Grammar</span><b>15/20</b></div><div class="space-mini-card"><strong>Physique</strong><span>Test 01 · Mécanique</span><b>13/20</b></div><div class="space-mini-card"><strong>Histoire</strong><span>Test 02 · Afrique</span><b>16/20</b></div><div class="space-mini-card"><strong>SVT</strong><span>Test 01 · Biologie</span><b>15/20</b></div></div></div></section>`;return;
   }
   if(role==='eleve' && key==='class'){ renderStudentClassDashboard(root,common); return; }
+  if(role==='eleve' && key==='apropos'){ renderStudentAboutMeCV(root,common); return; }
   if(role==='eleve' && (key==='professeurs'||key==='camarades')){
     const teacher=key==='professeurs'; const people=teacher?[['Awa Traoré','Mathématiques · Professeur principal','42 élèves'],['Moussa Kaboré','Français','38 élèves'],['Clarisse Ouédraogo','Anglais','41 élèves'],['Idrissa Sawadogo','Physique-Chimie','40 élèves'],['Fatimata Diallo','Histoire-Géographie','42 élèves']]:[['Adama Kinda','3e A · Élève','42 élèves'],['Mariam Compaoré','3e A · Élève','42 élèves'],['Salif Ouédraogo','3e A · Élève','42 élèves'],['Nadia Zongo','3e A · Élève','42 élèves'],['Issouf Kaboré','3e A · Élève','42 élèves']];
     root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">${teacher?'Mes professeurs':'Mes camarades'}</span><h3>${teacher?'Liste des enseignants':'Liste des élèves'}</h3><p>${teacher?'Effectifs et informations de démonstration.':'Les camarades de votre classe — données de démonstration.'}</p></div>${common}</div><div class="space-list">${people.map((p,i)=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${p[0].split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><strong>${p[0]}</strong><span>${p[1]}</span></div></div><span class="space-effectif">Effectif ${p[2].replace('élèves','')}</span></div>`).join('')}</div></section>`;return;
@@ -4960,3 +4951,80 @@ function appliquerTheme(choix){
 @media(max-width:480px){.branding-upload-box{grid-template-columns:1fr}.branding-preview-frame{max-width:180px;width:100%}.branding-copy .admin-btn{width:100%}}
 </style>
 <style id="aurore-action-confirmations">.establishment-edit-actions button:disabled,.gallery-admin-compose button:disabled{opacity:.65;cursor:wait}.modification-status-list{margin:14px 0;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--shadow)}.modification-status-item{margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line)}.modification-status-item strong{display:block}.modification-status-item small{display:block;color:var(--muted);margin-top:3px}.modification-status-item p{margin:8px 0 0;color:var(--muted)}</style>
+<style id="aurore-student-welcome-and-cv">
+.student-welcome-card{display:flex;align-items:center;gap:16px;margin:18px 0 20px;padding:18px 20px;border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));border-radius:24px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,var(--panel)),var(--panel) 60%,color-mix(in srgb,var(--accent2) 5%,var(--panel)));box-shadow:var(--shadow)}
+.student-welcome-avatar{width:64px;height:64px;flex:none;border-radius:18px;overflow:hidden;display:grid;place-items:center;background:var(--accent-strong);color:#fff;font-weight:900;font-size:1.1rem}
+.student-welcome-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.student-welcome-body strong{display:block;font-size:1.05rem}
+.student-welcome-body p{margin-top:4px;color:var(--muted);font-size:.78rem}
+@media(max-width:480px){.student-welcome-card{padding:14px 15px;gap:12px;border-radius:20px}.student-welcome-avatar{width:52px;height:52px;border-radius:15px}.student-welcome-body strong{font-size:.92rem}.student-welcome-body p{font-size:.7rem}}
+.cv-form{display:grid;gap:14px}
+.cv-form label{display:grid;gap:6px;font-size:.72rem;font-weight:800}
+.cv-form label small{font-weight:600;color:var(--muted);font-size:.62rem}
+.cv-form input,.cv-form textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit;font-size:.78rem}
+.cv-form textarea{min-height:78px;resize:vertical;line-height:1.5}
+.cv-form-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.cv-preview-card{padding:22px;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);margin-bottom:16px}
+.cv-preview-head{display:flex;align-items:center;gap:14px}
+.cv-preview-head .student-welcome-avatar{width:56px;height:56px;border-radius:16px}
+.cv-preview-head strong{font-size:1rem}
+.cv-preview-head span{display:block;color:var(--muted);font-size:.7rem;margin-top:3px}
+.cv-preview-section{margin-top:16px}
+.cv-preview-section h4{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);font-weight:900}
+.cv-preview-section p{margin-top:6px;color:var(--text);font-size:.76rem;line-height:1.6;white-space:pre-wrap}
+</style>
+<script id="aurore-student-about-me-cv">
+async function renderStudentAboutMeCV(root,common){
+  if(!root)return;
+  window.__cvBackButtonHtml=common;
+  root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">À propos de moi</span><h3>Mon profil / CV</h3><p>Ces informations vous permettent de préparer un profil clair, propre et professionnel — utile pour vos stages, dossiers d’orientation ou candidatures.</p></div>${common}</div><div id="cvContent"><div class="admin-card">Chargement…</div></div></section>`;
+  const box=$('cvContent');
+  try{
+    const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
+    const uid=currentAuroreSession?.user?.id;
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=nom,prenom,avatar_url,photo_profil_url,classe,niveau,a_propos_cv`,{headers:h,cache:'no-store'});
+    const row=(r.ok?await r.json():[])[0]||{};
+    const cv=row.a_propos_cv||{};
+    const fullName=[row.prenom,row.nom].filter(Boolean).join(' ')||'Élève';
+    const av=row.avatar_url||row.photo_profil_url;
+    const hasContent=Object.values(cv).some(v=>String(v||'').trim());
+    const previewHtml=hasContent?`<div class="cv-preview-card"><div class="cv-preview-head"><div class="student-welcome-avatar">${av?`<img src="${esc(av)}" alt="Photo de ${esc(fullName)}">`:esc(initials(fullName))}</div><div><strong>${esc(fullName)}</strong><span>${esc([cv.titre,row.classe,row.niveau].filter(Boolean).join(' · ')||'Profil élève')}</span></div></div>${cv.presentation?`<div class="cv-preview-section"><h4>Présentation</h4><p>${esc(cv.presentation)}</p></div>`:''}${cv.competences?`<div class="cv-preview-section"><h4>Compétences</h4><p>${esc(cv.competences)}</p></div>`:''}${cv.langues?`<div class="cv-preview-section"><h4>Langues</h4><p>${esc(cv.langues)}</p></div>`:''}${cv.experiences?`<div class="cv-preview-section"><h4>Expériences & activités</h4><p>${esc(cv.experiences)}</p></div>`:''}${cv.distinctions?`<div class="cv-preview-section"><h4>Distinctions & certifications</h4><p>${esc(cv.distinctions)}</p></div>`:''}${cv.centres_interet?`<div class="cv-preview-section"><h4>Centres d’intérêt</h4><p>${esc(cv.centres_interet)}</p></div>`:''}${cv.objectif?`<div class="cv-preview-section"><h4>Projet d’orientation</h4><p>${esc(cv.objectif)}</p></div>`:''}</div>`:'';
+    box.innerHTML=`${previewHtml}<div class="admin-card"><form class="cv-form" onsubmit="event.preventDefault();saveStudentAboutMeCV()">
+      <label>Titre / intitulé<small> Ex. « Élève en classe de Terminale D, orientation Sciences »</small><input id="cvTitre" value="${esc(cv.titre||'')}" maxlength="120" placeholder="Élève en classe de …"></label>
+      <label>Présentation<small> 3 à 5 lignes pour vous présenter clairement</small><textarea id="cvPresentation" maxlength="600" placeholder="Qui êtes-vous, ce qui vous motive, votre parcours en quelques mots…">${esc(cv.presentation||'')}</textarea></label>
+      <label>Compétences<small> Séparez-les par une virgule</small><textarea id="cvCompetences" maxlength="400" placeholder="Travail en équipe, prise de parole, Excel, rédaction…">${esc(cv.competences||'')}</textarea></label>
+      <label>Langues<small> Langue et niveau</small><input id="cvLangues" value="${esc(cv.langues||'')}" maxlength="200" placeholder="Français (natif), Anglais (intermédiaire)…"></label>
+      <label>Expériences & activités<small> Stages, jobs, bénévolat, clubs, activités extrascolaires</small><textarea id="cvExperiences" maxlength="800" placeholder="Stage d’observation, club d’informatique, bénévolat…">${esc(cv.experiences||'')}</textarea></label>
+      <label>Distinctions & certifications<small> Concours, diplômes complémentaires, récompenses</small><textarea id="cvDistinctions" maxlength="400" placeholder="Lauréat concours de mathématiques 2025…">${esc(cv.distinctions||'')}</textarea></label>
+      <label>Centres d’intérêt<small> Ce qui vous passionne en dehors des cours</small><input id="cvCentresInteret" value="${esc(cv.centres_interet||'')}" maxlength="250" placeholder="Lecture, football, musique, robotique…"></label>
+      <label>Projet d’orientation<small> Ce que vous visez après cette année</small><textarea id="cvObjectif" maxlength="400" placeholder="Filière, école ou métier envisagé…">${esc(cv.objectif||'')}</textarea></label>
+      <div class="cv-form-actions"><button class="auth-primary" id="cvSaveBtn" type="submit">Enregistrer mon profil</button><span id="cvMessage" class="personal-profile-message"></span></div>
+    </form></div>`;
+  }catch(e){box.innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger votre profil.')}</div>`;}
+}
+async function saveStudentAboutMeCV(){
+  const btn=$('cvSaveBtn'),msg=$('cvMessage');
+  const cv={
+    titre:$('cvTitre')?.value.trim()||'',
+    presentation:$('cvPresentation')?.value.trim()||'',
+    competences:$('cvCompetences')?.value.trim()||'',
+    langues:$('cvLangues')?.value.trim()||'',
+    experiences:$('cvExperiences')?.value.trim()||'',
+    distinctions:$('cvDistinctions')?.value.trim()||'',
+    centres_interet:$('cvCentresInteret')?.value.trim()||'',
+    objectif:$('cvObjectif')?.value.trim()||''
+  };
+  if(btn){btn.disabled=true;btn.textContent='Enregistrement…';}
+  try{
+    const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
+    const uid=currentAuroreSession?.user?.id;
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}`,{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({a_propos_cv:cv})});
+    if(!r.ok){const b=await r.json().catch(()=>null);throw new Error(b?.message||'Enregistrement impossible.');}
+    if(msg){msg.textContent='Profil enregistré.';msg.className='personal-profile-message ok';}
+    setTimeout(()=>{const root=$('spaceDashboard');if(root)renderStudentAboutMeCV(root,window.__cvBackButtonHtml||'');},700);
+  }catch(e){if(msg){msg.textContent=e.message||'Impossible d’enregistrer.';msg.className='personal-profile-message err';}}
+  finally{if(btn){btn.disabled=false;btn.textContent='Enregistrer mon profil';}}
+}
+window.saveStudentAboutMeCV=saveStudentAboutMeCV;
+</script>
