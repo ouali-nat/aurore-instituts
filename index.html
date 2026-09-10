@@ -4415,6 +4415,17 @@ main{width:100%;min-width:0;overflow-x:clip;}
     } catch (e) { return false; }
   }
 
+  // Rafraîchit périodiquement le jeton tant que l'onglet reste ouvert.
+  // Sans ça, un utilisateur resté connecté plus longtemps que la durée de vie
+  // du token (~1h) ferme la page avec un access_token expiré : la requête
+  // d'écriture de "sortie" est alors silencieusement refusée par Supabase
+  // (JWT expiré), et la ligne reste pour toujours sur "Session en cours" —
+  // c'est très exactement le problème observé côté admin. Même mécanisme que
+  // le rafraîchissement forcé déjà en place avant un dépôt de document.
+  setInterval(() => {
+    if (session && session.refresh_token) rafraichirSession().catch(() => {});
+  }, 15 * 60 * 1000);
+
   // Affiche à l'utilisateur connecté les notifications personnelles non lues
   // le concernant (ex. "Votre document a été validé et publié"), voir la table
   // "Notifications" (schéma fourni) dont la policy RLS ne permet à chacun de
