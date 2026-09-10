@@ -1397,6 +1397,860 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 }
 </style>
 
+
+<style id="aurore-configuration-espaces-rebuild-v6">
+/* ==========================================================
+   CONFIGURATION TEST + MES ESPACES
+   Reconstruction visuelle complète.
+   Aucun changement Supabase / données / logique JS.
+   ========================================================== */
+
+/* Le panneau de contrôle respire davantage */
+.aurore-account-card .config-test{
+  margin-top:24px!important;
+  padding:22px!important;
+  border-radius:26px!important;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line))!important;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 12%,transparent),transparent 42%),
+    linear-gradient(145deg,color-mix(in srgb,var(--accent) 7%,var(--panel)),var(--panel2) 82%)!important;
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.08),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+
+.aurore-account-card .config-test h3{
+  font-size:1.22rem!important;
+  letter-spacing:-.025em!important;
+}
+
+.aurore-account-card .config-test p{
+  max-width:760px!important;
+  font-size:.78rem!important;
+  line-height:1.55!important;
+}
+
+/* ── Cartes de configuration : grandes, carrées, flottantes ── */
+.aurore-account-card .config-test-grid{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:16px!important;
+  margin-top:19px!important;
+  align-items:stretch!important;
+}
+
+.aurore-account-card .config-test-grid .config-chip{
+  position:relative!important;
+  min-width:0!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:142px!important;
+  aspect-ratio:1/1!important;
+  padding:18px!important;
+  border-radius:23px!important;
+  border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line))!important;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 18%,transparent),transparent 48%),
+    linear-gradient(150deg,color-mix(in srgb,var(--accent) 10%,var(--panel2)),var(--panel2) 78%)!important;
+  color:var(--text)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  gap:13px!important;
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.055)!important;
+  transform:translateY(0)!important;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,filter .22s ease!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+
+/* reflet + petite ligne lumineuse */
+.aurore-account-card .config-test-grid .config-chip:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:23px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 36%)!important;
+  pointer-events:none!important;
+  z-index:-1;
+}
+
+.aurore-account-card .config-test-grid .config-chip:after{
+  content:""!important;
+  position:absolute!important;
+  left:18px!important;
+  right:18px!important;
+  bottom:0!important;
+  height:2px!important;
+  border-radius:99px!important;
+  background:linear-gradient(90deg,var(--accent-strong),var(--accent2))!important;
+  opacity:.8!important;
+}
+
+.aurore-account-card .config-test-grid .config-chip:hover,
+.aurore-account-card .config-test-grid .config-chip:focus-visible{
+  transform:translateY(-7px)!important;
+  border-color:var(--accent)!important;
+  box-shadow:
+    0 20px 40px color-mix(in srgb,var(--accent) 18%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.08)!important;
+  outline:none!important;
+}
+
+/* petits décalages = impression de cartes flottantes */
+.aurore-account-card .config-test-grid .config-chip:nth-child(2),
+.aurore-account-card .config-test-grid .config-chip:nth-child(4){
+  transform:translateY(7px)!important;
+}
+.aurore-account-card .config-test-grid .config-chip:nth-child(2):hover,
+.aurore-account-card .config-test-grid .config-chip:nth-child(2):focus-visible,
+.aurore-account-card .config-test-grid .config-chip:nth-child(4):hover,
+.aurore-account-card .config-test-grid .config-chip:nth-child(4):focus-visible{
+  transform:translateY(0)!important;
+}
+
+/* Icône beaucoup plus présente */
+.aurore-account-card .config-test-grid .config-chip .config-chip-ico{
+  width:55px!important;
+  height:55px!important;
+  min-width:55px!important;
+  border-radius:17px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2))!important;
+  color:#fff!important;
+  border:0!important;
+  font-size:1.05rem!important;
+  box-shadow:
+    0 10px 23px color-mix(in srgb,var(--accent) 25%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+
+.aurore-account-card .config-test-grid .config-chip>span:last-child{
+  position:relative!important;
+  z-index:2!important;
+  font-size:.73rem!important;
+  line-height:1.25!important;
+  font-weight:850!important;
+  max-width:115px!important;
+}
+
+/* ── MES ESPACES : vrai groupe de cartes ── */
+.aurore-account-card .configured-spaces{
+  margin-top:24px!important;
+  padding:22px!important;
+  border-radius:26px!important;
+  border:1px solid var(--line)!important;
+  background:
+    radial-gradient(circle at 0% 0%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 38%),
+    linear-gradient(145deg,color-mix(in srgb,var(--panel2) 96%,var(--accent)),var(--panel2))!important;
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.07),
+    inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+
+.aurore-account-card .configured-head{
+  align-items:center!important;
+  padding:0 2px 3px!important;
+}
+
+.aurore-account-card .configured-head h3{
+  font-size:1.18rem!important;
+  letter-spacing:-.025em!important;
+}
+
+.aurore-account-card .configured-head>span{
+  padding:6px 10px!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;
+  color:var(--accent)!important;
+  font-weight:850!important;
+}
+
+/* deux cartes côte à côte sur PC */
+.aurore-account-card .configured-list{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+  margin-top:18px!important;
+  align-items:stretch!important;
+}
+
+/* carte d'espace */
+.aurore-account-card .configured-row{
+  position:relative!important;
+  min-height:225px!important;
+  height:auto!important;
+  padding:20px 18px 0!important;
+  border-radius:23px!important;
+  border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line))!important;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 14%,transparent),transparent 45%),
+    linear-gradient(155deg,color-mix(in srgb,var(--accent) 7%,var(--panel)),var(--panel) 78%)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+}
+
+.aurore-account-card .configured-row:nth-child(2){
+  transform:translateY(8px)!important;
+}
+
+.aurore-account-card .configured-row:hover{
+  transform:translateY(-5px)!important;
+  border-color:color-mix(in srgb,var(--accent) 48%,var(--line))!important;
+  box-shadow:
+    0 21px 42px color-mix(in srgb,var(--accent) 13%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+
+.aurore-account-card .configured-row:nth-child(2):hover{
+  transform:translateY(2px)!important;
+}
+
+/* reflet */
+.aurore-account-card .configured-row:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:23px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.055),transparent 35%)!important;
+  pointer-events:none!important;
+}
+
+/* contenu haut */
+.aurore-account-card .configured-row .configured-main{
+  position:relative!important;
+  z-index:2!important;
+  padding:3px 2px 0!important;
+  min-width:0!important;
+}
+
+.aurore-account-card .configured-row .configured-main strong{
+  display:block!important;
+  font-size:.91rem!important;
+  line-height:1.3!important;
+  font-weight:900!important;
+  letter-spacing:-.015em!important;
+}
+
+.aurore-account-card .configured-row .configured-main span{
+  display:inline-flex!important;
+  width:max-content!important;
+  max-width:100%!important;
+  margin-top:9px!important;
+  padding:6px 9px!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--accent) 9%,var(--panel2))!important;
+  border:1px solid color-mix(in srgb,var(--accent) 17%,var(--line))!important;
+  color:var(--muted)!important;
+  font-size:.65rem!important;
+  line-height:1.2!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+/* zone boutons : centrage réel, sans marge négative */
+.aurore-account-card .configured-row .configured-actions{
+  position:relative!important;
+  z-index:3!important;
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:0!important;
+  padding-top:16px!important;
+}
+
+.aurore-account-card .configured-row .space-open-btn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  align-self:center!important;
+  width:min(92%,225px)!important;
+  min-width:0!important;
+  min-height:47px!important;
+  margin:0 auto!important;
+  padding:11px 17px!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2))!important;
+  color:#fff!important;
+  border:0!important;
+  font-size:.70rem!important;
+  font-weight:900!important;
+  text-align:center!important;
+  box-shadow:
+    0 10px 23px color-mix(in srgb,var(--accent) 25%,transparent)!important;
+  transform:none!important;
+}
+
+.aurore-account-card .configured-row .space-open-btn:hover{
+  transform:translateY(-3px)!important;
+  filter:brightness(1.06)!important;
+}
+
+/* Supprimer : bien séparé, centré sous le bouton */
+.aurore-account-card .configured-row .admin-btn.danger{
+  width:100%!important;
+  margin-top:13px!important;
+  padding:10px 8px 12px!important;
+  border:0!important;
+  border-top:1px solid var(--line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--muted)!important;
+  font-size:.64rem!important;
+  text-align:center!important;
+}
+
+.aurore-account-card .configured-row .admin-btn.danger:hover{
+  color:#ef4444!important;
+  background:color-mix(in srgb,#ef4444 5%,transparent)!important;
+}
+
+/* variante administration : touche rouge discrète uniquement */
+.aurore-account-card .configured-row.admin-space{
+  border-color:color-mix(in srgb,var(--accent) 24%,var(--line))!important;
+}
+
+/* tablette */
+@media(max-width:1050px){
+  .aurore-account-card .config-test-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .aurore-account-card .config-test-grid .config-chip{
+    min-height:150px!important;
+  }
+}
+
+/* téléphone : EXACTEMENT 2 cartes par ligne */
+@media(max-width:700px){
+  .aurore-account-card .config-test,
+  .aurore-account-card .configured-spaces{
+    padding:17px!important;
+    border-radius:22px!important;
+  }
+
+  .aurore-account-card .config-test-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip{
+    min-height:0!important;
+    aspect-ratio:1/1!important;
+    padding:13px!important;
+    border-radius:19px!important;
+    gap:9px!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip:nth-child(2),
+  .aurore-account-card .config-test-grid .config-chip:nth-child(4){
+    transform:translateY(5px)!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip .config-chip-ico{
+    width:45px!important;
+    height:45px!important;
+    min-width:45px!important;
+    border-radius:14px!important;
+    font-size:.88rem!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip>span:last-child{
+    font-size:.63rem!important;
+    max-width:105px!important;
+  }
+
+  .aurore-account-card .configured-list{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+
+  .aurore-account-card .configured-row,
+  .aurore-account-card .configured-row:nth-child(2){
+    min-height:220px!important;
+    padding:15px 12px 0!important;
+    border-radius:19px!important;
+    transform:none!important;
+  }
+
+  .aurore-account-card .configured-row:hover,
+  .aurore-account-card .configured-row:nth-child(2):hover{
+    transform:translateY(-3px)!important;
+  }
+
+  .aurore-account-card .configured-row .configured-main strong{
+    font-size:.75rem!important;
+  }
+
+  .aurore-account-card .configured-row .configured-main span{
+    width:auto!important;
+    font-size:.55rem!important;
+    white-space:normal!important;
+    line-height:1.3!important;
+    padding:5px 7px!important;
+  }
+
+  .aurore-account-card .configured-row .space-open-btn{
+    width:94%!important;
+    min-height:43px!important;
+    padding:9px 7px!important;
+    font-size:.58rem!important;
+    border-radius:12px!important;
+  }
+
+  .aurore-account-card .configured-row .admin-btn.danger{
+    font-size:.55rem!important;
+    padding:9px 4px 10px!important;
+  }
+}
+
+/* petits téléphones : toujours 2 colonnes, jamais une seule */
+@media(max-width:430px){
+  .aurore-account-card .config-test-grid{
+    gap:9px!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip{
+    border-radius:17px!important;
+    padding:10px!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip .config-chip-ico{
+    width:39px!important;
+    height:39px!important;
+    min-width:39px!important;
+    border-radius:12px!important;
+    font-size:.78rem!important;
+  }
+
+  .aurore-account-card .config-test-grid .config-chip>span:last-child{
+    font-size:.56rem!important;
+    line-height:1.18!important;
+  }
+
+  .aurore-account-card .configured-list{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:9px!important;
+  }
+
+  .aurore-account-card .configured-row,
+  .aurore-account-card .configured-row:nth-child(2){
+    min-height:205px!important;
+    padding:13px 9px 0!important;
+  }
+
+  .aurore-account-card .configured-row .configured-main strong{
+    font-size:.68rem!important;
+  }
+
+  .aurore-account-card .configured-row .space-open-btn{
+    width:96%!important;
+    min-height:39px!important;
+    font-size:.51rem!important;
+    padding:8px 4px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .aurore-account-card .config-test-grid .config-chip,
+  .aurore-account-card .configured-row{
+    transition:none!important;
+    transform:none!important;
+  }
+}
+</style>
+
+
+<style id="aurore-affectations-professeurs-v7">
+/* =========================================================
+   AFFECTATIONS — profils professeurs + attribution multiple
+   ========================================================= */
+.aurore-affectations-page{
+  position:relative;
+  overflow:visible!important;
+}
+.aurore-affectations-head{
+  margin-bottom:20px!important;
+}
+.aurore-affectations-head h3{
+  font-size:clamp(1.15rem,2.2vw,1.55rem)!important;
+  letter-spacing:-.03em!important;
+}
+.aurore-affectations-head p{
+  max-width:760px!important;
+  line-height:1.55!important;
+}
+
+/* résumé */
+.aurore-affectations-summary{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:15px 17px;
+  margin-bottom:18px;
+  border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));
+  border-radius:19px;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 12%,transparent),transparent 45%),
+    color-mix(in srgb,var(--panel2) 94%,var(--accent));
+  box-shadow:0 10px 28px rgba(0,0,0,.06);
+}
+.aurore-affectations-summary-icon{
+  width:45px;height:45px;flex:0 0 45px;
+  display:grid;place-items:center;
+  border-radius:14px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2));
+  font-weight:900;
+  font-size:1.05rem;
+}
+.aurore-affectations-summary strong{display:block;font-size:.78rem}
+.aurore-affectations-summary span{display:block;margin-top:3px;color:var(--muted);font-size:.62rem;line-height:1.4}
+.aurore-affectations-count{
+  margin-left:auto;
+  min-width:52px;
+  padding:8px 10px;
+  border-radius:13px;
+  text-align:center;
+  color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 10%,var(--panel));
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
+  font-size:1rem;font-weight:950;
+}
+.aurore-affectations-count small{display:block;color:var(--muted);font-size:.49rem;font-weight:800}
+
+/* profils acceptés */
+.aurore-professor-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.aurore-professor-card{
+  position:relative;
+  min-width:0;
+  padding:19px;
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 15%,transparent),transparent 42%),
+    linear-gradient(145deg,color-mix(in srgb,var(--accent) 6%,var(--panel)),var(--panel2) 82%);
+  box-shadow:0 15px 34px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  overflow:hidden;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.aurore-professor-card:before{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--accent-strong),var(--accent2));
+  opacity:.9;
+}
+.aurore-professor-card:hover{
+  transform:translateY(-4px);
+  border-color:color-mix(in srgb,var(--accent) 42%,var(--line));
+  box-shadow:0 22px 45px color-mix(in srgb,var(--accent) 10%,transparent);
+}
+.aurore-professor-hero{
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr) auto;
+  gap:13px;
+  align-items:center;
+}
+.aurore-professor-avatar{
+  width:68px;height:68px;
+  border-radius:19px;
+  overflow:hidden;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 18%,var(--panel)),var(--panel2));
+  border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
+  color:var(--accent);
+  font-weight:950;
+  font-size:.9rem;
+}
+.aurore-professor-avatar img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.aurore-professor-identity{min-width:0}
+.aurore-professor-kicker{
+  display:block;color:var(--accent);
+  font-size:.53rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.07em;
+}
+.aurore-professor-identity h3{
+  margin:5px 0 3px;
+  font-size:1rem;line-height:1.2;
+  letter-spacing:-.02em;
+}
+.aurore-professor-identity p{
+  margin:0;color:var(--muted);
+  font-size:.66rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.aurore-professor-valid{
+  width:27px;height:27px;border-radius:9px;
+  display:grid;place-items:center;
+  color:#15803d;
+  background:rgba(34,197,94,.10);
+  border:1px solid rgba(34,197,94,.20);
+  font-weight:950;
+}
+.aurore-professor-meta{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:14px;
+}
+.aurore-professor-meta span{
+  max-width:100%;
+  padding:5px 8px;border-radius:999px;
+  color:var(--muted);
+  background:color-mix(in srgb,var(--panel2) 90%,var(--accent));
+  border:1px solid var(--line);
+  font-size:.55rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.aurore-professor-classes{
+  margin-top:14px;padding-top:13px;
+  border-top:1px solid var(--line);
+}
+.aurore-professor-classes-head{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.aurore-professor-classes-head strong{font-size:.64rem}
+.aurore-professor-classes-head span{
+  min-width:22px;height:22px;padding:0 5px;
+  display:grid;place-items:center;
+  border-radius:7px;
+  background:color-mix(in srgb,var(--accent) 11%,var(--panel));
+  color:var(--accent);font-size:.58rem;font-weight:950;
+}
+.aurore-class-pills{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:28px;
+}
+.aurore-class-pills i{
+  padding:6px 9px;border-radius:9px;
+  font-style:normal;font-size:.58rem;font-weight:850;
+  color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 9%,var(--panel2));
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
+}
+.aurore-class-pills em{
+  padding:6px 0;color:var(--muted);
+  font-size:.57rem;font-style:normal;
+}
+.aurore-assign-prof-btn{
+  width:100%;min-height:45px;
+  margin-top:14px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));
+  border-radius:13px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,var(--panel2)),color-mix(in srgb,var(--accent2) 8%,var(--panel2)));
+  color:var(--accent);
+  font:inherit;font-size:.64rem;font-weight:900;
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.aurore-assign-prof-btn span{
+  width:22px;height:22px;display:grid;place-items:center;
+  border-radius:7px;background:var(--accent);color:#fff;
+}
+.aurore-assign-prof-btn:hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 13%,var(--panel2));
+}
+
+/* état vide */
+.aurore-affectations-empty{
+  padding:48px 22px;text-align:center;
+  border:1px dashed color-mix(in srgb,var(--accent) 28%,var(--line));
+  border-radius:22px;background:color-mix(in srgb,var(--panel2) 90%,var(--accent));
+}
+.aurore-empty-icon{
+  width:54px;height:54px;margin:0 auto 12px;
+  display:grid;place-items:center;border-radius:17px;
+  color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 11%,var(--panel));
+  font-size:1.1rem;font-weight:900;
+}
+.aurore-affectations-empty h3{margin:0;font-size:.95rem}
+.aurore-affectations-empty p{margin:7px auto 0;max-width:480px;color:var(--muted);font-size:.68rem;line-height:1.5}
+
+/* modal attribution */
+.aurore-assign-modal{
+  position:fixed;inset:0;z-index:1500;
+  display:flex;align-items:center;justify-content:center;
+  padding:18px;opacity:0;pointer-events:none;
+  transition:opacity .18s ease;
+}
+.aurore-assign-modal.visible{opacity:1;pointer-events:auto}
+.aurore-assign-backdrop{
+  position:absolute;inset:0;
+  background:rgba(5,4,12,.62);
+  backdrop-filter:blur(7px);
+}
+.aurore-assign-dialog{
+  position:relative;width:min(720px,100%);
+  max-height:min(88dvh,760px);
+  overflow:auto;
+  padding:23px;
+  border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line));
+  border-radius:27px;
+  background:var(--panel);
+  box-shadow:0 35px 110px rgba(0,0,0,.35);
+  transform:translateY(10px) scale(.985);
+  transition:transform .2s ease;
+}
+.aurore-assign-modal.visible .aurore-assign-dialog{transform:translateY(0) scale(1)}
+.aurore-assign-close{
+  position:absolute;right:14px;top:12px;
+  width:36px;height:36px;border:0;border-radius:11px;
+  background:var(--panel2);color:var(--muted);
+  font-size:1.35rem;cursor:pointer;
+}
+.aurore-assign-profile{
+  display:flex;align-items:center;gap:13px;
+  padding-right:42px;
+}
+.aurore-assign-avatar{
+  width:62px;height:62px;flex:0 0 62px;
+  border-radius:18px;overflow:hidden;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--accent) 12%,var(--panel2));
+  border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));
+  color:var(--accent);font-weight:950;
+}
+.aurore-assign-avatar img{width:100%;height:100%;object-fit:cover}
+.aurore-assign-profile span{
+  display:block;color:var(--accent);font-size:.54rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em
+}
+.aurore-assign-profile h3{margin:5px 0 3px;font-size:1.08rem}
+.aurore-assign-profile p{margin:0;color:var(--muted);font-size:.65rem}
+.aurore-assign-intro{
+  margin-top:20px;padding:13px 15px;
+  border-radius:15px;
+  background:color-mix(in srgb,var(--accent) 7%,var(--panel2));
+  border:1px solid color-mix(in srgb,var(--accent) 15%,var(--line));
+}
+.aurore-assign-intro strong{display:block;font-size:.72rem}
+.aurore-assign-intro span{display:block;margin-top:3px;color:var(--muted);font-size:.59rem}
+.aurore-class-choice-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+  margin-top:13px;
+}
+.aurore-class-choice{
+  position:relative;display:grid;
+  grid-template-columns:32px minmax(0,1fr);
+  gap:9px;align-items:center;
+  min-height:72px;padding:10px;
+  border:1px solid var(--line);border-radius:15px;
+  background:var(--panel2);
+  cursor:pointer;
+  transition:border-color .16s,transform .16s,background .16s;
+}
+.aurore-class-choice:hover{
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--accent) 40%,var(--line));
+}
+.aurore-class-choice:has(input:checked){
+  border-color:color-mix(in srgb,var(--accent) 50%,var(--line));
+  background:color-mix(in srgb,var(--accent) 9%,var(--panel2));
+}
+.aurore-class-choice.is-assigned{
+  opacity:.72;cursor:default;
+}
+.aurore-class-choice input{position:absolute;opacity:0;pointer-events:none}
+.aurore-class-choice-mark{
+  width:32px;height:32px;display:grid;place-items:center;
+  border-radius:10px;
+  border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));
+  background:color-mix(in srgb,var(--accent) 7%,var(--panel));
+  color:var(--accent);font-size:.82rem;font-weight:950;
+}
+.aurore-class-choice:has(input:checked) .aurore-class-choice-mark{
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2));
+  color:#fff;border-color:transparent;
+}
+.aurore-class-choice-copy{min-width:0}
+.aurore-class-choice-copy strong{display:block;font-size:.69rem}
+.aurore-class-choice-copy small{display:block;margin-top:3px;color:var(--muted);font-size:.54rem}
+.aurore-class-choice b{
+  position:absolute;right:9px;top:7px;
+  color:#15803d;font-size:.45rem;font-weight:900;
+}
+.aurore-no-classes{
+  grid-column:1/-1;padding:20px;text-align:center;
+  color:var(--muted);border:1px dashed var(--line);border-radius:15px;font-size:.65rem;
+}
+.aurore-assign-selected{
+  margin-top:12px;color:var(--muted);font-size:.58rem;
+}
+.aurore-assign-selected span{color:var(--accent);font-weight:950}
+.aurore-assign-status{
+  min-height:18px;margin-top:8px;color:var(--muted);font-size:.61rem;line-height:1.4
+}
+.aurore-assign-status.err{color:#dc2626}
+.aurore-assign-actions{
+  display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+}
+.aurore-assign-actions .admin-btn{min-height:43px}
+
+/* mobile */
+@media(max-width:850px){
+  .aurore-professor-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  .aurore-affectations-summary{align-items:flex-start}
+  .aurore-affectations-count{margin-left:auto}
+  .aurore-professor-card{padding:15px;border-radius:20px}
+  .aurore-professor-hero{grid-template-columns:58px minmax(0,1fr) auto;gap:10px}
+  .aurore-professor-avatar{width:58px;height:58px;border-radius:16px}
+  .aurore-professor-identity h3{font-size:.86rem}
+  .aurore-professor-kicker{font-size:.47rem}
+  .aurore-class-choice-grid{grid-template-columns:1fr 1fr;gap:7px}
+  .aurore-assign-dialog{padding:17px;border-radius:22px;max-height:93dvh}
+}
+@media(max-width:430px){
+  .aurore-affectations-summary{padding:12px}
+  .aurore-affectations-summary-icon{width:39px;height:39px;flex-basis:39px}
+  .aurore-affectations-summary span{font-size:.55rem}
+  .aurore-professor-grid{gap:11px}
+  .aurore-professor-card{padding:13px}
+  .aurore-professor-hero{grid-template-columns:49px minmax(0,1fr) auto}
+  .aurore-professor-avatar{width:49px;height:49px;border-radius:14px}
+  .aurore-professor-valid{width:23px;height:23px;border-radius:7px;font-size:.68rem}
+  .aurore-professor-identity h3{font-size:.76rem}
+  .aurore-professor-identity p{font-size:.57rem}
+  .aurore-professor-meta span{font-size:.49rem;padding:4px 6px}
+  .aurore-assign-prof-btn{min-height:42px;font-size:.57rem}
+  .aurore-assign-dialog{padding:14px}
+  .aurore-assign-profile{gap:10px}
+  .aurore-assign-avatar{width:52px;height:52px;flex-basis:52px}
+  .aurore-assign-profile h3{font-size:.9rem}
+  .aurore-class-choice{min-height:66px;padding:8px;grid-template-columns:28px minmax(0,1fr)}
+  .aurore-class-choice-mark{width:28px;height:28px;border-radius:8px}
+  .aurore-class-choice-copy strong{font-size:.61rem}
+  .aurore-class-choice-copy small{font-size:.49rem}
+  .aurore-class-choice b{display:none}
+  .aurore-assign-actions{flex-direction:column}
+  .aurore-assign-actions .admin-btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .aurore-professor-card,.aurore-assign-prof-btn,.aurore-assign-modal,.aurore-assign-dialog,.aurore-class-choice{transition:none!important}
+}
+</style>
+
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -3546,14 +4400,260 @@ function renderStudentPickerList(){const box=$('studentPickerList');if(!box)retu
 function selectStudentForParent(profileId,name,classe){const id=window.__parentStudentPickerRequest;if(!id)return;const input=$(`parentStudent-${id}`),card=$(`parentSelected-${id}`);if(input)input.value=profileId;if(card){card.style.display='block';card.innerHTML=`<strong>Élève sélectionné</strong><br>${esc(name)}${classe?' · '+esc(classe):''}`;}closeStudentPicker();}
 async function traiterRattachementAdmin(id,decision){try{const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const eleve=document.getElementById(`parentStudent-${id}`)?.value||'';const commentaire=document.getElementById(`parentComment-${id}`)?.value.trim()||'';if(decision==='valide'&&!eleve)throw new Error('Sélectionnez l’élève correspondant avant de valider.');const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/traiter_demande_rattachement`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_demande_id:id,p_decision:decision,p_eleve_profile_id:decision==='valide'?eleve:null,p_commentaire:commentaire||null})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Traitement impossible.');await adminParentsView();}catch(e){alert(e.message||'Impossible de traiter le rattachement.');}}
 async function adminAffectationsView(){
-  const root=$('spaceDashboard');if(!root)return;const etabId=currentSpaceEstablishmentId||'';root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Affectations</span><h3>Professeurs et classes</h3><p>L’administration décide quelles classes sont accessibles à chaque professeur.</p></div><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('administration',{etablissementId:'${esc(etabId)}'})})">Retour aux rubriques</button></div><div id="assignmentForm"><div class="admin-card">Chargement…</div></div><div id="assignmentList" style="margin-top:14px"></div></section>`;
-  try{const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};const [pr,cr,ar]=await Promise.all([fetch(`${SUPABASE_URL}/rest/v1/rpc/professeurs_etablissement`,{method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:etabId})}),fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(etabId)}&actif=eq.true&select=id,nom,niveau,annee_scolaire&order=nom.asc`,{headers:h}),fetch(`${SUPABASE_URL}/rest/v1/rpc/affectations_professeurs_etablissement`,{method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:etabId})})]);const profs=pr.ok?await pr.json():[],classes=cr.ok?await cr.json():[],assignments=ar.ok?await ar.json():[];$('assignmentForm').innerHTML=`<div class="admin-card"><div class="personal-profile-grid"><label>Professeur<select id="assignmentTeacher"><option value="">Sélectionner un professeur…</option>${profs.map(p=>`<option value="${esc(p.profile_id)}">${esc(p.full_name||[p.prenom,p.nom].filter(Boolean).join(' '))}${p.discipline?' · '+esc(p.discipline):''}</option>`).join('')}</select></label><label>Classe<select id="assignmentClass"><option value="">Sélectionner une classe…</option>${classes.map(c=>`<option value="${esc(c.id)}">${esc(c.nom)}${c.niveau?' · '+esc(c.niveau):''}</option>`).join('')}</select></label></div><div class="admin-actions" style="margin-top:12px"><button class="admin-btn primary" type="button" onclick="creerAffectationProfesseur()" ${classes.length?'':'disabled title="Aucune classe active n’est configurée pour ce lycée."'}>
-        ${classes.length?'Affecter le professeur':'Affectation indisponible'}
-      </button></div></div>`;$('assignmentList').innerHTML=assignments.length?`<div class="space-list">${assignments.filter(a=>a.statut==='active').map(a=>`<div class="space-list-row"><div class="space-person"><div class="space-avatar">${esc(initials([a.professeur_prenom,a.professeur_nom].filter(Boolean).join(' ')||'P'))}</div><div><strong>${esc([a.professeur_prenom,a.professeur_nom].filter(Boolean).join(' ')||'Professeur')}</strong><span>${esc(a.classe_nom)}</span></div></div><button class="admin-btn" type="button" onclick="retirerAffectationProfesseur('${esc(a.id)}')">Retirer</button></div>`).join('')}</div>`:'<div class="admin-card">Aucune affectation active.</div>';
-  }catch(e){$('assignmentForm').innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger les affectations.')}</div>`;}
+  const root=$('spaceDashboard');if(!root)return;
+  const etabId=currentSpaceEstablishmentId||'';
+  root.innerHTML=`<section class="space-dashboard aurore-affectations-page">
+    <div class="space-dashboard-head aurore-affectations-head">
+      <div>
+        <span class="space-panel-label">Affectations</span>
+        <h3>Professeurs et classes</h3>
+        <p>Les professeurs acceptés sont automatiquement disponibles ici. Ouvrez leur fiche pour leur attribuer une ou plusieurs classes.</p>
+      </div>
+      <button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('administration',{etablissementId:'${esc(etabId)}'})})">Retour aux rubriques</button>
+    </div>
+    <div id="assignmentForm"></div>
+    <div id="assignmentList" class="aurore-affectations-list"></div>
+  </section>`;
+
+  try{
+    const token=await getFreshAccessToken();
+    if(!token)throw new Error('Session expirée.');
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+
+    const [pr,cr,ar]=await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/rpc/professeurs_etablissement`,{
+        method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:etabId})
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/classes?etablissement_id=eq.${encodeURIComponent(etabId)}&actif=eq.true&select=id,nom,niveau,annee_scolaire&order=nom.asc`,{headers:h}),
+      fetch(`${SUPABASE_URL}/rest/v1/rpc/affectations_professeurs_etablissement`,{
+        method:'POST',headers:h,body:JSON.stringify({p_etablissement_id:etabId})
+      })
+    ]);
+
+    const profs=pr.ok?await pr.json():[];
+    const classes=cr.ok?await cr.json():[];
+    const assignments=ar.ok?await ar.json():[];
+
+    const profileIds=[...new Set((Array.isArray(profs)?profs:[]).map(p=>p.profile_id).filter(Boolean))];
+    let profileRows=[];
+    if(profileIds.length){
+      const rp=await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=in.(${profileIds.map(encodeURIComponent).join(',')})&select=id,prenom,nom,full_name,avatar_url,photo_profil_url,telephone,email,discipline,fonction`,
+        {headers:h,cache:'no-store'}
+      );
+      profileRows=rp.ok?await rp.json():[];
+    }
+    const profileById=new Map((Array.isArray(profileRows)?profileRows:[]).map(p=>[p.id,p]));
+    const activeAssignments=(Array.isArray(assignments)?assignments:[]).filter(a=>a.statut==='active');
+
+    const assignmentByProfessor=new Map();
+    activeAssignments.forEach(a=>{
+      const key=String(a.professeur_profile_id||'');
+      if(!assignmentByProfessor.has(key))assignmentByProfessor.set(key,[]);
+      assignmentByProfessor.get(key).push(a);
+    });
+
+    const assignmentForm=$('assignmentForm');
+    assignmentForm.innerHTML=`
+      <div class="aurore-affectations-summary">
+        <div class="aurore-affectations-summary-icon">↔</div>
+        <div>
+          <strong>${profs.length} professeur${profs.length>1?'s':''} disponible${profs.length>1?'s':''}</strong>
+          <span>Les profils validés apparaissent automatiquement dans l’espace Affectations.</span>
+        </div>
+        <div class="aurore-affectations-count">${activeAssignments.length}<small>affectation${activeAssignments.length>1?'s':''}</small></div>
+      </div>`;
+
+    const list=$('assignmentList');
+    if(!profs.length){
+      list.innerHTML=`<div class="aurore-affectations-empty">
+        <div class="aurore-empty-icon">◉</div>
+        <h3>Aucun professeur accepté pour le moment</h3>
+        <p>Après validation d’une demande professeur, son profil apparaîtra automatiquement ici.</p>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML=`<div class="aurore-professor-grid">
+      ${profs.map(p=>{
+        const db=profileById.get(p.profile_id)||{};
+        const name=p.full_name||db.full_name||[p.prenom||db.prenom,p.nom||db.nom].filter(Boolean).join(' ')||'Professeur';
+        const avatar=p.avatar_url||db.avatar_url||db.photo_profil_url||'';
+        const discipline=p.discipline||db.discipline||'Discipline non renseignée';
+        const fonction=db.fonction||'Professeur';
+        const phone=db.telephone||'';
+        const email=db.email||'';
+        const assigned=assignmentByProfessor.get(String(p.profile_id))||[];
+        const assignedNames=assigned.map(a=>a.classe_nom).filter(Boolean);
+        const initialsText=esc(initials(name));
+        return `<article class="aurore-professor-card" data-professor-id="${esc(p.profile_id)}">
+          <div class="aurore-professor-hero">
+            <div class="aurore-professor-avatar">
+              ${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:initialsText}
+            </div>
+            <div class="aurore-professor-identity">
+              <span class="aurore-professor-kicker">Professeur · Profil accepté</span>
+              <h3>${esc(name)}</h3>
+              <p>${esc(discipline)}</p>
+            </div>
+            <span class="aurore-professor-valid">✓</span>
+          </div>
+          <div class="aurore-professor-meta">
+            <span>${esc(fonction)}</span>
+            ${phone?`<span>${esc(phone)}</span>`:''}
+            ${email?`<span>${esc(email)}</span>`:''}
+          </div>
+          <div class="aurore-professor-classes">
+            <div class="aurore-professor-classes-head">
+              <strong>Classes affectées</strong>
+              <span>${assigned.length}</span>
+            </div>
+            <div class="aurore-class-pills">
+              ${assignedNames.length?assignedNames.map(n=>`<i>${esc(n)}</i>`).join(''):'<em>Aucune classe pour le moment</em>'}
+            </div>
+          </div>
+          <button class="aurore-assign-prof-btn" type="button" onclick="ouvrirAttributionProfesseur('${esc(p.profile_id)}')">
+            <span>＋</span> Attribuer une ou plusieurs classes
+          </button>
+        </article>`;
+      }).join('')}
+    </div>`;
+
+    window.__auroreAffectationState={profs,classes,assignments,profileById};
+
+  }catch(e){
+    $('assignmentForm').innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger les affectations.')}</div>`;
+  }
 }
-async function creerAffectationProfesseur(){try{const prof=document.getElementById('assignmentTeacher')?.value||'',classe=document.getElementById('assignmentClass')?.value||'';if(!prof||!classe)throw new Error('Sélectionnez un professeur et une classe.');const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/affecter_professeur_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_professeur_profile_id:prof,p_classe_id:classe})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Affectation impossible.');await adminAffectationsView();}catch(e){alert(e.message||'Impossible d’affecter le professeur.');}}
-async function retirerAffectationProfesseur(id){if(!confirm('Retirer cette affectation ?'))return;try{const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/retirer_professeur_classe`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_affectation_id:id})});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Retrait impossible.');await adminAffectationsView();}catch(e){alert(e.message||'Impossible de retirer l’affectation.');}}
+
+function ouvrirAttributionProfesseur(profileId){
+  const state=window.__auroreAffectationState||{};
+  const prof=(state.profs||[]).find(p=>String(p.profile_id)===String(profileId));
+  if(!prof)return;
+  const db=state.profileById?.get(profileId)||{};
+  const name=prof.full_name||db.full_name||[prof.prenom||db.prenom,prof.nom||db.nom].filter(Boolean).join(' ')||'Professeur';
+  const avatar=prof.avatar_url||db.avatar_url||db.photo_profil_url||'';
+  const assignments=(state.assignments||[]).filter(a=>a.statut==='active'&&String(a.professeur_profile_id)===String(profileId));
+  const assignedIds=new Set(assignments.map(a=>String(a.classe_id)));
+
+  document.getElementById('auroreAssignModal')?.remove();
+  const modal=document.createElement('div');
+  modal.id='auroreAssignModal';
+  modal.className='aurore-assign-modal';
+  modal.innerHTML=`<div class="aurore-assign-backdrop" onclick="fermerAttributionProfesseur()"></div>
+    <section class="aurore-assign-dialog" role="dialog" aria-modal="true" aria-labelledby="auroreAssignTitle">
+      <button class="aurore-assign-close" type="button" aria-label="Fermer" onclick="fermerAttributionProfesseur()">×</button>
+      <div class="aurore-assign-profile">
+        <div class="aurore-assign-avatar">${avatar?`<img src="${esc(avatar)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div>
+        <div>
+          <span>Attribution des classes</span>
+          <h3 id="auroreAssignTitle">${esc(name)}</h3>
+          <p>${esc(prof.discipline||db.discipline||'Professeur')}</p>
+        </div>
+      </div>
+      <div class="aurore-assign-intro">
+        <strong>Choisissez les classes</strong>
+        <span>Vous pouvez en sélectionner plusieurs avant de valider.</span>
+      </div>
+      <div class="aurore-class-choice-grid">
+        ${(state.classes||[]).map(c=>{
+          const already=assignedIds.has(String(c.id));
+          return `<label class="aurore-class-choice ${already?'is-assigned':''}">
+            <input type="checkbox" value="${esc(c.id)}" ${already?'checked disabled':''}>
+            <span class="aurore-class-choice-mark">${already?'✓':'+'}</span>
+            <span class="aurore-class-choice-copy">
+              <strong>${esc(c.nom||'Classe')}</strong>
+              <small>${esc(c.niveau||'Niveau non précisé')}${c.annee_scolaire?' · '+esc(c.annee_scolaire):''}</small>
+            </span>
+            ${already?'<b>Déjà affectée</b>':''}
+          </label>`;
+        }).join('')||'<div class="aurore-no-classes">Aucune classe active n’est configurée pour ce lycée.</div>'}
+      </div>
+      <div class="aurore-assign-selected"><span id="auroreAssignSelectedCount">0</span> nouvelle(s) affectation(s) sélectionnée(s)</div>
+      <div id="auroreAssignStatus" class="aurore-assign-status" aria-live="polite"></div>
+      <div class="aurore-assign-actions">
+        <button type="button" class="admin-btn" onclick="fermerAttributionProfesseur()">Annuler</button>
+        <button type="button" class="admin-btn primary" onclick="validerAttributionProfesseur('${esc(profileId)}')" ${(state.classes||[]).length?'':'disabled'}>Valider les affectations</button>
+      </div>
+    </section>`;
+  document.body.appendChild(modal);
+  requestAnimationFrame(()=>modal.classList.add('visible'));
+  modal.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(input=>{
+    input.addEventListener('change',()=>{
+      const count=modal.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)').length;
+      const out=document.getElementById('auroreAssignSelectedCount');
+      if(out)out.textContent=String(count);
+    });
+  });
+}
+
+function fermerAttributionProfesseur(){
+  const modal=document.getElementById('auroreAssignModal');
+  if(!modal)return;
+  modal.classList.remove('visible');
+  setTimeout(()=>modal.remove(),180);
+}
+
+async function validerAttributionProfesseur(profileId){
+  const modal=document.getElementById('auroreAssignModal');
+  const state=window.__auroreAffectationState||{};
+  const selected=[...modal.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)')].map(x=>x.value);
+  if(!selected.length){
+    const status=$('auroreAssignStatus');
+    if(status)status.textContent='Sélectionnez au moins une nouvelle classe.';
+    return;
+  }
+  const status=$('auroreAssignStatus');
+  const button=modal.querySelector('.aurore-assign-actions .admin-btn.primary');
+  try{
+    const token=await getFreshAccessToken();
+    if(!token)throw new Error('Session expirée.');
+    if(button){button.disabled=true;button.textContent='Enregistrement…';}
+    if(status)status.textContent=`Attribution de ${selected.length} classe${selected.length>1?'s':''}…`;
+    let done=0;
+    for(const classeId of selected){
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/affecter_professeur_classe`,{
+        method:'POST',
+        headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
+        body:JSON.stringify({p_professeur_profile_id:profileId,p_classe_id:classeId})
+      });
+      const b=await r.json().catch(()=>null);
+      if(!r.ok)throw new Error(b?.message||b?.hint||`Impossible d’affecter la classe ${classeId}.`);
+      done++;
+    }
+    if(status)status.textContent=`✓ ${done} classe${done>1?'s':''} affectée${done>1?'s':''} avec succès.`;
+    await new Promise(r=>setTimeout(r,420));
+    fermerAttributionProfesseur();
+    await adminAffectationsView();
+  }catch(e){
+    if(button){button.disabled=false;button.textContent='Valider les affectations';}
+    if(status){status.textContent=e.message||'Impossible d’enregistrer les affectations.';status.classList.add('err');}
+  }
+}
+
+async function creerAffectationProfesseur(){
+  /* Compatibilité avec les anciens appels éventuels : ouvre désormais
+     l'interface moderne d'attribution du professeur sélectionné. */
+  const prof=document.getElementById('assignmentTeacher')?.value||'';
+  if(prof){ouvrirAttributionProfesseur(prof);return;}
+  alert('Sélectionnez un professeur depuis sa fiche.');
+}
+
+async function retirerAffectationProfesseur(id){
+  if(!confirm('Retirer cette affectation ?'))return;
+  try{
+    const token=await getFreshAccessToken();
+    if(!token)throw new Error('Session expirée.');
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/retirer_professeur_classe`,{
+      method:'POST',
+      headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
+      body:JSON.stringify({p_affectation_id:id})
+    });
+    const b=await r.json().catch(()=>null);
+    if(!r.ok)throw new Error(b?.message||b?.hint||'Retrait impossible.');
+    await adminAffectationsView();
+  }catch(e){alert(e.message||'Impossible de retirer l’affectation.');}}
+
 
 function prepareInstituteGallery(event){const box=$('adminGalleryPreview'),files=[...(event.target.files||[])].slice(0,20);window.__adminGalleryFiles=files;if(!box)return;box.innerHTML=files.map((f,i)=>`<div class="admin-gallery-edit"><img src="${URL.createObjectURL(f)}" alt="Aperçu ${i+1}"><label>Titre<input data-gallery-title value="${esc(f.name.replace(/\.[^.]+$/,''))}"></label><label>Description<input data-gallery-description placeholder="Facultatif"></label></div>`).join('');}
 async function saveInstituteGallery(etabId){
