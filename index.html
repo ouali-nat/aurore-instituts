@@ -2460,6 +2460,97 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 @media(max-width:700px){.prof-class-detail-board .prof-student-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
 @media(max-width:430px){.prof-class-detail-board .prof-student-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.prof-class-detail-board{padding:12px;border-radius:20px}}
 </style>
+
+<style id="aurore-prof-class-layout-final-v12">
+/* Espace professeur — structure stable : le conteneur grandit avec son contenu */
+.prof-class-detail-board{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+  display:block!important;
+}
+.prof-class-detail-board > *{box-sizing:border-box;min-width:0}
+.prof-class-detail-board .prof-students-board-head{
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+}
+.prof-class-detail-grid{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  align-items:stretch!important;
+}
+.prof-class-detail-card{
+  min-width:0!important;
+  width:100%;
+  box-sizing:border-box;
+  min-height:88px;
+}
+.prof-class-detail-board .prof-student-grid{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+  min-width:0!important;
+}
+.prof-class-detail-board .prof-student-card{
+  width:100%;
+  min-width:0!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
+  box-sizing:border-box;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.prof-class-detail-board .prof-student-card .cover{
+  flex:0 0 auto!important;
+  width:100%!important;
+}
+.prof-class-detail-board .prof-student-card .body{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.prof-class-detail-board .prof-student-card .body h3,
+.prof-class-detail-board .prof-student-card .meta,
+.prof-class-detail-board .prof-student-card .tags{
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+.prof-class-detail-board .prof-student-card .foot{
+  margin-top:auto!important;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  flex-wrap:wrap;
+}
+.prof-class-detail-board .prof-student-card .foot button{
+  flex:0 1 auto;
+  max-width:100%;
+}
+@media(max-width:600px){
+  .prof-class-detail-board{padding:12px!important}
+  .prof-class-detail-grid{gap:9px!important}
+  .prof-class-detail-board .prof-student-grid{gap:10px!important}
+  .prof-class-detail-board .prof-student-card .foot{display:flex!important;flex-direction:column!important;align-items:stretch!important}
+  .prof-class-detail-board .prof-student-card .foot button{width:100%!important}
+}
+@media(max-width:360px){
+  .prof-class-detail-board{padding:10px!important}
+  .prof-class-detail-board .prof-student-grid,.prof-class-detail-grid{gap:7px!important}
+}
+</style>
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -5312,9 +5403,87 @@ async function decideMemberRequest(id,decision){
 
 
 async function renderStudentClassDashboard(root,common){
-  const p=currentAuroreProfile||{},classId=p.classe_id||'';root.innerHTML=`<section class="space-dashboard"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>Ma classe et ma vie scolaire</h3><p>Retrouvez ici les informations qui concernent directement votre classe.</p></div>${common}</div><div id="studentClassContent"><div class="admin-card">Chargement de votre classe…</div></div></section>`;
+  const p=currentAuroreProfile||{},classId=p.classe_id||'';
+  root.innerHTML=`<section class="space-dashboard student-class-space"><div class="space-dashboard-head"><div><span class="space-panel-label">Ma classe</span><h3>Ma classe et ma vie scolaire</h3><p>Retrouvez ici vos professeurs, vos camarades et les informations qui concernent directement votre classe.</p></div>${common}</div><div id="studentClassContent"><div class="admin-card">Chargement de votre classe…</div></div></section>`;
   if(!classId){$('studentClassContent').innerHTML='<div class="class-choice-status">Aucune classe n’est encore rattachée à votre compte. Choisissez une classe dans Mon espace puis attendez la validation de l’administration.</div>';return;}
-  try{const token=currentAuroreSession.access_token,h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,nom,niveau,annee_scolaire,etablissement_id`,{headers:h});const c=(r.ok?(await r.json()):[])[0];if(!c){$('studentClassContent').innerHTML='<div class="class-choice-status err">Votre classe n’est plus disponible.</div>';return;}const er=await fetch(`${SUPABASE_URL}/rest/v1/eleves?profile_id=eq.${encodeURIComponent(currentAuroreSession.user.id)}&select=matricule,nom,prenom,classe_id`,{headers:h});const me=(er.ok?(await er.json()):[])[0];const sr=await fetch(`${SUPABASE_URL}/rest/v1/eleves?classe_id=eq.${encodeURIComponent(classId)}&statut=eq.actif&select=id`,{headers:h});const effectif=sr.ok?(await sr.json()).length:0;$('studentClassContent').innerHTML=`<div class="student-class-hero"><span class="class-board-kicker">${esc(c.niveau||'Classe')}</span><h3>${esc(c.nom)}</h3><p>${esc([c.annee_scolaire,effectif?effectif+' élève'+(effectif>1?'s':''):'Effectif en cours'].filter(Boolean).join(' · '))}</p><div class="student-class-grid"><div class="student-class-tile"><strong>Mon identité</strong><span>${esc([me?.prenom||p.prenom,me?.nom||p.nom].filter(Boolean).join(' ')||'Profil Aurore')}</span></div><div class="student-class-tile"><strong>Mon niveau</strong><span>${esc(c.niveau||p.niveau||'À compléter')}</span></div><div class="student-class-tile"><strong>Ma filière / série</strong><span>${esc(p.filiere||'À compléter')}</span></div><div class="student-class-tile"><strong>Effectif</strong><span>${effectif||'—'} élève${effectif>1?'s':''}</span></div><div class="student-class-tile"><strong>Mes devoirs</strong><span>Les devoirs publiés par vos enseignants apparaîtront ici.</span></div><div class="student-class-tile"><strong>Mes résultats</strong><span>Notes, tests et bulletins publiés pour votre profil.</span></div></div><div class="class-select-note" style="margin-top:16px">Les informations personnelles des autres élèves ne sont pas affichées dans votre espace.</div></div>`;}catch(e){$('studentClassContent').innerHTML=`<div class="class-choice-status err">${esc(e.message||'Impossible de charger votre classe.')}</div>`;}
+  try{
+    const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
+    const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,nom,niveau,annee_scolaire,etablissement_id`,{headers:h,cache:'no-store'});
+    const c=(r.ok?(await r.json()):[])[0];if(!c)throw new Error('Votre classe n’est plus disponible.');
+    const [er,cr]=await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/eleves?profile_id=eq.${encodeURIComponent(currentAuroreSession.user.id)}&select=matricule,nom,prenom,classe_id`,{headers:h,cache:'no-store'}),
+      fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_cv_eleves_classe`,{method:'POST',headers:h,body:'{}',cache:'no-store'})
+    ]);
+    const me=(er.ok?(await er.json()):[])[0];
+    const classmates=cr.ok?await cr.json():[];
+    const rows=Array.isArray(classmates)?classmates.filter(x=>String(x.classe_id||'')===String(classId)):[];
+    const effectif=rows.length;
+    window.__studentClassCVRows=rows;
+
+    let teachers=[];
+    try{
+      const ar=await fetch(`${SUPABASE_URL}/rest/v1/affectations_professeurs_classes?classe_id=eq.${encodeURIComponent(classId)}&statut=eq.active&select=professeur_profile_id`,{headers:h,cache:'no-store'});
+      if(ar.ok){
+        const assigns=await ar.json();
+        const ids=[...new Set((Array.isArray(assigns)?assigns:[]).map(x=>x.professeur_profile_id).filter(Boolean))];
+        if(ids.length){
+          const pr=await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=in.(${ids.map(encodeURIComponent).join(',')})&role=eq.professeur&select=id,prenom,nom,full_name,avatar_url,photo_profil_url,discipline,fonction,a_propos_cv`,{headers:h,cache:'no-store'});
+          if(pr.ok)teachers=await pr.json();
+        }
+      }
+    }catch(_){teachers=[];}
+    window.__studentClassTeachers=Array.isArray(teachers)?teachers:[];
+
+    const teacherCards=teachers.map((t,i)=>{
+      const name=t.full_name||[t.prenom,t.nom].filter(Boolean).join(' ')||'Professeur';
+      const av=t.avatar_url||t.photo_profil_url||'';
+      const hasCV=!!(t.a_propos_cv&&Object.keys(t.a_propos_cv).length);
+      return `<article class="card student-network-card"><div class="cover student-network-cover${av?'':' adaptive-logo'}"><div class="badge">${av?`<img src="${esc(av)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div></div><div class="body"><div class="tags"><span class="tag">Professeur</span><span class="tag green">${hasCV?'CV disponible':'Profil'}</span></div><h3>${esc(name)}</h3><div class="meta">${esc(t.discipline||'Enseignant')}${t.fonction?' · '+esc(t.fonction):''}</div><div class="foot"><span>Professeur #${i+1}</span><button type="button" onclick="event.stopPropagation();openStudentProfessorCV('${esc(t.id)}')">Voir le CV</button></div></div></article>`;
+    }).join('');
+
+    const classCards=rows.map((x,i)=>{
+      const name=x.full_name||[x.prenom,x.nom].filter(Boolean).join(' ')||'Élève';
+      const av=x.avatar_url||x.photo_profil_url||'';
+      const hasCV=!!(x.a_propos_cv&&Object.keys(x.a_propos_cv).length);
+      return `<article class="card student-network-card"><div class="cover student-network-cover${av?'':' adaptive-logo'}"><div class="badge">${av?`<img src="${esc(av)}" alt="Photo de ${esc(name)}">`:esc(initials(name))}</div></div><div class="body"><div class="tags"><span class="tag">Élève</span><span class="tag green">${hasCV?'CV disponible':'Profil scolaire'}</span></div><h3>${esc(name)}</h3><div class="meta">${esc(x.classe||c.nom||'Classe')}${x.niveau?' · '+esc(x.niveau):''}</div><div class="foot"><span>Élève #${i+1}</span><button type="button" onclick="event.stopPropagation();openStudentClassmateCV(${i})">Voir le CV</button></div></div></article>`;
+    }).join('');
+
+    $('studentClassContent').innerHTML=`<section class="student-class-board"><div class="student-class-hero"><div><span class="class-board-kicker">${esc(c.niveau||'Classe')}</span><h3>${esc(c.nom)}</h3><p>${esc([c.annee_scolaire,effectif?effectif+' élève'+(effectif>1?'s':''):'Effectif en cours'].filter(Boolean).join(' · '))}</p></div><span class="student-class-total">${effectif}</span></div><div class="student-class-grid"><div class="student-class-tile"><strong>Mon identité</strong><span>${esc([me?.prenom||p.prenom,me?.nom||p.nom].filter(Boolean).join(' ')||'Profil Aurore')}</span></div><div class="student-class-tile"><strong>Mon niveau</strong><span>${esc(c.niveau||p.niveau||'À compléter')}</span></div><div class="student-class-tile"><strong>Ma filière / série</strong><span>${esc(p.filiere||'À compléter')}</span></div><div class="student-class-tile"><strong>Effectif</strong><span>${effectif||'—'} élève${effectif>1?'s':''}</span></div></div><section class="student-network-section"><div class="student-network-head"><div><span class="space-panel-label">Vie de la classe</span><h4>Mes professeurs</h4><p>Les enseignants affectés à votre classe, avec leur profil et leur CV lorsqu’il est renseigné.</p></div><span class="student-network-count">${teachers.length}</span></div><div class="student-network-grid">${teacherCards||'<div class="admin-card"><strong>Aucun professeur affecté pour le moment.</strong><p class="admin-meta" style="margin-top:5px">Les enseignants apparaîtront ici après leur affectation par l’administration.</p></div>'}</div></section><section class="student-network-section"><div class="student-network-head"><div><span class="space-panel-label">Vie de la classe</span><h4>Mes camarades</h4><p>Les élèves actifs de votre classe. Chaque CV respecte les informations que son propriétaire a choisi de rendre visibles à sa classe.</p></div><span class="student-network-count">${rows.length}</span></div><div class="student-network-grid">${classCards||'<div class="admin-card"><strong>Aucun camarade visible pour le moment.</strong><p class="admin-meta" style="margin-top:5px">Les élèves de votre classe apparaîtront ici après leur rattachement.</p></div>'}</div></section></section>`;
+  }catch(e){$('studentClassContent').innerHTML=`<div class="class-select-status err">${esc(e.message||'Impossible de charger votre classe.')}</div>`;}
+}
+
+function openStudentClassmateCV(index){
+  const rows=window.__studentClassCVRows||[],row=rows[index];
+  if(!row){alert('Ce profil n’est plus disponible.');return;}
+  openStudentNetworkCV(row,'CV de l’élève');
+}
+function openStudentProfessorCV(profileId){
+  const row=(window.__studentClassTeachers||[]).find(x=>String(x.id)===String(profileId));
+  if(!row){alert('Ce profil professeur n’est plus disponible.');return;}
+  openStudentNetworkCV(row,'CV du professeur');
+}
+function openStudentNetworkCV(row,label){
+  const old=$('auroreCvViewer');if(old)old.remove();
+  const overlay=document.createElement('div');overlay.id='auroreCvViewer';overlay.className='cv-viewer';
+  overlay.innerHTML=`<div class="cv-viewer-toolbar"><button class="cv-viewer-btn" type="button" onclick="closeStudentParcoursViewer()">← Retour</button><div class="cv-toolbar-actions"><span class="cv-viewer-label">${cvEsc(label)}</span><button class="cv-viewer-btn primary" type="button" onclick="window.print()">Imprimer / PDF</button></div></div><div class="cv-paper-wrap"><div class="cv-paper"><div class="cv-paper-side"><div class="cv-empty-note">Chargement du CV…</div></div><main class="cv-paper-main"></main></div></div>`;
+  document.body.appendChild(overlay);
+  const cv=row.a_propos_cv||{};
+  const name=row.full_name||[row.prenom,row.nom].filter(Boolean).join(' ')||'Profil';
+  const av=row.avatar_url||row.photo_profil_url||'';
+  const side=overlay.querySelector('.cv-paper-side'),main=overlay.querySelector('.cv-paper-main');
+  const roleLabel=String(row.role||'').toLowerCase()==='professeur'?'Professeur':'Élève';
+  side.innerHTML=`<div class="cv-paper-photo">${av?`<img src="${cvEsc(av)}" alt="Photo de ${cvEsc(name)}">`:cvEsc(initials(name))}</div><h1 class="cv-paper-name">${cvEsc(name)}</h1><p class="cv-paper-title">${cvEsc(cv.titre||roleLabel)}</p>${roleLabel==='Professeur'?(row.discipline||row.fonction?`<div class="cv-side-section"><h4>Fonction</h4><p>${cvEsc([row.discipline,row.fonction].filter(Boolean).join(' · '))}</p></div>`:''):(row.classe||row.niveau?`<div class="cv-side-section"><h4>Scolarité</h4><p>${cvEsc([row.classe,row.niveau].filter(Boolean).join(' · '))}</p></div>`:'')}${cv.langues?`<div class="cv-side-section"><h4>Langues</h4><p>${cvEsc(cv.langues)}</p></div>`:''}${cv.centres_interet?`<div class="cv-side-section"><h4>Centres d’intérêt</h4><p>${cvEsc(cv.centres_interet)}</p></div>`:''}`;
+  let sections='';
+  if(cv.presentation)sections+=`<section class="cv-main-section"><div class="cv-paper-main-head"><div class="cv-paper-main-head-copy"><h2>Profil</h2><p class="cv-main-intro">${cvEsc(cv.presentation)}</p></div>${av?`<div class="cv-student-logo"><img src="${cvEsc(av)}" alt="Photo de ${cvEsc(name)}"></div>`:`<div class="cv-student-logo">${cvEsc(initials(name))}</div>`}</div></section>`;
+  if(cv.competences){const chips=String(cv.competences).split(/[,\n;]+/).map(x=>x.trim()).filter(Boolean);sections+=`<section class="cv-main-section"><h2>Compétences</h2><div class="cv-chip-list">${chips.map(x=>`<span class="cv-chip">${cvEsc(x)}</span>`).join('')}</div></section>`;}
+  if(cv.experiences)sections+=`<section class="cv-main-section"><h2>Expériences & activités</h2><div class="cv-list"><div class="cv-list-item">${cvEsc(cv.experiences)}</div></div></section>`;
+  if(cv.distinctions)sections+=`<section class="cv-main-section"><h2>Distinctions & certifications</h2><div class="cv-list"><div class="cv-list-item">${cvEsc(cv.distinctions)}</div></div></section>`;
+  if(cv.objectif)sections+=`<section class="cv-main-section"><h2>Projet d’orientation</h2><p class="cv-main-intro">${cvEsc(cv.objectif)}</p></section>`;
+  const imgs=cvNormalizeImages(cv.images);if(imgs.length)sections+=`<section class="cv-main-section"><h2>Réalisations & souvenirs</h2><div class="cv-gallery">${imgs.map(im=>`<figure><img src="${cvEsc(im.url)}" alt="Image du CV"><figcaption>${cvEsc(im.caption||'')}</figcaption></figure>`).join('')}</div></section>`;
+  if(roleLabel==='Professeur'&&(row.discipline||row.fonction))sections+=`<section class="cv-main-section"><h2>Informations professionnelles</h2><div class="cv-list"><div class="cv-list-item">${cvEsc([row.discipline&&'Discipline : '+row.discipline,row.fonction&&'Fonction : '+row.fonction].filter(Boolean).join('\n'))}</div></div></section>`;
+  if(!sections)sections='<div class="cv-empty-note">Aucune information supplémentaire n’a encore été renseignée.</div>';
+  main.innerHTML=sections;
 }
 
 async function renderParentChildrenView(){
@@ -6925,4 +7094,15 @@ window.renderStudentParcours=renderStudentParcours;window.saveStudentParcours=sa
 
 <style id="aurore-student-parcours-rebuild">
 .student-parcours{display:grid;gap:14px}.student-parcours .space-dashboard-head{margin-bottom:0}.parcours-hero{padding:20px;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb,var(--accent) 7%,var(--panel));box-shadow:var(--shadow)}.parcours-kicker{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);font-weight:900}.parcours-hero h3{margin:6px 0;font-size:1.18rem}.parcours-hero p{margin:0;color:var(--muted);font-size:.72rem;line-height:1.55}.parcours-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.78fr);gap:14px;align-items:start}.parcours-form,.parcours-preview{border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--shadow)}.parcours-form{padding:15px}.parcours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.parcours-field{display:grid;gap:6px;min-width:0}.parcours-field.full{grid-column:1/-1}.parcours-field span{font-size:.66rem;font-weight:900}.parcours-field small{font-size:.58rem;color:var(--muted);line-height:1.35}.parcours-field input,.parcours-field textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);padding:10px 11px;font:inherit;font-size:.74rem;outline:none}.parcours-field textarea{min-height:92px;resize:vertical;line-height:1.5}.parcours-preview{overflow:hidden}.parcours-preview-body{padding:15px;max-height:none!important;overflow:visible!important}.parcours-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.cv-privacy-box{margin-top:12px}.cv-image-grid{overflow:hidden}.cv-image-item img{display:block;max-width:100%}@media(max-width:850px){.parcours-layout{grid-template-columns:1fr}}@media(max-width:600px){.parcours-grid{grid-template-columns:1fr}.parcours-field.full{grid-column:auto}.parcours-form{padding:13px}.parcours-hero{padding:17px}.parcours-actions{display:grid;grid-template-columns:1fr}.parcours-actions button{width:100%}}
+</style>
+
+<style id="aurore-student-network-v13">
+.student-class-space .space-dashboard-head{margin-bottom:14px}
+.student-class-board{display:grid;gap:16px;padding:16px;border:1px solid var(--line);border-radius:22px;background:color-mix(in srgb,var(--accent) 4%,var(--panel));box-shadow:var(--shadow);min-width:0}
+.student-class-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--panel2);min-width:0}
+.student-class-hero h3{margin:5px 0 4px;font-size:1.25rem}.student-class-hero p{margin:0;color:var(--muted);font-size:.68rem}.student-class-total,.student-network-count{display:grid;place-items:center;min-width:42px;height:42px;padding:0 10px;border-radius:13px;background:color-mix(in srgb,var(--accent) 13%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line));font-weight:900;color:var(--accent2)}
+.student-class-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.student-class-tile{min-width:0;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.student-class-tile strong,.student-class-tile span{display:block}.student-class-tile strong{font-size:.62rem}.student-class-tile span{margin-top:5px;color:var(--muted);font-size:.67rem;line-height:1.4;overflow-wrap:anywhere}
+.student-network-section{display:grid;gap:11px}.student-network-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 2px 0;min-width:0}.student-network-head h4{margin:4px 0;font-size:1rem}.student-network-head p{margin:0;color:var(--muted);font-size:.67rem;line-height:1.45}.student-network-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0;align-items:stretch}.student-network-card{width:100%;min-width:0;height:auto;display:flex;flex-direction:column;overflow:hidden}.student-network-card .cover{flex:0 0 auto}.student-network-card .body{display:flex;flex-direction:column;flex:1;min-width:0}.student-network-card h3,.student-network-card .meta{overflow-wrap:anywhere}.student-network-card .foot{margin-top:auto;width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.student-network-card .foot button{white-space:nowrap}
+@media(max-width:650px){.student-class-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.student-network-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.student-network-card .body{padding:10px}.student-network-card h3{font-size:.82rem}.student-network-card .meta{font-size:.62rem}.student-network-card .foot{font-size:.58rem}.student-network-card .foot button{font-size:.58rem;padding:6px 8px}.student-class-board{padding:11px}.student-class-hero{padding:14px}}
+@media(max-width:390px){.student-network-grid{grid-template-columns:1fr}.student-class-grid{grid-template-columns:1fr}}
 </style>
