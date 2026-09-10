@@ -4836,6 +4836,7 @@ function appliquerTheme(choix){
 </style>
 <script id="aurore-student-about-me-cv">
 function cvEsc(v){return typeof esc==='function'?esc(String(v??'')):String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function parcoursEsc(v){return cvEsc(v);}
 function cvNormalizeImages(images){return Array.isArray(images)?images.filter(x=>x&&typeof x==='object'&&x.url).slice(0,5):[];}
 function cvHasContent(cv){return ['titre','presentation','competences','langues','experiences','distinctions','centres_interet','objectif'].some(k=>String(cv?.[k]||'').trim())||cvNormalizeImages(cv?.images).length>0;}
 function cvImageEditorHtml(images){
