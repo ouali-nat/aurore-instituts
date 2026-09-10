@@ -1138,6 +1138,265 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 @media print{body>*:not(#auroreCvViewer){display:none!important}.cv-viewer{position:static!important;overflow:visible!important}.cv-viewer-toolbar{display:none!important}.cv-paper-wrap{padding:0!important}.cv-paper{box-shadow:none!important;border:0!important;width:100%!important}.cv-paper-side{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style>
 
+
+<style id="aurore-student-square-dashboard-v5">
+/* =========================================================
+   ESPACE ÉLÈVE — blocs carrés, flottants, même langage visuel
+   que les cartes d'administration du lycée.
+   ========================================================= */
+.student-space-tools{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:18px!important;
+  margin-top:24px!important;
+  align-items:stretch!important;
+}
+
+.student-space-tools .space-tool-card{
+  aspect-ratio:1/1!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:17px!important;
+  border-radius:22px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+  overflow:hidden!important;
+  isolation:isolate;
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 20%,transparent),transparent 46%),
+    linear-gradient(155deg,color-mix(in srgb,var(--accent) 13%,var(--panel2)),var(--panel2) 72%)!important;
+  border:1px solid color-mix(in srgb,var(--accent) 34%,var(--line))!important;
+  box-shadow:
+    0 12px 30px rgba(10,8,25,.14),
+    inset 0 1px 0 rgba(255,255,255,.055)!important;
+  transform:translateY(0);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,filter .22s ease!important;
+}
+
+/* légère variation des cartes pour retrouver l'effet "flottant" de la maquette */
+.student-space-tools .space-tool-card:nth-child(2n){
+  transform:translateY(7px);
+}
+.student-space-tools .space-tool-card:nth-child(3n){
+  background:
+    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent2) 26%,transparent),transparent 48%),
+    linear-gradient(155deg,color-mix(in srgb,var(--accent2) 10%,var(--panel2)),var(--panel2) 72%)!important;
+}
+.student-space-tools .space-tool-card:nth-child(5n){
+  background:
+    radial-gradient(circle at 100% 0%,rgba(245,158,11,.20),transparent 48%),
+    linear-gradient(155deg,rgba(245,158,11,.10),var(--panel2) 72%)!important;
+  border-color:color-mix(in srgb,#f59e0b 35%,var(--line))!important;
+}
+
+.student-space-tools .space-tool-card:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  height:auto!important;
+  border-radius:22px!important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.055),transparent 34%),
+    radial-gradient(circle at 85% 12%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 35%)!important;
+  opacity:1!important;
+  pointer-events:none!important;
+  z-index:-1;
+}
+
+.student-space-tools .space-tool-card:after{
+  content:""!important;
+  position:absolute!important;
+  left:17px!important;
+  right:17px!important;
+  bottom:0!important;
+  height:2px!important;
+  border-radius:99px!important;
+  background:linear-gradient(90deg,var(--accent-strong),var(--accent2))!important;
+  opacity:.75!important;
+}
+
+.student-space-tools .space-tool-card:hover,
+.student-space-tools .space-tool-card:focus-visible{
+  transform:translateY(-5px)!important;
+  border-color:var(--accent)!important;
+  box-shadow:
+    0 20px 40px color-mix(in srgb,var(--accent) 18%,rgba(0,0,0,.14)),
+    inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+.student-space-tools .space-tool-card:nth-child(2n):hover,
+.student-space-tools .space-tool-card:nth-child(2n):focus-visible{
+  transform:translateY(2px)!important;
+}
+
+.student-space-tools .space-tool-icon{
+  position:relative!important;
+  width:52px!important;
+  height:52px!important;
+  min-width:52px!important;
+  border-radius:16px!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:1.05rem!important;
+  font-weight:900!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--accent-strong),var(--accent2))!important;
+  box-shadow:
+    0 9px 20px color-mix(in srgb,var(--accent) 25%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+
+.student-space-tools .space-tool-copy{
+  position:relative;
+  z-index:1;
+  min-width:0;
+  margin-top:12px;
+}
+.student-space-tools .space-tool-kicker{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:31px!important;
+  height:24px!important;
+  padding:0 8px!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--accent) 16%,transparent)!important;
+  border:1px solid color-mix(in srgb,var(--accent) 28%,transparent)!important;
+  color:var(--accent)!important;
+  font-size:.55rem!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+}
+.student-space-tools .space-tool-card h3{
+  font-size:1rem!important;
+  line-height:1.2!important;
+  margin:9px 0 6px!important;
+  letter-spacing:-.025em;
+}
+.student-space-tools .space-tool-card p{
+  font-size:.68rem!important;
+  line-height:1.45!important;
+  max-width:none!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:3!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important;
+  color:var(--muted)!important;
+}
+
+.student-space-tools .space-tool-arrow{
+  position:relative!important;
+  z-index:2;
+  align-self:flex-end!important;
+  width:38px!important;
+  height:38px!important;
+  border-radius:13px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:color-mix(in srgb,var(--accent) 16%,transparent)!important;
+  border:1px solid color-mix(in srgb,var(--accent) 24%,transparent)!important;
+  color:var(--accent)!important;
+  font-size:1rem!important;
+  font-weight:900!important;
+  box-shadow:0 7px 16px rgba(0,0,0,.08)!important;
+}
+
+/* Le dernier bloc reste bien carré et ne s'étire pas sur toute la ligne. */
+.student-space-tools .space-tool-card-wide{
+  grid-column:auto!important;
+  aspect-ratio:1/1!important;
+}
+
+/* Le bandeau de bienvenue et l'établissement respirent davantage autour des cartes. */
+.space-panel:has(.student-space-tools) .student-welcome-card{
+  margin-bottom:18px!important;
+}
+.space-panel:has(.student-space-tools) .admin-establishment-profile-card{
+  margin-bottom:22px!important;
+}
+
+/* Tablette */
+@media(max-width:1050px){
+  .student-space-tools{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:15px!important;
+  }
+}
+@media(max-width:760px){
+  .student-space-tools{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .student-space-tools .space-tool-card{
+    border-radius:19px!important;
+    padding:14px!important;
+  }
+  .student-space-tools .space-tool-card:nth-child(2n){
+    transform:translateY(5px);
+  }
+  .student-space-tools .space-tool-icon{
+    width:45px!important;
+    height:45px!important;
+    min-width:45px!important;
+    border-radius:14px!important;
+    font-size:.92rem!important;
+  }
+  .student-space-tools .space-tool-card h3{
+    font-size:.88rem!important;
+  }
+  .student-space-tools .space-tool-card p{
+    font-size:.62rem!important;
+  }
+  .student-space-tools .space-tool-arrow{
+    width:33px!important;
+    height:33px!important;
+    border-radius:11px!important;
+  }
+}
+@media(max-width:430px){
+  .student-space-tools{
+    gap:9px!important;
+  }
+  .student-space-tools .space-tool-card{
+    padding:12px!important;
+    border-radius:17px!important;
+  }
+  .student-space-tools .space-tool-icon{
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    border-radius:12px!important;
+  }
+  .student-space-tools .space-tool-copy{
+    margin-top:8px;
+  }
+  .student-space-tools .space-tool-kicker{
+    min-width:27px!important;
+    height:21px!important;
+    font-size:.49rem!important;
+  }
+  .student-space-tools .space-tool-card h3{
+    font-size:.78rem!important;
+    margin-top:7px!important;
+  }
+  .student-space-tools .space-tool-card p{
+    font-size:.57rem!important;
+    line-height:1.38!important;
+  }
+  .student-space-tools .space-tool-arrow{
+    width:29px!important;
+    height:29px!important;
+    font-size:.85rem!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .student-space-tools .space-tool-card,
+  .student-space-tools .space-tool-card:nth-child(2n){
+    transform:none!important;
+    transition:none!important;
+  }
+}
+</style>
+
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -2890,7 +3149,7 @@ async function openSpace(role,options={}){
       <div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div>
       <button class="auth-secondary" type="button" id="switchGoogleAccountBtn" onclick="switchGoogleAccount()">Changer de compte Google</button>
     </div>`:'';
-    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head aurore-general-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${studentWelcomeHtml}${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid aurore-general-tools':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
+    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head aurore-general-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">${role==='eleve'?'ESPACE ÉLÈVE':'ESPACE ADMINISTRATION'}</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${studentWelcomeHtml}${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid aurore-general-tools':(role==='eleve'?'admin-lycee-modern student-space-tools':'admin-lycee-modern')}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
   }
   if(role==='general') setTimeout(()=>loadAdminOverview(),0);
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
