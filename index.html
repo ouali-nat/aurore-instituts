@@ -1073,6 +1073,40 @@ pre{max-width:100%;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:700px){.profile-logo{width:142px!important;height:142px!important;margin-top:0!important}}
 @media(max-width:820px){.admin-request-category-grid{grid-template-columns:1fr}.admin-request-page-head{flex-direction:column}}
 </style>
+
+<style id="aurore-admin-lycee-redesign-v3">
+/* ===== Administration lycée — nouvelle présentation ===== */
+.admin-lycee-panel-head{display:flex!important;align-items:flex-start!important;gap:14px!important;margin-bottom:12px!important}
+.admin-lycee-panel-head>div{min-width:0}
+.admin-lycee-panel-kicker{display:inline-block;font-size:.55rem;font-weight:950;letter-spacing:.16em;color:var(--accent2);margin-bottom:4px}
+.admin-lycee-panel-head h2{font-size:clamp(1.35rem,2.7vw,1.8rem)!important;letter-spacing:-.025em!important;margin:0 0 4px!important}
+.admin-lycee-panel-head p{max-width:650px;font-size:.72rem!important;line-height:1.5!important}
+.admin-lycee-modern{display:grid!important;grid-template-columns:1fr!important;gap:18px!important;margin-top:12px!important}
+.admin-lycee-section{position:relative;padding:16px;border:1px solid color-mix(in srgb,var(--line) 86%,var(--accent));border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 94%,var(--accent)),var(--panel2));box-shadow:0 12px 32px rgba(0,0,0,.055);overflow:hidden}
+.admin-lycee-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 42%);pointer-events:none}
+.admin-lycee-section-head{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.admin-lycee-section-head h3{font-size:.94rem;margin:3px 0 3px;letter-spacing:-.01em}
+.admin-lycee-section-head p{margin:0;color:var(--muted);font-size:.64rem;line-height:1.4}
+.admin-lycee-eyebrow{font-size:.51rem;font-weight:950;letter-spacing:.15em;color:var(--accent2)}
+.admin-lycee-section-mark{flex:0 0 auto;display:grid;place-items:center;width:32px;height:32px;border-radius:11px;background:color-mix(in srgb,var(--accent) 9%,var(--panel2));border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));color:var(--accent);font-size:.57rem;font-weight:950}
+.admin-lycee-section-grid{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.admin-lycee-modern .space-tool-card{min-height:126px!important;height:auto!important;aspect-ratio:auto!important;padding:14px!important;border-radius:17px!important;border:1px solid var(--line)!important;background:color-mix(in srgb,var(--panel2) 90%,var(--accent))!important;box-shadow:0 7px 18px rgba(0,0,0,.045)!important;display:flex!important;position:relative;overflow:hidden;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important}
+.admin-lycee-modern .space-tool-card:before{background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 13%,transparent),transparent 58%)!important}
+.admin-lycee-modern .space-tool-card:hover{transform:translateY(-3px)!important;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))!important;box-shadow:0 14px 27px rgba(0,0,0,.09)!important}
+.admin-lycee-modern .space-tool-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.admin-lycee-modern .space-tool-icon{width:34px!important;height:34px!important;border-radius:10px!important;font-size:.84rem!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;border-color:color-mix(in srgb,var(--accent) 18%,var(--line))!important;color:var(--accent2)!important}
+.admin-lycee-modern .space-tool-copy{position:relative;min-width:0}
+.admin-lycee-modern .space-tool-kicker{font-size:.48rem!important;color:var(--muted)!important;letter-spacing:.13em!important}
+.admin-lycee-modern .space-tool-card h3{font-size:.79rem!important;line-height:1.22!important;margin:5px 0 4px!important;max-width:90%!important}
+.admin-lycee-modern .space-tool-card p{font-size:.6rem!important;line-height:1.4!important;color:var(--muted)!important;-webkit-line-clamp:2!important;max-width:100%!important}
+.admin-lycee-modern .space-tool-arrow{position:absolute;right:11px;bottom:10px;width:23px;height:23px;border-radius:7px;display:grid!important;place-items:center;background:color-mix(in srgb,var(--accent) 9%,var(--panel));color:var(--accent);font-size:.72rem;font-weight:950}
+.admin-lycee-modern .admin-lycee-card-feature{min-height:116px!important}
+.admin-lycee-modern .admin-lycee-card-feature:first-child{grid-column:span 2}
+.admin-lycee-modern .admin-lycee-card-feature:nth-child(2){grid-column:span 2}
+@media(max-width:950px){.admin-lycee-section-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-lycee-modern .admin-lycee-card-feature:first-child,.admin-lycee-modern .admin-lycee-card-feature:nth-child(2){grid-column:span 1}}
+@media(max-width:560px){.admin-lycee-modern{gap:12px!important}.admin-lycee-section{padding:12px;border-radius:19px}.admin-lycee-section-head{margin-bottom:9px}.admin-lycee-section-head h3{font-size:.82rem}.admin-lycee-section-head p{font-size:.58rem}.admin-lycee-section-mark{width:28px;height:28px;border-radius:9px}.admin-lycee-section-grid{gap:8px}.admin-lycee-modern .space-tool-card,.admin-lycee-modern .admin-lycee-card-feature{min-height:112px!important;padding:11px!important;border-radius:14px!important}.admin-lycee-modern .space-tool-icon{width:30px!important;height:30px!important;font-size:.74rem!important}.admin-lycee-modern .space-tool-card h3{font-size:.72rem!important}.admin-lycee-modern .space-tool-card p{font-size:.55rem!important}}
+</style>
+
 </head>
 <body class="auth-initializing site-locked">
 <header>
@@ -1457,7 +1491,7 @@ async function loadSpaceEstablishmentBanner(role,etablissementId=null){
     if(!rows){const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/mes_espaces`,{method:'POST',headers,body:'{}'});rows=r.ok?await r.json():[];window.__auroreSpacesCache={rows,ts:Date.now()};}
     const mine=Array.isArray(rows)?rows.find(x=>x.role===role&&x.etablissement_id&&(!etablissementId||String(x.etablissement_id)===String(etablissementId))):null;
     if(!mine)return null;
-    const r2=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(mine.etablissement_id)}&select=id,nom,type,ville,logo_url`,{headers});
+    const r2=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?id=eq.${encodeURIComponent(mine.etablissement_id)}&select=id,nom,type,ville,province,adresse,telephone,email,site_web,logo_url`,{headers});
     const rows2=r2.ok?await r2.json():[];
     currentSpaceEstablishment=rows2[0]||{nom:mine.etablissement_nom,ville:mine.etablissement_ville};
   }catch(_){currentSpaceEstablishment=null;}
@@ -2745,10 +2779,30 @@ async function openSpace(role,options={}){
     general:{title:'Administration générale Aurore',subtitle:'Pilotage national des comptes, demandes et établissements.',items:[['Demandes d’établissements','Examiner les demandes non validées et décider de leur validation.','DE','general-demandes'],['Acceptés','Établissements validés et actuellement actifs.','OK','general-accepted'],['Refusés','Demandes refusées avec leur motif de décision.','NO','general-refused'],['Suspendus','Établissements temporairement retirés de la publication.','SU','general-suspended'],['Bannis','Établissements interdits de publication sur Aurore.','BA','general-banned'],['Espaces établissements','Ouvrir l’espace d’un établissement validé et contrôler ses classes, élèves inscrits et inscriptions.','ET','general-establishments'],['Diagnostic affichage','Contrôler les établissements, classes, élèves et demandes réellement visibles depuis Supabase.','DG','general-diagnostic']]}
   };
   const cfg=configs[role]; if(!cfg)return;
-  const cards=cfg.items.map((item,i)=>role==='general'?
-    `<article class="space-tool-card admin-general-card" tabindex="0" role="button" title="${esc(item[1])}" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3></div><span class="space-tool-counter" id="adminCounter-${item[3]}">—</span></article>`
-    :`<article class="space-tool-card ${item[1].length>58?'space-tool-card-wide':''}" tabindex="0" role="button" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div></article>`
-  ).join('');
+  const renderSpaceCard=(item,i,extra='')=>`<article class="space-tool-card ${extra} ${item[1].length>58?'space-tool-card-wide':''}" tabindex="0" role="button" aria-label="${esc(item[0])}" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div class="space-tool-copy"><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3><p>${item[1]}</p></div><span class="space-tool-arrow" aria-hidden="true">→</span></article>`;
+  const cards=role==='administration' ? `
+    <section class="admin-control-center" aria-label="Centre de gestion du lycée">
+      <div class="admin-control-head">
+        <div><span class="admin-control-eyebrow">CENTRE DE GESTION</span><h3>Gérer votre établissement</h3><p>Accédez rapidement aux informations, à la communauté scolaire et aux outils administratifs du lycée.</p></div>
+        <div class="admin-control-status"><i></i><span>Établissement actif</span></div>
+      </div>
+      <div class="admin-control-group">
+        <div class="admin-control-group-label"><span>01</span><div><strong>Établissement</strong><small>Identité, informations et communications</small></div></div>
+        <div class="admin-control-grid admin-control-grid-2">${cfg.items.slice(0,2).map((x,i)=>renderSpaceCard(x,i,'admin-control-card admin-control-card-feature')).join('')}</div>
+      </div>
+      <div class="admin-control-group">
+        <div class="admin-control-group-label"><span>02</span><div><strong>Communauté scolaire</strong><small>Professeurs, disciplines, élèves et familles</small></div></div>
+        <div class="admin-control-grid">${cfg.items.slice(2,6).map((x,i)=>renderSpaceCard(x,i+2,'admin-control-card')).join('')}</div>
+      </div>
+      <div class="admin-control-group">
+        <div class="admin-control-group-label"><span>03</span><div><strong>Gestion & ressources</strong><small>Affectations, résultats, évaluations et documents</small></div></div>
+        <div class="admin-control-grid">${cfg.items.slice(6).map((x,i)=>renderSpaceCard(x,i+6,'admin-control-card')).join('')}</div>
+      </div>
+    </section>`
+    :cfg.items.map((item,i)=>role==='general'?
+      `<article class="space-tool-card admin-general-card" tabindex="0" role="button" title="${esc(item[1])}" onclick="openSpaceTool('${role}','${item[3]}')"><div class="space-tool-icon">${item[2]}</div><div><span class="space-tool-kicker">${String(i+1).padStart(2,'0')}</span><h3>${item[0]}</h3></div><span class="space-tool-counter" id="adminCounter-${item[3]}">—</span></article>`
+      :renderSpaceCard(item,i)
+    ).join('');
   const etab=await etabBannerPromise;
   if(etab){
     setSpaceLogo(etab.logo_url,etab.nom);
@@ -2756,7 +2810,7 @@ async function openSpace(role,options={}){
   }else{
     restoreSiteLogo();
   }
-  const bannerHtml=etab?`<div class="space-establishment-banner"><div class="seb-logo${etab.logo_url?' adaptive-logo':''}">${etab.logo_url?`<img src="${esc(etab.logo_url)}" alt="Logo de ${esc(etab.nom||'établissement')}">`:esc((etab.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div class="seb-info"><span class="seb-kicker">Établissement</span><h3>${esc(etab.nom||'Établissement')}</h3><p>${esc([etab.type,etab.ville].filter(Boolean).join(' · ')||'Informations à compléter')}</p></div></div>`:'';
+  const bannerHtml=etab?`<section class="admin-establishment-profile-card" aria-label="Présentation de l’établissement"><div class="admin-establishment-profile-glow"></div><div class="admin-establishment-profile-logo${etab.logo_url?' adaptive-logo':''}">${etab.logo_url?`<img src="${esc(etab.logo_url)}" alt="Logo de ${esc(etab.nom||'établissement')}">`:esc((etab.nom||'ET').trim().slice(0,2).toUpperCase())}</div><div class="admin-establishment-profile-body"><div class="admin-establishment-profile-top"><div><div class="admin-establishment-type">${esc(etab.type||'Lycée')} <span>✓ Établissement vérifié</span></div><h3>${esc(etab.nom||'Établissement')}</h3><p class="admin-establishment-location">${esc([etab.ville,etab.province,etab.adresse].filter(Boolean).join(' · ')||'Informations à compléter')}</p></div></div><div class="admin-establishment-actions">${etab.telephone?`<button type="button" onclick="location.href='tel:${esc(etab.telephone)}'">Appeler</button>`:''}${etab.email?`<button type="button" onclick="location.href='mailto:${esc(etab.email)}'">Écrire</button>`:''}${etab.site_web?`<button type="button" class="secondary" onclick="window.open('${esc(etab.site_web)}','_blank','noopener')">Site officiel</button>`:''}</div></div></section>`:'';
   let panel=document.getElementById('spacePanel');
   if(!panel){
     panel=document.createElement('section');
@@ -2770,7 +2824,7 @@ async function openSpace(role,options={}){
       <div><span class="space-panel-label">Compte administrateur</span><strong style="display:block;margin-top:4px">${esc(currentAuroreSession?.user?.email||'Compte Google connecté')}</strong><small style="display:block;color:var(--muted);margin-top:4px">Changer de compte Google sans modifier les établissements ni leurs données.</small></div>
       <button class="auth-secondary" type="button" id="switchGoogleAccountBtn" onclick="switchGoogleAccount()">Changer de compte Google</button>
     </div>`:'';
-    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div>${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid':'admin-lycee-grid'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
+    panel.classList.add('page-mode');if(!options.tool)applyOrResetSpaceScroll();panel.innerHTML=`<div class="space-panel-head admin-lycee-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{closeSpacePanel()})">Retour</button><div><span class="admin-lycee-panel-kicker">ESPACE ADMINISTRATION</span><h2>${cfg.title}</h2><p>${cfg.subtitle}</p></div></div>${bannerHtml}${generalAccountControl}<div class="space-tools-grid ${role==='general'?'admin-general-grid':'admin-lycee-modern'}">${cards}</div><div id="spaceDashboard"></div>`;panel.classList.add('visible');adaptSebLogoColor();
   }
   if(role==='general') setTimeout(()=>loadAdminOverview(),0);
   if(options.tool) setTimeout(()=>openSpaceTool(role,options.tool),0);
@@ -4222,6 +4276,62 @@ function appliquerTheme(choix){
   .school-student-list,.admin-request-list-grid{grid-template-columns:repeat(2,1fr)!important}
   .diagnostic-summary{grid-template-columns:1fr 1fr!important}
 }
+
+/* ===== Refonte finale — Administration lycée : identité + outils modernes ===== */
+.admin-establishment-profile-card{
+  position:relative;display:grid;grid-template-columns:116px minmax(0,1fr);gap:22px;align-items:center;
+  margin:18px 0 22px;padding:22px 24px;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));
+  border-radius:28px;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 11%,var(--panel)),var(--panel) 58%,color-mix(in srgb,var(--accent2) 6%,var(--panel)));
+  box-shadow:0 18px 48px rgba(20,14,35,.12);
+}
+.admin-establishment-profile-glow{position:absolute;inset:auto -80px -100px auto;width:300px;height:230px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 17%,transparent),transparent 68%);pointer-events:none}
+.admin-establishment-profile-logo{position:relative;width:116px;height:116px;border-radius:27px;display:grid;place-items:center;overflow:hidden;background:var(--panel2);border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.14);font-family:Georgia,serif;font-weight:900;font-size:1.8rem;color:var(--accent2)}
+.admin-establishment-profile-logo.adaptive-logo{background:color-mix(in srgb,var(--logo-dominant,var(--panel2)) 24%,var(--panel2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--logo-dominant,var(--line)) 45%,var(--line)),0 14px 34px rgba(0,0,0,.14)}
+.admin-establishment-profile-logo img{width:100%;height:100%;object-fit:contain;padding:9px;display:block;box-sizing:border-box}
+.admin-establishment-profile-body{position:relative;min-width:0}
+.admin-establishment-profile-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.admin-establishment-type{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.admin-establishment-type span{padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--accent) 10%,var(--panel2));border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));color:var(--accent2);font-size:.58rem;letter-spacing:.02em;text-transform:none}
+.admin-establishment-profile-body h3{margin:8px 0 5px;font-size:clamp(1.15rem,2.4vw,1.65rem);line-height:1.15;overflow-wrap:anywhere}
+.admin-establishment-location{margin:0;color:var(--muted);font-size:.76rem;line-height:1.5}
+.admin-establishment-profile-mark{flex:0 0 auto;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 11%,var(--panel2));color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));font-size:.65rem;font-weight:900}
+.admin-establishment-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.admin-establishment-actions button{border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:11px;padding:9px 13px;background:linear-gradient(135deg,var(--accent-strong),var(--accent2));color:#fff;font:inherit;font-size:.67rem;font-weight:850;cursor:pointer;box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 20%,transparent);transition:transform .18s ease,box-shadow .18s ease}
+.admin-establishment-actions button.secondary{background:var(--panel2);color:var(--text);box-shadow:none}
+.admin-establishment-actions button:hover{transform:translateY(-2px);box-shadow:0 11px 23px color-mix(in srgb,var(--accent) 25%,transparent)}
+.admin-lycee-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:13px!important;margin-top:0!important}
+.admin-lycee-grid .space-tool-card,
+.admin-lycee-grid .space-tool-card-wide{aspect-ratio:auto!important;min-height:142px!important;height:auto!important;padding:16px!important;border-radius:20px!important;background:linear-gradient(150deg,var(--panel2),color-mix(in srgb,var(--accent) 5%,var(--panel2)))!important;border:1px solid var(--line)!important;box-shadow:0 10px 25px rgba(0,0,0,.055)!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease!important}
+.admin-lycee-grid .space-tool-card:before{background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 55%)!important}
+.admin-lycee-grid .space-tool-card:hover{transform:translateY(-4px)!important;border-color:color-mix(in srgb,var(--accent) 55%,var(--line))!important;box-shadow:0 18px 34px rgba(0,0,0,.10)!important}
+.admin-lycee-grid .space-tool-icon{width:38px!important;height:38px!important;border-radius:12px!important;background:color-mix(in srgb,var(--accent) 10%,var(--panel))!important;border-color:color-mix(in srgb,var(--accent) 18%,var(--line))!important;color:var(--accent2)!important;font-size:.9rem!important}
+.admin-lycee-grid .space-tool-kicker{font-size:.53rem!important;letter-spacing:.12em!important;color:var(--muted)!important}
+.admin-lycee-grid .space-tool-card h3{font-size:.86rem!important;line-height:1.22!important;margin:6px 0 4px!important}
+.admin-lycee-grid .space-tool-card p{font-size:.64rem!important;line-height:1.42!important;color:var(--muted)!important;-webkit-line-clamp:2!important}
+.admin-lycee-grid .space-tool-card:after{content:'→';position:absolute;right:14px;bottom:13px;width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 9%,var(--panel));color:var(--accent);font-size:.8rem;font-weight:900;opacity:.8;transition:transform .18s ease,background .18s ease}
+.admin-lycee-grid .space-tool-card:hover:after{transform:translateX(3px);background:color-mix(in srgb,var(--accent) 16%,var(--panel))}
+.admin-lycee-grid .space-tool-card-wide{grid-column:span 1!important}
+@media(max-width:1050px){.admin-lycee-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:720px){.admin-establishment-profile-card{grid-template-columns:78px minmax(0,1fr);gap:14px;padding:15px;border-radius:22px}.admin-establishment-profile-logo{width:78px;height:78px;border-radius:19px}.admin-establishment-profile-mark{display:none}.admin-establishment-profile-body h3{font-size:1rem}.admin-establishment-location{font-size:.67rem}.admin-establishment-actions{margin-top:12px}.admin-establishment-actions button{padding:8px 10px;font-size:.62rem}.admin-lycee-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.admin-lycee-grid .space-tool-card,.admin-lycee-grid .space-tool-card-wide{min-height:126px!important;padding:13px!important}}
+@media(max-width:430px){.admin-establishment-profile-card{grid-template-columns:1fr;text-align:left}.admin-establishment-profile-logo{width:82px;height:82px}.admin-establishment-profile-top{gap:8px}.admin-establishment-type{font-size:.57rem}.admin-lycee-grid .space-tool-card h3{font-size:.78rem!important}.admin-lycee-grid .space-tool-card p{font-size:.59rem!important}}
+</style>
+<style id="aurore-admin-final-redesign">
+/* ===== Refonte finale — Administration lycée : centre de contrôle unifié ===== */
+.admin-control-center{position:relative;margin-top:18px;padding:22px 24px 24px;border:1px solid color-mix(in srgb,var(--accent) 16%,var(--line));border-radius:28px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent)),var(--panel2));box-shadow:0 18px 48px rgba(0,0,0,.08);overflow:hidden}
+.admin-control-center:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--accent) 11%,transparent),transparent 38%);pointer-events:none}
+.admin-control-head{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.admin-control-eyebrow{display:block;color:var(--accent);font-size:.56rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+.admin-control-head h3{margin:5px 0 4px;font-size:1.12rem;letter-spacing:-.02em}.admin-control-head p{max-width:650px;color:var(--muted);font-size:.69rem;line-height:1.5}
+.admin-control-status{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 10px;border:1px solid color-mix(in srgb,#16a34a 22%,var(--line));border-radius:999px;background:color-mix(in srgb,#16a34a 7%,var(--panel2));color:#15803d;font-size:.58rem;font-weight:850;white-space:nowrap}.admin-control-status i{width:6px;height:6px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px color-mix(in srgb,#16a34a 12%,transparent)}
+.admin-control-group{position:relative;margin-top:20px}.admin-control-group+.admin-control-group{padding-top:20px;border-top:1px solid var(--line)}
+.admin-control-group-label{display:flex;align-items:center;gap:10px;margin-bottom:10px}.admin-control-group-label>span{width:29px;height:29px;display:grid;place-items:center;border-radius:9px;background:color-mix(in srgb,var(--accent) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line));color:var(--accent);font-size:.55rem;font-weight:950}.admin-control-group-label strong{display:block;font-size:.76rem}.admin-control-group-label small{display:block;margin-top:2px;color:var(--muted);font-size:.59rem}
+.admin-control-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.admin-control-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.admin-control-card{min-height:112px!important;aspect-ratio:auto!important;height:auto!important;padding:13px!important;border-radius:16px!important;background:color-mix(in srgb,var(--panel2) 92%,var(--accent))!important;border:1px solid var(--line)!important;box-shadow:none!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important}.admin-control-card:hover{transform:translateY(-3px)!important;border-color:color-mix(in srgb,var(--accent) 48%,var(--line))!important;box-shadow:0 12px 25px rgba(0,0,0,.08)!important}.admin-control-card .space-tool-icon{width:34px!important;height:34px!important;border-radius:10px!important;font-size:.82rem!important}.admin-control-card .space-tool-kicker{font-size:.47rem!important}.admin-control-card h3{font-size:.76rem!important;line-height:1.22!important;margin:5px 0 3px!important}.admin-control-card p{font-size:.58rem!important;line-height:1.4!important;-webkit-line-clamp:2!important}.admin-control-card:after{display:none!important}.admin-control-card .space-tool-arrow{display:none!important}
+.admin-establishment-profile-card{margin:18px 0 20px!important;grid-template-columns:112px minmax(0,1fr)!important;padding:20px 22px!important;border-radius:26px!important;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,var(--panel)),var(--panel) 60%,color-mix(in srgb,var(--accent2) 5%,var(--panel)))!important}
+.admin-establishment-profile-logo{width:112px!important;height:112px!important;border-radius:26px!important}.admin-establishment-profile-body h3{font-size:clamp(1.15rem,2.5vw,1.55rem)!important}.admin-establishment-type{font-size:.58rem!important}.admin-establishment-type span{font-size:.55rem!important}.admin-establishment-location{font-size:.7rem!important}.admin-establishment-actions{margin-top:13px!important}
+@media(max-width:900px){.admin-control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-control-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.admin-control-center{padding:17px 14px 18px;border-radius:22px}.admin-control-head{flex-direction:column}.admin-control-status{align-self:flex-start}.admin-control-grid,.admin-control-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-control-card{min-height:105px!important;padding:11px!important}.admin-control-group-label small{font-size:.56rem}.admin-establishment-profile-card{grid-template-columns:76px minmax(0,1fr)!important;gap:13px!important;padding:14px!important;border-radius:21px!important}.admin-establishment-profile-logo{width:76px!important;height:76px!important;border-radius:18px!important}.admin-establishment-profile-actions{width:100%}.admin-establishment-actions button{padding:8px 10px!important;font-size:.59rem!important}}
+@media(max-width:430px){.admin-control-grid,.admin-control-grid-2{grid-template-columns:1fr 1fr}.admin-control-card h3{font-size:.7rem!important}.admin-control-card p{font-size:.55rem!important}.admin-establishment-profile-card{grid-template-columns:1fr!important}.admin-establishment-profile-logo{width:82px!important;height:82px!important}}
 </style>
 <script id="aurore-integrity-check">
 // ---------------------------------------------------------------------------
