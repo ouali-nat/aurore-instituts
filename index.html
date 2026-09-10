@@ -3632,6 +3632,21 @@ async function renderProfessorStudentsView(){
 }
 
 function openSpaceTool(role,key){
+  // Mon parcours est une page autonome : son ouverture ne doit dépendre
+  // d'aucune vérification réseau, d'aucun RPC et d'aucun chargement Supabase.
+  // Le clic doit donc toujours donner accès à la page immédiatement.
+  if(role==='eleve' && (key==='parcours'||key==='apropos')){
+    const etabParam=currentSpaceEstablishmentId?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
+    const route=`#espace/eleve/parcours${etabParam}`;
+    if(location.hash!==route)pushRoute(route);
+    const panel=document.getElementById('spacePanel');
+    if(!panel)return;
+    panel.classList.add('page-mode','tool-page','visible');
+    panel.innerHTML=`<div class="space-panel-head"><button class="space-back" type="button" onclick="auroreBack(()=>{openSpace('eleve',{etablissementId:'${esc(currentSpaceEstablishmentId)}'})})">Retour à l’espace</button><h2>Espace élèves</h2><p>Votre parcours scolaire et personnel.</p></div><div id="spaceDashboard"></div>`;
+    const root=document.getElementById('spaceDashboard');
+    if(root)renderStudentParcours(root,'<button class="space-back" type="button" onclick="auroreBack(()=>{openSpace(\'eleve\',{etablissementId:\''+esc(currentSpaceEstablishmentId)+'\'})})">Retour aux rubriques</button>');
+    return;
+  }
   const etabParam=(role!=='general'&&currentSpaceEstablishmentId)?`?etab=${encodeURIComponent(currentSpaceEstablishmentId)}`:'';
   const route=`#espace/${encodeURIComponent(role)}/${encodeURIComponent(key)}${etabParam}`;
   if(location.hash!==route) pushRoute(route);
