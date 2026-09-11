@@ -4211,15 +4211,35 @@ function auroreBack(fallback){
 const auroreRouteTransitionNames={accueil:'Aurore revient à l’accueil…',annuaire:'Aurore ouvre l’annuaire…',archives:'Aurore ouvre les archives…',instituts:'Aurore ouvre les instituts…',espace:'Aurore prépare votre espace…',administration:'Aurore ouvre l’administration…',inscriptions:'Aurore charge les demandes d’inscription…','admin-eleves':'Aurore charge la gestion des élèves…','admin-classe':'Aurore ouvre la classe…','admin-etablissements':'Aurore charge les établissements…'};
 function auroreTransitionMessage(hash){const raw=String(hash||'').toLowerCase();for(const [key,msg] of Object.entries(auroreRouteTransitionNames)){if(raw.includes(key))return msg}return 'Aurore prépare la page suivante…'}
 let pageTransitionProgressTimer=null;
+let pageTransitionProgressAnimationTimer=null;
 let pageTransitionProgressValue=0;
-function setPageTransitionProgress(value,status){
-  const pct=Math.max(0,Math.min(100,Number(value)||0));
-  pageTransitionProgressValue=pct;
+function renderPageTransitionProgress(pct,status){
+  const value=Math.max(0,Math.min(100,Number(pct)||0));
+  pageTransitionProgressValue=value;
   const bar=$('aurorePageTransitionBar'),label=$('aurorePageTransitionPercent'),track=$('aurorePageTransitionTrack'),statusEl=$('aurorePageTransitionStatus');
-  if(bar)bar.style.width=pct.toFixed(2)+'%';
-  if(label)label.textContent=pct>=99.995?'100 %':pct.toFixed(0)+' %';
-  if(track)track.setAttribute('aria-valuenow',String(pct));
+  if(bar)bar.style.width=value.toFixed(2)+'%';
+  if(label)label.textContent=value>=99.995?'100 %':String(Math.floor(value)).padStart(2,'0')+' %';
+  if(track)track.setAttribute('aria-valuenow',String(Math.round(value)));
   if(status&&statusEl)statusEl.textContent=status;
+}
+function setPageTransitionProgress(value,status){
+  const target=Math.max(0,Math.min(100,Number(value)||0));
+  if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
+  if(target<=pageTransitionProgressValue){
+    renderPageTransitionProgress(target,status);
+    return;
+  }
+  const step=()=>{
+    if(pageTransitionProgressValue>=target){
+      clearInterval(pageTransitionProgressAnimationTimer);
+      pageTransitionProgressAnimationTimer=null;
+      renderPageTransitionProgress(target,status);
+      return;
+    }
+    renderPageTransitionProgress(Math.min(target,pageTransitionProgressValue+1),status);
+  };
+  pageTransitionProgressAnimationTimer=setInterval(step,32);
+  step();
 }
 function setPageTransitionState(state){
   const el=$('aurorePageTransition'),icon=$('aurorePageTransitionIcon');
@@ -4233,6 +4253,8 @@ function startPageTransition(text='Aurore prépare la page suivante…',duration
   const el=$('aurorePageTransition');if(!el)return;
   if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
   if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
+  if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
+  pageTransitionProgressAnimationTimer=null;
   const t=$('aurorePageTransitionText');if(t)t.textContent=text;
   const title=$('aurorePageTransitionTitle');if(title)title.textContent='Chargement en cours';
   setPageTransitionState('loading');
@@ -4249,7 +4271,8 @@ function endPageTransition(success=true,message='Chargement terminé'){
   const el=$('aurorePageTransition');if(!el)return;
   if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
   if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
-  pageTransitionTimer=null;pageTransitionProgressTimer=null;
+  if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
+  pageTransitionTimer=null;pageTransitionProgressTimer=null;pageTransitionProgressAnimationTimer=null;
   setPageTransitionState(success?'success':'error');
   setPageTransitionProgress(100,message);
   const title=$('aurorePageTransitionTitle');if(title)title.textContent=success?'Chargement terminé':'Chargement impossible';
