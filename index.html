@@ -5623,8 +5623,9 @@ function prepareClassInformationImages(event){
   window.__classInformationFiles=files;if(!box)return;box.hidden=!files.length; if(choice)choice.hidden=files.length<2;
   box.innerHTML=files.map((f,i)=>`<div class="class-info-image-preview"><img src="${URL.createObjectURL(f)}" alt="Aperçu ${i+1}"><span>${String(i+1).padStart(2,'0')}</span></div>`).join('');
 }
-async function uploadClassInformationImage(file,classId,index,etabId){
+async function uploadClassInformationImage(file,classId,index,etabId,token){
   const client=await getClient();if(!client)throw new Error('Client Supabase indisponible.');
+  token=token||await getFreshAccessToken();if(!token)throw new Error('Session expirée. Veuillez vous reconnecter.');
   const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
   const path=`actualites/${etabId}/classes/${classId}/${Date.now()}-${index}-${crypto.randomUUID()}.${ext}`;
   const up=await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${path}`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':file.type||'image/jpeg','x-upsert':'false','cache-control':'31536000'},body:file});
