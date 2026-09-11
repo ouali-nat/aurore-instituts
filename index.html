@@ -5647,15 +5647,17 @@ function prepareClassInformationImages(event){
   box.innerHTML=files.map((f,i)=>`<div class="class-info-image-preview"><img src="${URL.createObjectURL(f)}" alt="Aperçu ${i+1}"><span>${String(i+1).padStart(2,'0')}</span></div>`).join('');
 }
 async function uploadClassInformationImage(file,classId,index,etabId,token){
-  const client=await getClient();if(!client)throw new Error('Client Supabase indisponible.');
   token=token||await getFreshAccessToken();if(!token)throw new Error('Session expirée. Veuillez vous reconnecter.');
+  if(!file||!file.type||!String(file.type).startsWith('image/'))throw new Error('Fichier image invalide.');
+  if(file.size>10*1024*1024)throw new Error('Chaque image doit faire 10 Mo maximum.');
   const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
   const path=`actualites/${etabId}/classes/${classId}/${Date.now()}-${index}-${crypto.randomUUID()}.${ext}`;
-  const up=await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${path}`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':file.type||'image/jpeg','x-upsert':'false','cache-control':'31536000'},body:file});
-   if(!up.ok){const b=await up.json().catch(()=>null);throw new Error(b?.message||b?.error||`Téléversement impossible (${up.status}).`);} 
-  if(up.error)throw up.error;
-  const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;if(!url)throw new Error('URL de l’image introuvable.');
-  return url;
+  const up=await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${path}`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':file.type,'x-upsert':'false','cache-control':'31536000'},body:file});
+  const body=await up.json().catch(()=>null);
+  if(!up.ok)throw new Error(body?.message||body?.error||body?.statusCode||`Téléversement impossible (${up.status}).`);
+  // Le chemin public est déterministe : inutile de dépendre du client Supabase
+  // juste après le téléversement (cela évite un second état de session inutile).
+  return `${SUPABASE_URL}/storage/v1/object/public/profiles/${path}`;
 }
 async function submitClassCommunication(classId,type){
   const msg=$('ccMessage'),btn=$('ccSubmit'),etabId=currentSpaceEstablishmentId||'';
