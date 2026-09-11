@@ -4238,7 +4238,7 @@ function setPageTransitionProgress(value,status){
     }
     renderPageTransitionProgress(Math.min(target,pageTransitionProgressValue+1),status);
   };
-  pageTransitionProgressAnimationTimer=setInterval(step,32);
+  pageTransitionProgressAnimationTimer=setInterval(step,12);
   step();
 }
 function setPageTransitionState(state){
@@ -4283,7 +4283,7 @@ function endPageTransition(success=true,message='Chargement terminé'){
       el.setAttribute('aria-hidden','true');
       setPageTransitionProgress(0,'Préparation…');
       setPageTransitionState('loading');
-    },260);
+    },90);
   }
 }
 function failPageTransition(message='Une erreur est survenue pendant le chargement.'){endPageTransition(false,message)}
@@ -4371,7 +4371,7 @@ function handleHash(eventState=null){
     applyingRoute=false;
     if(pageTransitionTimer) {
       clearTimeout(pageTransitionTimer);
-      pageTransitionTimer=setTimeout(()=>endPageTransition(true,'Chargement terminé'),260);
+      pageTransitionTimer=setTimeout(()=>endPageTransition(true,'Chargement terminé'),0);
     }
   }
 }
