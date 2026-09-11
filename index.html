@@ -4263,9 +4263,32 @@ function startPageTransition(text='Aurore prépare la page suivante…',duration
   const started=performance.now();
   pageTransitionProgressTimer=setInterval(()=>{
     const elapsed=performance.now()-started;
-    const target=Math.min(88,6+(elapsed/Math.max(500,duration))*82);
-    if(target>pageTransitionProgressValue)setPageTransitionProgress(target,target<30?'Préparation…':target<62?'Chargement des données…':'Finalisation…');
+    // Ne jamais bloquer artificiellement à 88 %. La progression peut monter
+    // jusqu'à 99 % en attendant que la vue soit réellement montée.
+    const target=Math.min(99,6+(elapsed/Math.max(500,duration))*93);
+    if(target>pageTransitionProgressValue){
+      setPageTransitionProgress(
+        target,
+        target<30?'Préparation…':target<62?'Chargement des données…':'Finalisation…'
+      );
+    }
   },90);
+}
+function forceClosePageTransition(){
+  const el=$('aurorePageTransition');
+  if(!el)return;
+  if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
+  if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
+  if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
+  pageTransitionTimer=null;
+  pageTransitionProgressTimer=null;
+  pageTransitionProgressAnimationTimer=null;
+  el.classList.remove('show');
+  el.setAttribute('aria-hidden','true');
+  el.style.setProperty('display','none','important');
+  el.style.setProperty('pointer-events','none','important');
+  el.style.setProperty('visibility','hidden','important');
+  el.style.setProperty('opacity','0','important');
 }
 function endPageTransition(success=true,message='Chargement terminé'){
   const el=$('aurorePageTransition');if(!el)return;
@@ -4274,21 +4297,13 @@ function endPageTransition(success=true,message='Chargement terminé'){
   if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
   pageTransitionTimer=null;pageTransitionProgressTimer=null;pageTransitionProgressAnimationTimer=null;
 
-  // La vue est déjà montée : le voile ne doit plus pouvoir la recouvrir.
   if(success){
-    el.classList.remove('show');
-    el.setAttribute('aria-hidden','true');
-    el.style.pointerEvents='none';
-    el.style.visibility='hidden';
-    el.style.opacity='0';
+    // Fermeture forcée : si la vue est montée, le voile ne doit plus exister
+    // visuellement, même si un ancien timer l'avait laissé à 88 %.
     setPageTransitionProgress(100,message);
-    requestAnimationFrame(()=>{
-      el.style.removeProperty('pointer-events');
-      el.style.removeProperty('visibility');
-      el.style.removeProperty('opacity');
-      setPageTransitionProgress(0,'Préparation…');
-      setPageTransitionState('loading');
-    });
+    forceClosePageTransition();
+    setPageTransitionProgress(0,'Préparation…');
+    setPageTransitionState('loading');
     return;
   }
 
