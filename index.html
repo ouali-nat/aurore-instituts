@@ -3225,7 +3225,8 @@ async function saveStudentAvatar(){
   if(!file||!id)return;
   try{
     btn.disabled=true;if(msg)msg.textContent='Enregistrement de votre photo…';
-    const url=await uploadPersonalAvatar(file,id);
+    const storageOwnerId=simulation?(window.__auroreOriginalProfile?.id||currentAuroreSession?.user?.id||id):id;
+    const url=await uploadPersonalAvatar(file,storageOwnerId);
     if(!url)throw new Error('La photo n’a pas pu être enregistrée.');
     const token=await getFreshAccessToken();if(!token)throw new Error('Session expirée.');
     let r;
@@ -4871,7 +4872,7 @@ async function renderAdminClassPage(classId){
   const h={apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`};
   try{
     const cr=await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&select=id,etablissement_id,nom,niveau,annee_scolaire,actif`,{headers:h,cache:'no-store'});
-    const classes=cr.ok?await cr.json():[];const cls=classes[0];if(!cls)throw new Error('Cette classe n’existe plus ou n’est pas accessible.');
+    const classes=cr.ok?await cr.json():[];const cls=classes[0];if(!cls)throw new Error('Cette classe n’existe plus ou n’est pas accessible.');currentSpaceEstablishmentId=String(cls.etablissement_id||currentSpaceEstablishmentId||'');
     const r=await fetch(`${SUPABASE_URL}/rest/v1/profiles?etablissement_id=eq.${encodeURIComponent(cls.etablissement_id)}&classe_id=eq.${encodeURIComponent(classId)}&role=eq.eleve&profil_statut=not.eq.banni&select=id,nom,prenom,full_name,avatar_url,photo_profil_url,date_naissance,email,telephone,niveau,filiere,profil_statut,adresse,last_seen_at&order=nom.asc,prenom.asc`,{headers:h,cache:'no-store'});
     if(!r.ok)throw new Error(`Impossible de charger les élèves (${r.status}).`);
     const rows=await r.json();
@@ -5404,7 +5405,8 @@ async function saveIndependentBranding(etabId,type){
   try{
     const token=await getFreshAccessToken(),uid=currentAuroreSession?.user?.id;if(!token||!uid)throw new Error('Session expirée.');
     const client=await getClient(),ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`${uid}/etablissement-branding/${etabId}-${type}-${Date.now()}-${crypto.randomUUID()}.${ext}`;
-    const up=await client.storage.from('profiles').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg',cacheControl:'31536000'});if(up.error)throw up.error;
+    const up=await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${path}`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':file.type||'image/jpeg','x-upsert':'false','cache-control':'31536000'},body:file});
+   if(!up.ok){const b=await up.json().catch(()=>null);throw new Error(b?.message||b?.error||`Téléversement impossible (${up.status}).`);} if(up.error)throw up.error;
     const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;if(!url)throw new Error('URL publique introuvable.');
     const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/modifier_branding_etablissement`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({p_etablissement_id:etabId,p_logo_url:type==='logo'?url:null,p_cover_url:type==='cover'?url:null})});
     const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||'Impossible d’enregistrer cette image.');
@@ -5612,7 +5614,7 @@ function openClassCommunication(classId,type){
   const old=$('adminClassCommunicationModal');if(old)old.remove();
   const devoir=type==='devoir';
   const modal=document.createElement('div');modal.id='adminClassCommunicationModal';modal.className='class-communication-modal';
-  modal.innerHTML=`<div class="class-communication-backdrop" onclick="closeClassCommunication()"></div><div class="class-communication-dialog"><button type="button" class="decision-close" onclick="closeClassCommunication()">×</button><span class="space-panel-label">Administration · ${devoir?'Devoir':'Information'}</span><h3>${devoir?'Programmer un devoir':'Passer une information'}</h3><p>${devoir?'Le devoir sera visible uniquement par les élèves de cette classe.':'L’information sera immédiatement visible dans le bloc Informations des élèves de cette classe.'}</p><form id="classCommunicationForm" onsubmit="event.preventDefault();submitClassCommunication('${esc(classId)}','${devoir?'devoir':'information'}')">${devoir?`<label>Matière<input id="ccSubject" required maxlength="100" placeholder="Ex. Mathématiques"></label><label>Titre du devoir<input id="ccTitle" required maxlength="160" placeholder="Ex. Exercices sur les fonctions"></label><label>Consigne<textarea id="ccContent" maxlength="5000" placeholder="Consignes du devoir…"></textarea></label><div class="cc-date-grid"><label>Date et heure de début<input id="ccStart" type="datetime-local" required></label><label>Date et heure de fin<input id="ccEnd" type="datetime-local" required></label></div>`:`<label>Titre<input id="ccTitle" required maxlength="160" placeholder="Ex. Réunion de rentrée"></label><label>Information<textarea id="ccContent" maxlength="5000" placeholder="Écrivez l’information à transmettre…"></textarea></label><label class="admin-media-upload">Images <span>(facultatif)</span><input id="ccImages" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple onchange="prepareClassInformationImages(event)"><small>Ajoutez plusieurs images pour créer un carrousel dans le bloc Informations des élèves.</small></label><div id="ccImagesPreview" class="class-info-images-preview" hidden></div><div id="ccCarouselChoice" class="admin-carousel-choice" hidden><div><strong>Présentation des images</strong><span>Plusieurs images peuvent être réunies dans un seul carrousel.</span></div><label class="admin-switch"><input id="ccCarousel" type="checkbox"><span></span><b>Carrousel</b></label></div>`}<div id="ccMessage" class="class-select-note"></div><div class="decision-actions"><button type="button" class="auth-secondary" onclick="closeClassCommunication()">Annuler</button><button class="auth-primary" type="submit" id="ccSubmit">${devoir?'Programmer et publier':'Publier l’information'}</button></div></form></div></div>`;
+  modal.innerHTML=`<div class="class-communication-backdrop" onclick="closeClassCommunication()"></div><div class="class-communication-dialog"><button type="button" class="decision-close" onclick="closeClassCommunication()">×</button><span class="space-panel-label">Administration · ${devoir?'Devoir':'Information'}</span><h3>${devoir?'Programmer un devoir':'Passer une information'}</h3><p>${devoir?'Le devoir sera visible uniquement par les élèves de cette classe.':'L’information sera immédiatement visible dans le bloc Informations des élèves de cette classe.'}</p><form id="classCommunicationForm" onsubmit="event.preventDefault();submitClassCommunication('${esc(classId)}','${devoir?'devoir':'information'}')">${devoir?`<label>Matière<input id="ccSubject" required maxlength="100" placeholder="Ex. Mathématiques"></label><label>Titre du devoir<input id="ccTitle" required maxlength="160" placeholder="Ex. Exercices sur les fonctions"></label><label>Consigne<textarea id="ccContent" maxlength="5000" placeholder="Consignes du devoir…"></textarea></label><div class="cc-date-grid"><label>Date et heure de début<input id="ccStart" type="datetime-local" required></label><label>Date et heure de fin<input id="ccEnd" type="datetime-local" required></label></div>`:`<label>Titre<input id="ccTitle" required maxlength="160" placeholder="Ex. Réunion de rentrée"></label><label>Information<textarea id="ccContent" required maxlength="5000" placeholder="Écrivez l’information à transmettre…"></textarea></label><label class="admin-media-upload">Images <span>(facultatif)</span><input id="ccImages" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple onchange="prepareClassInformationImages(event)"><small>Ajoutez plusieurs images pour créer un carrousel dans le bloc Informations des élèves.</small></label><div id="ccImagesPreview" class="class-info-images-preview" hidden></div><div id="ccCarouselChoice" class="admin-carousel-choice" hidden><div><strong>Présentation des images</strong><span>Plusieurs images peuvent être réunies dans un seul carrousel.</span></div><label class="admin-switch"><input id="ccCarousel" type="checkbox"><span></span><b>Carrousel</b></label></div>`}<div id="ccMessage" class="class-select-note"></div><div class="decision-actions"><button type="button" class="auth-secondary" onclick="closeClassCommunication()">Annuler</button><button class="auth-primary" type="submit" id="ccSubmit">${devoir?'Programmer et publier':'Publier l’information'}</button></div></form></div></div>`;
   document.body.appendChild(modal);window.__classInformationFiles=[];requestAnimationFrame(()=>modal.classList.add('show'));
 }
 function closeClassCommunication(){const m=$('adminClassCommunicationModal');if(m)m.remove();window.__classInformationFiles=[];}
@@ -5625,7 +5627,8 @@ async function uploadClassInformationImage(file,classId,index,etabId){
   const client=await getClient();if(!client)throw new Error('Client Supabase indisponible.');
   const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
   const path=`actualites/${etabId}/classes/${classId}/${Date.now()}-${index}-${crypto.randomUUID()}.${ext}`;
-  const up=await client.storage.from('profiles').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg',cacheControl:'31536000'});
+  const up=await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${path}`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':file.type||'image/jpeg','x-upsert':'false','cache-control':'31536000'},body:file});
+   if(!up.ok){const b=await up.json().catch(()=>null);throw new Error(b?.message||b?.error||`Téléversement impossible (${up.status}).`);} 
   if(up.error)throw up.error;
   const url=client.storage.from('profiles').getPublicUrl(path).data?.publicUrl;if(!url)throw new Error('URL de l’image introuvable.');
   return url;
@@ -5655,7 +5658,8 @@ async function submitClassCommunication(classId,type){
       const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||'Création du devoir impossible.');if(!body)throw new Error('Supabase n’a pas confirmé la création du devoir.');
     }else{
       const title=$('ccTitle')?.value.trim()||'',text=$('ccContent')?.value.trim()||'',files=window.__classInformationFiles||[],carousel=!!$('ccCarousel')?.checked;
-      if(!files.length&&!title&&!text)throw new Error('Renseignez un titre ou un contenu, ou ajoutez au moins une image.');
+      if(!title)throw new Error('Le titre est obligatoire.');
+       if(!text&&!files.length)throw new Error('Ajoutez le contenu de l’information ou au moins une image.');
       let contenu=text;
       if(files.length){
         const images=[];
