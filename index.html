@@ -4273,21 +4273,41 @@ function endPageTransition(success=true,message='Chargement terminé'){
   if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
   if(pageTransitionProgressAnimationTimer)clearInterval(pageTransitionProgressAnimationTimer);
   pageTransitionTimer=null;pageTransitionProgressTimer=null;pageTransitionProgressAnimationTimer=null;
-  setPageTransitionState(success?'success':'error');
-  setPageTransitionProgress(100,message);
-  const title=$('aurorePageTransitionTitle');if(title)title.textContent=success?'Chargement terminé':'Chargement impossible';
-  const text=$('aurorePageTransitionText');if(text)text.textContent=success?'La page est prête.':message;
+
+  // La vue est déjà montée : le voile ne doit plus pouvoir la recouvrir.
   if(success){
-    // Dès que la vue demandée est rendue, le voile de chargement ne doit plus
-    // masquer la page. On le retire immédiatement après avoir marqué 100 %.
     el.classList.remove('show');
     el.setAttribute('aria-hidden','true');
-    el.style.removeProperty('display');
-    setPageTransitionProgress(0,'Préparation…');
-    setPageTransitionState('loading');
+    el.style.pointerEvents='none';
+    el.style.visibility='hidden';
+    el.style.opacity='0';
+    setPageTransitionProgress(100,message);
+    requestAnimationFrame(()=>{
+      el.style.removeProperty('pointer-events');
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('opacity');
+      setPageTransitionProgress(0,'Préparation…');
+      setPageTransitionState('loading');
+    });
+    return;
   }
+
+  setPageTransitionState('error');
+  setPageTransitionProgress(100,message);
+  const title=$('aurorePageTransitionTitle');if(title)title.textContent='Chargement impossible';
+  const text=$('aurorePageTransitionText');if(text)text.textContent=message;
 }
 function failPageTransition(message='Une erreur est survenue pendant le chargement.'){endPageTransition(false,message)}
+(function(){
+  if(window.__aurorePageTransitionGuard)return;
+  window.__aurorePageTransitionGuard=true;
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && !applyingRoute){
+      const overlay=document.getElementById('aurorePageTransition');
+      if(overlay && overlay.classList.contains('show')) endPageTransition(true,'Chargement terminé');
+    }
+  });
+})();
 function pushRoute(hash){pendingRouteTransition=String(hash||'');saveRoutePosition();auroreInAppHistoryDepth++;history.pushState({scrollY:0},'',hash);startPageTransition(auroreTransitionMessage(hash),1050)}
 
 function restoreRoutePosition(state){
@@ -4370,9 +4390,10 @@ function handleHash(eventState=null){
     }
   }finally{
     applyingRoute=false;
-    if(pageTransitionTimer) {
-      clearTimeout(pageTransitionTimer);
-      pageTransitionTimer=setTimeout(()=>endPageTransition(true,'Chargement terminé'),0);
+    // Point de raccord unique : handleHash vient de terminer le montage
+    // de la vue demandée. On ferme donc immédiatement le voile global.
+    if(pageTransitionTimer || document.getElementById('aurorePageTransition')?.classList.contains('show')){
+      endPageTransition(true,'Chargement terminé');
     }
   }
 }
