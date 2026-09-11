@@ -871,20 +871,30 @@ html[data-theme="light"] .media-item{background:var(--panel2)!important;color:va
   @media(max-width:700px){.personal-space-card{padding:20px;border-radius:22px}.role-choice-wrap{padding-top:12px}}
 </style>
 <style id="aurore-page-transition">
-.aurore-page-transition{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,13,18,.50);backdrop-filter:blur(18px) saturate(1.18);-webkit-backdrop-filter:blur(18px) saturate(1.18);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .20s ease,visibility .20s ease}
+.aurore-page-transition{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,6,11,.58);backdrop-filter:blur(16px) saturate(1.12);-webkit-backdrop-filter:blur(16px) saturate(1.12);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .20s ease,visibility .20s ease}
 .aurore-page-transition::before,.aurore-page-transition::after{content:"";position:absolute;width:34vmax;height:34vmax;border-radius:50%;filter:blur(50px);opacity:.16;pointer-events:none;background:var(--accent)}
 .aurore-page-transition::before{top:-14vmax;left:-10vmax;animation:auroreFloatA 5s ease-in-out infinite}.aurore-page-transition::after{right:-12vmax;bottom:-16vmax;animation:auroreFloatB 6s ease-in-out infinite}
 .aurore-page-transition.show{opacity:1;visibility:visible;pointer-events:all}
-.aurore-page-transition-card{position:relative;z-index:1;width:min(390px,calc(100vw - 34px));padding:30px 25px 25px;border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));border-radius:28px;background:color-mix(in srgb,var(--panel) 88%,transparent);box-shadow:0 30px 90px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.025) inset;text-align:center;transform:translateY(16px) scale(.96);opacity:.7;transition:transform .38s cubic-bezier(.16,1,.3,1),opacity .32s ease;overflow:hidden}
-.aurore-page-transition-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,transparent),transparent 48%,color-mix(in srgb,var(--accent) 5%,transparent));pointer-events:none}
+.aurore-page-transition-card{position:relative;z-index:1;width:min(430px,100%);padding:25px 22px 21px;border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));border-radius:26px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent) 4%),var(--panel2));box-shadow:0 28px 80px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);text-align:center;transform:translateY(16px) scale(.96);opacity:.7;transition:transform .38s cubic-bezier(.16,1,.3,1),opacity .32s ease;overflow:hidden}
+.aurore-page-transition-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 9%,transparent),transparent 48%,color-mix(in srgb,var(--accent2) 5%,transparent));pointer-events:none}
 .aurore-page-transition.show .aurore-page-transition-card{transform:none;opacity:1}
-.aurore-page-transition-icon{position:relative;width:72px;height:72px;margin:0 auto 17px;border-radius:23px;display:grid;place-items:center;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 19%,var(--panel)),color-mix(in srgb,var(--accent) 7%,var(--panel)));color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 34%,var(--line));box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 16%,transparent),inset 0 1px 0 rgba(255,255,255,.10)}
-.aurore-page-transition-icon::before{content:"";position:absolute;inset:-7px;border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);border-radius:28px;animation:aurorePulse 1.8s ease-out infinite}
-.aurore-page-transition-icon svg{position:relative;width:32px;height:32px;animation:aurorePageSpin .9s linear infinite;filter:drop-shadow(0 3px 8px color-mix(in srgb,var(--accent) 25%,transparent))}
-.aurore-page-transition-card strong{position:relative;display:block;font-size:1.08rem;letter-spacing:-.01em}.aurore-page-transition-card span{position:relative;display:block;margin-top:7px;color:var(--muted);font-size:.78rem;line-height:1.55}
-.aurore-page-transition-progress{position:relative;height:4px;margin:20px auto 0;width:min(250px,78%);overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--accent) 10%,var(--line))}.aurore-page-transition-progress::after{content:"";position:absolute;inset:0;width:42%;border-radius:inherit;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:auroreProgress 1.15s ease-in-out infinite}
-@keyframes aurorePageSpin{to{transform:rotate(360deg)}}@keyframes aurorePulse{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.18);opacity:0}}@keyframes auroreProgress{0%{transform:translateX(-145%)}100%{transform:translateX(340%)}}@keyframes auroreFloatA{50%{transform:translate(7vw,5vh) scale(1.12)}}@keyframes auroreFloatB{50%{transform:translate(-6vw,-4vh) scale(.9)}}
-body.aurore-transitioning{overflow-x:hidden!important}@media(max-width:430px){.aurore-page-transition-card{padding:26px 19px 22px;border-radius:24px}.aurore-page-transition-icon{width:64px;height:64px;border-radius:20px}.aurore-page-transition-icon svg{width:29px;height:29px}}@media(prefers-reduced-motion:reduce){.aurore-page-transition-icon::before,.aurore-page-transition-icon svg,.aurore-page-transition-progress::after,.aurore-page-transition::before,.aurore-page-transition::after{animation:none}.aurore-page-transition-card{transition:none}}
+.aurore-page-transition-icon{position:relative;width:62px;height:62px;margin:0 auto 14px;border-radius:20px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 14%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));color:var(--accent);font-size:1.35rem;font-weight:900}
+.aurore-page-transition-icon::before{content:"";position:absolute;inset:-7px;border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);border-radius:27px;animation:aurorePulse 1.8s ease-out infinite}
+.aurore-page-transition-icon svg{position:relative;width:30px;height:30px;animation:aurorePageSpin .9s linear infinite;filter:drop-shadow(0 3px 8px color-mix(in srgb,var(--accent) 25%,transparent))}
+.aurore-page-transition-card strong{position:relative;display:block;font-size:1.08rem;letter-spacing:-.02em}
+.aurore-page-transition-card span{position:relative;display:block;margin-top:7px;color:var(--muted);font-size:.77rem;line-height:1.5;min-height:1.2em}
+.aurore-page-transition-percent{position:relative;margin-top:17px;font-size:1.65rem;font-weight:900;letter-spacing:-.05em;color:var(--text);font-variant-numeric:tabular-nums}
+.aurore-page-transition-track{position:relative;width:100%;height:9px;margin-top:10px;overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--accent) 9%,var(--line));box-shadow:inset 0 1px 2px rgba(0,0,0,.16)}
+.aurore-page-transition-bar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .28s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 18px color-mix(in srgb,var(--accent) 35%,transparent);position:relative;overflow:hidden}
+.aurore-page-transition-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.28) 45%,transparent 70%);transform:translateX(-100%);animation:auroreProgressShine 1.8s linear infinite}
+.aurore-page-transition-card small{position:relative;display:block;margin-top:11px;color:var(--muted);font-size:.68rem;line-height:1.4}
+.aurore-page-transition.success .aurore-page-transition-icon{color:#22c55e;border-color:color-mix(in srgb,#22c55e 35%,var(--line));background:color-mix(in srgb,#22c55e 10%,var(--panel))}
+.aurore-page-transition.error .aurore-page-transition-icon{color:#ef4444;border-color:color-mix(in srgb,#ef4444 35%,var(--line));background:color-mix(in srgb,#ef4444 10%,var(--panel))}
+.aurore-page-transition.error .aurore-page-transition-bar{background:linear-gradient(90deg,#ef4444,#f87171);box-shadow:0 0 18px rgba(239,68,68,.30)}
+@keyframes aurorePageSpin{to{transform:rotate(360deg)}}@keyframes aurorePulse{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.18);opacity:0}}@keyframes auroreProgressShine{to{transform:translateX(180%)}}@keyframes auroreFloatA{50%{transform:translate(7vw,5vh) scale(1.12)}}@keyframes auroreFloatB{50%{transform:translate(-6vw,-4vh) scale(.9)}}
+body.aurore-transitioning{overflow-x:hidden!important}
+@media(max-width:430px){.aurore-page-transition-card{padding:23px 18px 20px;border-radius:24px}.aurore-page-transition-icon{width:58px;height:58px;border-radius:18px}}
+@media(prefers-reduced-motion:reduce){.aurore-page-transition-icon::before,.aurore-page-transition-icon svg,.aurore-page-transition-bar::after,.aurore-page-transition::before,.aurore-page-transition::after{animation:none}.aurore-page-transition-card{transition:none}}
 </style>
 
 <style id="aurore-personal-registration-modal">
@@ -2703,8 +2713,14 @@ body.spaces-focus{overflow-y:auto!important;overflow-x:hidden!important}
 <!-- ===== TRANSITION GLOBALE ENTRE LES PAGES ===== -->
 <div class="aurore-page-transition" id="aurorePageTransition" aria-hidden="true">
   <div class="aurore-page-transition-card" role="status" aria-live="polite">
-    <div class="aurore-page-transition-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8" opacity=".25"></circle><path d="M20 12a8 8 0 0 1-8 8"></path></svg></div>
-    <strong id="aurorePageTransitionTitle">Chargement en cours</strong><span id="aurorePageTransitionText">Aurore prépare la page suivante…</span><div class="aurore-page-transition-progress" aria-hidden="true"></div>
+    <div class="aurore-page-transition-icon" id="aurorePageTransitionIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8" opacity=".25"></circle><path d="M20 12a8 8 0 0 1-8 8"></path></svg></div>
+    <strong id="aurorePageTransitionTitle">Chargement en cours</strong>
+    <span id="aurorePageTransitionText">Aurore prépare la page suivante…</span>
+    <div class="aurore-page-transition-percent" id="aurorePageTransitionPercent">0 %</div>
+    <div class="aurore-page-transition-track" id="aurorePageTransitionTrack" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progression du chargement">
+      <div class="aurore-page-transition-bar" id="aurorePageTransitionBar"></div>
+    </div>
+    <small id="aurorePageTransitionStatus">Préparation…</small>
   </div>
 </div>
 
@@ -2967,7 +2983,7 @@ function openAuthPage(options={}){
   restoreSiteLogo();
   const push=options.push!==false;
   const transition=options.transition!==false;
-  if(transition && location.hash==='#compte') startPageTransition('Ouverture de votre espace de connexion…',300);
+  if(transition && location.hash==='#compte') startPageTransition('Ouverture de votre espace de connexion…',900);
   if(push && location.hash!=='#compte') pushRoute('#compte');
   $('homeView').classList.add('hide-home');
   $('profileView').classList.remove('show');
@@ -3948,19 +3964,29 @@ function requestEstablishment(){openAuthPage();setTimeout(()=>{if(currentAuroreS
 
 async function loadInstituts(){
   const notice=$('dataNotice');
+  const ownTransition=!$('aurorePageTransition')?.classList.contains('show');
+  if(ownTransition)startPageTransition('Aurore charge les établissements…',1200);
   try{
+    setPageTransitionProgress(18,'Connexion à Supabase…');
     const r=await fetch(`${SUPABASE_URL}/rest/v1/etablissements?actif=eq.true&validation_statut=eq.valide&select=*&order=nom.asc`,{headers:API_HEADERS,cache:'no-store'});
+    setPageTransitionProgress(58,'Réception des établissements…');
     const body=await r.json().catch(()=>null);
-    if(!r.ok) throw new Error(body?.message||body?.hint||`Supabase ${r.status}`);
+    if(!r.ok)throw new Error(body?.message||body?.hint||`Supabase ${r.status}`);
     data=Array.isArray(body)?body.map(normalize):[];
+    setPageTransitionProgress(82,'Préparation de l’affichage…');
     if(notice)notice.innerHTML=`<strong>Connecté :</strong> ${data.length} établissement${data.length>1?'s':''} validé${data.length>1?'s':''} chargé${data.length>1?'s':''} depuis Supabase.`;
+    render();
+    setPageTransitionProgress(94,'Finalisation de la page…');
+    loadSupport();
+    if(ownTransition)endPageTransition(true,'Chargement terminé');
   }catch(err){
     data=[];
+    render();
     if(notice)notice.innerHTML=`<strong>Erreur Supabase :</strong> ${esc(err.message||'Impossible de charger les établissements.')}`;
     console.error('Aurore — chargement des établissements:',err);
+    if(ownTransition)failPageTransition(err.message||'Impossible de charger les établissements.');
+    else setPageTransitionProgress(100,'Échec du chargement');
   }
-  render();
-  loadSupport();
 }
 
 function render(){
@@ -4184,9 +4210,61 @@ function auroreBack(fallback){
 }
 const auroreRouteTransitionNames={accueil:'Aurore revient à l’accueil…',annuaire:'Aurore ouvre l’annuaire…',archives:'Aurore ouvre les archives…',instituts:'Aurore ouvre les instituts…',espace:'Aurore prépare votre espace…',administration:'Aurore ouvre l’administration…',inscriptions:'Aurore charge les demandes d’inscription…','admin-eleves':'Aurore charge la gestion des élèves…','admin-classe':'Aurore ouvre la classe…','admin-etablissements':'Aurore charge les établissements…'};
 function auroreTransitionMessage(hash){const raw=String(hash||'').toLowerCase();for(const [key,msg] of Object.entries(auroreRouteTransitionNames)){if(raw.includes(key))return msg}return 'Aurore prépare la page suivante…'}
-function startPageTransition(text='Aurore prépare la page suivante…',duration=280){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);const t=$('aurorePageTransitionText');if(t)t.textContent=text;el.classList.add('show');el.setAttribute('aria-hidden','false');pageTransitionTimer=setTimeout(endPageTransition,duration)}
-function endPageTransition(){const el=$('aurorePageTransition');if(!el)return;if(pageTransitionTimer)clearTimeout(pageTransitionTimer);pageTransitionTimer=null;el.classList.remove('show');el.setAttribute('aria-hidden','true')}
-function pushRoute(hash){pendingRouteTransition=String(hash||'');saveRoutePosition();auroreInAppHistoryDepth++;history.pushState({scrollY:0},'',hash);startPageTransition(auroreTransitionMessage(hash),280)}
+let pageTransitionProgressTimer=null;
+let pageTransitionProgressValue=0;
+function setPageTransitionProgress(value,status){
+  const pct=Math.max(0,Math.min(100,Number(value)||0));
+  pageTransitionProgressValue=pct;
+  const bar=$('aurorePageTransitionBar'),label=$('aurorePageTransitionPercent'),track=$('aurorePageTransitionTrack'),statusEl=$('aurorePageTransitionStatus');
+  if(bar)bar.style.width=pct.toFixed(2)+'%';
+  if(label)label.textContent=pct>=99.995?'100 %':pct.toFixed(0)+' %';
+  if(track)track.setAttribute('aria-valuenow',String(pct));
+  if(status&&statusEl)statusEl.textContent=status;
+}
+function setPageTransitionState(state){
+  const el=$('aurorePageTransition'),icon=$('aurorePageTransitionIcon');
+  if(!el)return;
+  el.classList.remove('success','error');
+  if(icon){icon.className='aurore-page-transition-icon';icon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8" opacity=".25"></circle><path d="M20 12a8 8 0 0 1-8 8"></path></svg>';}
+  if(state==='success'){el.classList.add('success');if(icon){icon.textContent='✓';}}
+  if(state==='error'){el.classList.add('error');if(icon){icon.textContent='!';}}
+}
+function startPageTransition(text='Aurore prépare la page suivante…',duration=900){
+  const el=$('aurorePageTransition');if(!el)return;
+  if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
+  if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
+  const t=$('aurorePageTransitionText');if(t)t.textContent=text;
+  const title=$('aurorePageTransitionTitle');if(title)title.textContent='Chargement en cours';
+  setPageTransitionState('loading');
+  el.classList.add('show');el.setAttribute('aria-hidden','false');
+  setPageTransitionProgress(6,'Connexion au service…');
+  const started=performance.now();
+  pageTransitionProgressTimer=setInterval(()=>{
+    const elapsed=performance.now()-started;
+    const target=Math.min(88,6+(elapsed/Math.max(500,duration))*82);
+    if(target>pageTransitionProgressValue)setPageTransitionProgress(target,target<30?'Préparation…':target<62?'Chargement des données…':'Finalisation…');
+  },90);
+}
+function endPageTransition(success=true,message='Chargement terminé'){
+  const el=$('aurorePageTransition');if(!el)return;
+  if(pageTransitionTimer)clearTimeout(pageTransitionTimer);
+  if(pageTransitionProgressTimer)clearInterval(pageTransitionProgressTimer);
+  pageTransitionTimer=null;pageTransitionProgressTimer=null;
+  setPageTransitionState(success?'success':'error');
+  setPageTransitionProgress(100,message);
+  const title=$('aurorePageTransitionTitle');if(title)title.textContent=success?'Chargement terminé':'Chargement impossible';
+  const text=$('aurorePageTransitionText');if(text)text.textContent=success?'La page est prête.':message;
+  if(success){
+    setTimeout(()=>{
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden','true');
+      setPageTransitionProgress(0,'Préparation…');
+      setPageTransitionState('loading');
+    },260);
+  }
+}
+function failPageTransition(message='Une erreur est survenue pendant le chargement.'){endPageTransition(false,message)}
+function pushRoute(hash){pendingRouteTransition=String(hash||'');saveRoutePosition();auroreInAppHistoryDepth++;history.pushState({scrollY:0},'',hash);startPageTransition(auroreTransitionMessage(hash),1050)}
 
 function restoreRoutePosition(state){
   const y=Number(state?.scrollY);
@@ -4197,7 +4275,7 @@ function handleHash(eventState=null){
   const h=decodeURIComponent(location.hash||'#accueil');
   const isStudentParcoursRoute=h.startsWith('#espace/eleve/parcours');
   if(isStudentParcoursRoute) endPageTransition();
-  else if(lastHandledHash && h!==lastHandledHash && pendingRouteTransition!==h) startPageTransition(auroreTransitionMessage(h),280);
+  else if(lastHandledHash && h!==lastHandledHash && pendingRouteTransition!==h) startPageTransition(auroreTransitionMessage(h),1050);
   if(h===lastHandledHash && eventState!==null)return;
   if(pendingRouteTransition===h) pendingRouteTransition='';
   lastHandledHash=h;
@@ -4270,7 +4348,7 @@ function handleHash(eventState=null){
     applyingRoute=false;
     if(pageTransitionTimer) {
       clearTimeout(pageTransitionTimer);
-      pageTransitionTimer=setTimeout(endPageTransition,120);
+      pageTransitionTimer=setTimeout(()=>endPageTransition(true,'Chargement terminé'),260);
     }
   }
 }
@@ -5702,7 +5780,7 @@ async function uploadClassInformationImage(file,classId,index,etabId,token){
   if(!up.ok)throw new Error(body?.message||body?.error||body?.statusCode||rawBody||`Téléversement impossible (${up.status}).`);
   // Le chemin public est déterministe : inutile de dépendre du client Supabase
   // juste après le téléversement (cela évite un second état de session inutile).
-  return `${SUPABASE_URL}/storage/v1/object/public/profiles/${path}`;
+  return {url:`${SUPABASE_URL}/storage/v1/object/public/profiles/${path}`,path};
 }
 async function submitClassCommunication(classId,type){
   const msg=$('ccMessage'),btn=$('ccSubmit'),etabId=currentSpaceEstablishmentId||'';
