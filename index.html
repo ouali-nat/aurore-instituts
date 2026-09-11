@@ -3067,6 +3067,17 @@ async function getFreshAccessToken(){
   saveAuroreSession(currentAuroreSession);
   return currentAuroreSession.access_token;
 }
+async function getAuthUidForUpload(token){
+  if(!token)return null;
+  const r=await fetch(`${SUPABASE_URL}/auth/v1/user`,{
+    method:'GET',
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`},
+    cache:'no-store'
+  });
+  const body=await r.json().catch(()=>null);
+  if(!r.ok||!body?.id)throw new Error(body?.message||body?.error_description||'Impossible d’identifier votre compte.');
+  return body.id;
+}
 async function restoreAuroreSession(){
   try{
     const raw=localStorage.getItem('aurore-session'); if(!raw)return false;
@@ -6104,7 +6115,7 @@ async function renderProfessorEvaluationsView(){
     if(!dr.ok)throw new Error('Impossible de charger vos devoirs programmés.');
     if(!pr.ok)throw new Error('Impossible de charger vos propositions.');
     const classes=await cr.json(),devoirs=await dr.json(),pending=await pr.json();
-    const cls=Array.isArray(classes)?classes:[], pub=Array.isArray(devoirs)?devoirs:[], req=Array.isArray(pending)?pending:[];
+    const cls0=Array.isArray(classes)?classes:[],cls=[...new Map(cls0.map(c=>[String(c.classe_id||c.id||''),c]).filter(([k])=>k)).values()], pub=Array.isArray(devoirs)?devoirs:[], req=Array.isArray(pending)?pending:[];
     const waiting=req.filter(d=>d.statut==='en_attente'), rejected=req.filter(d=>d.statut==='refuse');
     const byClass=new Map();pub.forEach(d=>{const k=String(d.classe_id||'');if(!byClass.has(k))byClass.set(k,[]);byClass.get(k).push(d);});
     box.innerHTML=`
