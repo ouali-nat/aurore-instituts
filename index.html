@@ -6995,7 +6995,7 @@ function appliquerTheme(choix){
     const strong=btn.querySelector('strong'); if(strong)strong.textContent=on?'Connexion à Google…':'Continuer avec Google';
   }
 
-  async function startGoogle(){
+  async function startGoogle({reuseGoogleSession=false}={}){
     if(googleBusy)return;
     googleBusy=true;
     // Filet de sécurité posé en tout premier, avant tout await : si pour une
@@ -7010,7 +7010,11 @@ function appliquerTheme(choix){
     try{
       const c=await assurerClientAuthGoogle();
       const redirectTo=window.location.origin+window.location.pathname;
-      const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
+      const oauthOptions={redirectTo};
+      // L'entrée explicitement déclenchée depuis Aurore ID n'impose pas le sélecteur de compte :
+      // Google peut réutiliser la session déjà ouverte dans le navigateur.
+      if(!reuseGoogleSession)oauthOptions.queryParams={prompt:'select_account'};
+      const {error}=await c.auth.signInWithOAuth({provider:'google',options:oauthOptions});
       if(error)throw error;
       // Le navigateur quitte la page pour Google : on garde le verrouillage actif.
     }catch(err){
@@ -7179,6 +7183,16 @@ function appliquerTheme(choix){
         document.body.classList.remove('auth-initializing');
         const lock=document.getElementById('accessLock');
         if(lock){lock.style.visibility='visible';lock.style.opacity='1';}
+      }
+      // Pilote Aurore ID : connexion Google lancée uniquement si l'utilisateur
+      // a explicitement choisi ce service depuis le portail.
+      const entryParams=new URLSearchParams(window.location.search);
+      if(entryParams.get('aurore_sso')==='google'){
+        entryParams.delete('aurore_sso');
+        const remaining=entryParams.toString();
+        const cleanUrl=window.location.pathname+(remaining?'?'+remaining:'')+window.location.hash;
+        try{window.history.replaceState(window.history.state,'',cleanUrl);}catch(_){}
+        void startGoogle({reuseGoogleSession:true});
       }
     }
   }
