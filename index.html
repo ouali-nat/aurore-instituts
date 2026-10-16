@@ -4744,7 +4744,7 @@ async function switchGoogleAccount(){
     try{await c.auth.signOut({scope:'local'});}catch(_){}
     currentAuroreSession=null; currentAuroreProfile=null; window.__auroreAuthenticated=false;
     try{localStorage.removeItem('aurore-session');}catch(_){}
-    const redirectTo=window.location.origin+window.location.pathname;
+    const redirectTo='https://aurore-instituts.vercel.app/'; // URL canonique : évite le retour OAuth vers un déploiement Vercel éphémère.
     const {data,error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account',access_type:'offline'}}});
     if(error)throw error;
     if(data?.url)window.location.assign(data.url);
@@ -7009,7 +7009,7 @@ function appliquerTheme(choix){
     accessMessage('Veuillez patienter — connexion sécurisée avec Google en cours…','ok');
     try{
       const c=await assurerClientAuthGoogle();
-      const redirectTo=window.location.origin+window.location.pathname;
+      const redirectTo='https://aurore-instituts.vercel.app/'; // URL canonique : évite le retour OAuth vers un déploiement Vercel éphémère.
       const {error}=await c.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
       if(error)throw error;
       // Le navigateur quitte la page pour Google : on garde le verrouillage actif.
